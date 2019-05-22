@@ -287,7 +287,7 @@ For command line tool, you can also use following options to set the parsing con
 * use `-m` option to specify the path of parser model, ex. `-m dep.bccwj.model`. 
 * use `-M` option to specify the path of chunker model, ex. `-M chunk.bccwj.model`. 
 
-### Parse from directly input
+### Parse from terminal input
 
 ```
 $ java -jar kintoki-0.1.1-SNAPSHOT-jar-with-dependencies.jar -f1 -r cabocharc.properties
