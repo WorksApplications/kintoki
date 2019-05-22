@@ -1,0 +1,10 @@
+{
+    "systemDict" : "system.dic",
+    "oovProviderPlugin" : [
+        { "class" : "com.worksap.nlp.sudachi.SimpleOovProviderPlugin",
+          "oovPOS" : [ "名詞", "普通名詞", "一般", "*", "*", "*" ],
+          "leftId" : 1,
+          "rightId" : 1,
+          "cost" : 0 }
+    ]
+}

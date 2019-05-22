@@ -1,0 +1,51 @@
+#
+# default cabocharc file
+#
+
+# 0 - EUC_JP
+# 1 - CP932
+# 2 - UTF8
+# 3 - ASCII
+charset = 2
+
+# 0 - IPA
+# 1 - JUMAN
+# 2 - UNIDIC
+posset = 2
+
+# Output Format
+#  0 - tree
+#  1 - lattice
+output-format = 0
+
+# Input Layer
+#  0 - RAW sentence layer (MeCab only)
+#  1 - POS tagged layer (default)
+#  2 - POS tagged and Chunked layer
+#  3 - POS tagged, Chunked and Feature selected layer
+input-layer = 0
+
+# Output Layer
+#  1 - POS tagged layer (MeCab only)
+#  2 - Chunked layer
+#  3 - Chunked and Feature selected layer
+#  4 - Parsed layer (default)
+output-layer = 4
+
+# Parser model file name
+parser-model  = @@TEST_DIR@@/dep.bccwj.model
+
+# Chunker model file name
+chunker-model = @@TEST_DIR@@/chunk.bccwj.model
+
+# Sudachi
+sudachi-dict = @@TEST_DIR@@/
+
+# 0 - PARSING_MODE
+# 1 - TRAINING_MODE
+action-mode = 0
+
+# crf param
+nbest = 0
+verbose = 0
+cost-factor = 1.0

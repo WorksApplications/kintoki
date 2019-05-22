@@ -1,0 +1,14 @@
+.metadata
+.project
+.classpath
+.checkstyle
+.settings/
+.idea/
+target/
+bin/
+*.iml
+*.db
+*.log
+*.bak
+*.swp
+*~
