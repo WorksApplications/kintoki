@@ -454,7 +454,7 @@ EOS
 ```
 
 # Models
-We provide two models, `chunk.bccwj.model` and `dep.bccwj.model` for Chunking and Parsing. We use BCCWJ-DepPara (https://github.com/UniversalDependencies/UD_Japanese-BCCWJ) to generate training data for the model, you can also use you own dataset to train models for Kintoki. 
+We provide two models, `chunk.bccwj.model` and `dep.bccwj.model` for Chunking and Parsing. We use BCCWJ-DepPara3  (https://github.com/masayu-a/BCCWJ1_1-DepPara3) to generate training data for the model, you can also use you own dataset to train models for Kintoki. 
 
 - Training model
 
