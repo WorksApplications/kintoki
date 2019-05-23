@@ -457,6 +457,7 @@ EOS
 We provide two models, `chunk.bccwj.model` and `dep.bccwj.model` for Chunking and Parsing. We use BCCWJ-DepPara (https://github.com/UniversalDependencies/UD_Japanese-BCCWJ) to generate training data for the model, you can also use you own dataset to train models for Kintoki. 
 
 - Training model
+
 We use C++ version of CaboCha (0.69) to train models for Kintoki. For the detail of training model, please refer to https://taku910.github.io/cabocha/ . Kintoki use `UNIDIC` as defalult pos set and `UTF8` as default character set, so it is necessary to keep the same settings when training a new model for kintoki. Models that are trained by the C++ version of CaboCha with the `UNIDIC / UTF8 ` setting can be used by Kintoki. 
 
 
