@@ -178,7 +178,7 @@ public class Cabocha {
         Parser parser = new Parser(newParam);
         parser.open();
 
-        int inputLayer = param.getInt(Param.INPUT_LAYER);
+        int inputLayer = newParam.getInt(Param.INPUT_LAYER);
         List<String> rest = param.getRest();
 
         if (Utils.check(outputFile)) {
