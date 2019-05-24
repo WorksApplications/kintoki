@@ -15,6 +15,78 @@
     <test.dict.source.directory>${project.basedir}/src/test/dict</test.dict.source.directory>
   </properties>
 
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.0.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.0.0-M1</version>
+            <configuration>
+              <source>${java.version}</source>
+              <locale>en_US</locale>
+              <show>public</show>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <!-- <configuration> -->
+                <!--   <gpgArguments> -->
+                <!--     <arg>-\-pinentry-mode</arg> -->
+                <!--     <arg>loopback</arg> -->
+                <!--   </gpgArguments> -->
+                <!-- </configuration> -->
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.8</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <build>
     <plugins>
       <plugin>
@@ -54,24 +126,16 @@
         </executions>
       </plugin>
       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
         <configuration>
           <archive>
             <manifest>
               <mainClass>com.worksap.nlp.kintoki.cabocha.Cabocha</mainClass>
+              <addClasspath>true</addClasspath>
             </manifest>
           </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
         </configuration>
       </plugin>
     </plugins>
@@ -100,5 +164,51 @@
       <version>1.4</version>
     </dependency>
   </dependencies>
+
+  <url>https://github.com/WorksApplications/kintoki</url>
+  <description>A library for Japanese dependency parsing</description>
+  <inceptionYear>2019</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Works Applications Co., Ltd.</name>
+    <url>http://www.worksap.com/</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>kazuma-t</id>
+      <name>Kazuma TAKAOKA</name>
+      <email>takaoka_k@worksap.co.jp</email>
+      <timezone>Asia/Tokyo</timezone>
+    </developer>
+  </developers>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/WorksApplications/kintoki/issues</url>
+  </issueManagement>
+  <scm>
+    <connection>scm:git:git@github.com:WorksApplications/kintoki.git</connection>
+    <developerConnection>scm:git:git@github.com:WorksApplications/kintoki.git</developerConnection>
+    <url>https://github.com/WorksApplications/kintoki</url>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
 </project>
