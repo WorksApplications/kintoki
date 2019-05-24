@@ -33,8 +33,7 @@ class Utils {
         "/dep.bccwj.model",
         "/system.dic",
         "/sudachi.json",
-            "/input",
-            "/output",
+        "/input",
     };
 
     static final String PROPERTY_FILE = "/cabocharc.properties";
