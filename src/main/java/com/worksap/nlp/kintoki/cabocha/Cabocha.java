@@ -202,7 +202,7 @@ public class Cabocha {
 
     private static void oneLineParse(Parser parser, BufferedWriter bw) throws IOException {
         Scanner scanner = new Scanner(System.in);
-        while (true) {
+        while (scanner.hasNext()) {
             String line = scanner.nextLine();
             String result = parser.parseToString(line);
             if (result == null)continue;
