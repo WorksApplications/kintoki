@@ -20,8 +20,9 @@ import com.worksap.nlp.kintoki.cabocha.model.FastSVMModel;
 import com.worksap.nlp.kintoki.cabocha.model.SVMModelFactory;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class DependencyParser extends Analyzer {
@@ -96,13 +97,12 @@ public class DependencyParser extends Analyzer {
         Hypothesis hypo = data.getHypothesis();
         hypo.init(size);
 
-        Stack<Integer> agenda = new Stack<>();
-        Ref<Double> score = new Ref<>(0.0);
+        Deque<Integer> agenda = new ArrayDeque<>(size);
+        double score = 0.0;
         agenda.push(0);
 
         for (int dst = 1; dst < size; ++dst) {
-            Ref<Integer> src = new Ref<>(0);
-            MYPOP(agenda, src);
+            int src = myPop(agenda);
 
             // |is_fake_link| is used for partial training, where
             // not all dependency relations are specified in the training phase.
@@ -111,21 +111,22 @@ public class DependencyParser extends Analyzer {
             // dependency for training.
             boolean isFakeLink = (getActionMode() == Constant.TRAINING_MODE &&
                     dst != size - 1 &&
-                    tree.chunk(src.get()).getLink() == -1);
+                    tree.chunk(src).getLink() == -1);
 
             // if agenda is empty, src == -1.
-            while (src.get() != -1 && (dst == size - 1 || isFakeLink || estimate(tree, src.get(), dst, score))) {
-                hypo.getHead().set(src.get(), dst);
-                hypo.getScore().set(src.get(), score.get());
+            while (src != -1 && (dst == size - 1 || isFakeLink
+                                 || (score = estimate(tree, src, dst)) > 0)) {
+                hypo.getHead().set(src, dst);
+                hypo.getScore().set(src, score);
                 // store children for dynamic_features
                 if (!isFakeLink) {
-                    hypo.getChildren().get(dst).add(src.get());
+                    hypo.getChildren().get(dst).add(src);
                 }
 
-                MYPOP(agenda, src);
+                src = myPop(agenda);
             }
-            if (src.get() != -1) {
-                agenda.push(src.get());
+            if (src != -1) {
+                agenda.push(src);
             }
             agenda.push(dst);
         }
@@ -139,7 +140,7 @@ public class DependencyParser extends Analyzer {
         return true;
     }
 
-    private boolean estimate(Tree tree, int src, int dst, Ref<Double> score) {
+    private double estimate(Tree tree, int src, int dst) {
         Hypothesis hypo = data.getHypothesis();
 
         List<Integer> fp = data.getFp();
@@ -253,20 +254,19 @@ public class DependencyParser extends Analyzer {
         fp = fp.stream().sorted().distinct().collect(Collectors.toList());
 
         if (getActionMode() == Constant.PARSING_MODE) {
-            score.set(svmModel.classify(fp));
+            double score = svmModel.classify(fp);
             data.getFp().clear();
-            return score.get() > 0;
+            return score;
         }
 
-        return false;
+        return 0.0;
     }
 
-    private void MYPOP(Stack<Integer> agenda, Ref<Integer> n) {
-        if (agenda.empty()) {
-            n.set(-1);
+    private int myPop(Deque<Integer> agenda) {
+        if (agenda.isEmpty()) {
+            return -1;
         } else {
-            n.set(agenda.peek());
-            agenda.pop();
+            return agenda.pop();
         }
     }
 

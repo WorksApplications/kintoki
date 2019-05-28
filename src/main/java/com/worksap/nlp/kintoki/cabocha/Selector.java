@@ -60,7 +60,7 @@ public class Selector extends Analyzer {
         this.patUnidicHeadPre.compile(patternMap.get("UNIDIC_HEAD_PRE_PAT"));
     }
 
-    private void findHead(Tree tree, Chunk chunk, Ref<Integer> headIndex, Ref<Integer> funcIndex){
+    private void findHead(Chunk chunk, Ref<Integer> headIndex, Ref<Integer> funcIndex){
         headIndex.set(0);
         funcIndex.set(0);
         int tokenSize = chunk.getTokenSize();
@@ -118,7 +118,7 @@ public class Selector extends Analyzer {
 
             Ref<Integer> headIndex = new Ref<>(0);
             Ref<Integer> funcIndex = new Ref<>(0);
-            findHead(tree, chunk, headIndex, funcIndex);
+            findHead(chunk, headIndex, funcIndex);
 
             chunk.setHeadPos(headIndex.get());
             chunk.setFuncPos(funcIndex.get());

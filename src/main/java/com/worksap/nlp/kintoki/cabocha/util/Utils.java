@@ -20,25 +20,25 @@ import com.worksap.nlp.kintoki.cabocha.Token;
 
 public class Utils {
 
+    private Utils() {}
+
     public static boolean check(String str){
-        if (str == null || str.trim().isEmpty())
-            return false;
-        return true;
+        return str != null && !str.trim().isEmpty();
     }
 
     public static String concatFeature(Token token, int size) {
-        String output = "";
+        StringBuilder output = new StringBuilder();
         int minSize = Math.min(token.getFeatureListSize(), size);
         for (int i = 0; i < minSize; ++i) {
             if (("*").equals(token.getFeatureList().get(i))) {
                 break;
             }
             if (i != 0) {
-                output += "-";
+                output.append("-");
             }
-            output += token.getFeatureList().get(i);
+            output.append(token.getFeatureList().get(i));
         }
-        return output;
+        return output.toString();
     }
 
 }

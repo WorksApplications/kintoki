@@ -26,20 +26,20 @@ import java.util.*;
 
 public class Param {
 
-    public final static String INPUT_LAYER = "input-layer";
-    public final static String OUTPUT_LAYER = "output-layer";
-    public final static String PARSER_MODEL = "parser-model";
-    public final static String CHUNKER_MODEL = "chunker-model";
-    public final static String SUDACHI_DICT = "sudachi-dict";
-    public final static String ACTION_MODE = "action-mode";
-    public final static String OUTPUT_FORMAT = "output-format";
-    public final static String NBEST = "nbest";
-    public final static String VERBOSE = "verbose";
-    public final static String COST_FACTOR = "cost-factor";
-    public final static String RC_FILE = "rcfile";
-    public final static String OUTPUT = "output";
-    public final static String HELP = "help";
-    public final static String VERSION = "version";
+    public static final String INPUT_LAYER = "input-layer";
+    public static final String OUTPUT_LAYER = "output-layer";
+    public static final String PARSER_MODEL = "parser-model";
+    public static final String CHUNKER_MODEL = "chunker-model";
+    public static final String SUDACHI_DICT = "sudachi-dict";
+    public static final String ACTION_MODE = "action-mode";
+    public static final String OUTPUT_FORMAT = "output-format";
+    public static final String NBEST = "nbest";
+    public static final String VERBOSE = "verbose";
+    public static final String COST_FACTOR = "cost-factor";
+    public static final String RC_FILE = "rcfile";
+    public static final String OUTPUT = "output";
+    public static final String HELP = "help";
+    public static final String VERSION = "version";
 
     private static Map<String, Class> keyTypes;
     static {
@@ -56,8 +56,8 @@ public class Param {
         keyTypes.put(Param.COST_FACTOR, Double.class);
     }
 
-    private Map<String, Object> conf = new HashMap<String, Object>();
-    private List<String> rest = new ArrayList<String>();
+    private Map<String, Object> conf = new HashMap<>();
+    private List<String> rest = new ArrayList<>();
     private String systemName;
     private String help;
     private String version;
@@ -138,8 +138,9 @@ public class Param {
     }
 
     private void initParam(Properties prop) {
-        for (String key : keyTypes.keySet()) {
-            Class klass = keyTypes.get(key);
+        for (Map.Entry<String, Class> entry : keyTypes.entrySet()) {
+            String key = entry.getKey();
+            Class klass = entry.getValue();
             String value = prop.getProperty(key);
             if (klass == Integer.class) {
                 conf.put(key, Integer.parseInt(value));
@@ -152,7 +153,12 @@ public class Param {
     }
 
     public void initParam(Option[] opts) {
-        this.help = Constant.COPYRIGHT + "\nUsage: " + systemName + " [options] files\n";
+        StringBuilder helpMsg = new StringBuilder();
+        helpMsg.append(Constant.COPYRIGHT);
+        helpMsg.append("\nUsage: ");
+        helpMsg.append(systemName);
+        helpMsg.append(" [options] files\n");
+
         this.version = Constant.PACKAGE + " of " + Constant.VERSION + "\n";
 
         int max = 0;
@@ -167,20 +173,23 @@ public class Param {
             int l = opt.getName().length();
             if (Utils.check(opt.getArgDescription()))
                 l += (1 + opt.getArgDescription().length());
-            this.help += " -";
-            this.help += opt.getShortName();
-            this.help += ", --";
-            this.help += opt.getName();
+            helpMsg.append(" -");
+            helpMsg.append(opt.getShortName());
+            helpMsg.append(", --");
+            helpMsg.append(opt.getName());
             if (Utils.check(opt.getArgDescription())) {
-                this.help += "=";
-                this.help += opt.getArgDescription();
+                helpMsg.append("=");
+                helpMsg.append(opt.getArgDescription());
             }
-            for (; l <= max; l++) this.help += " ";
-            this.help += opt.getDescription();
-            this.help += "\n";
+            for (; l <= max; l++) {
+                helpMsg.append(" ");
+            }
+            helpMsg.append(opt.getDescription());
+            helpMsg.append("\n");
         }
 
-        this.help += "\n";
+        helpMsg.append("\n");
+        help = helpMsg.toString();
     }
 
     public void update(Param param) {
@@ -212,10 +221,10 @@ public class Param {
                 if (args[ind].charAt(1) == '-') {
                     String s = args[ind].substring(2);
                     String name = s.trim();
-                    if (s.indexOf(" ") != -1)
-                        name = s.substring(0, s.indexOf(" ")).trim();
-                    if (s.indexOf("=") != -1)
-                        name = s.substring(0, s.indexOf("=")).trim();
+                    if (s.indexOf(' ') != -1)
+                        name = s.substring(0, s.indexOf(' ')).trim();
+                    if (s.indexOf('=') != -1)
+                        name = s.substring(0, s.indexOf('=')).trim();
                     if (name.length() == 0) return;
 
                     boolean hit = false;
@@ -230,7 +239,7 @@ public class Param {
                     if (!hit) gotoFatalError(0, args[ind]);
 
                     if (Utils.check(opts[i].getArgDescription())) {
-                        if (s.indexOf("=") != -1) {
+                        if (s.indexOf('=') != -1) {
                             String[] fields = s.split("=");
                             String value = fields.length > 1? fields[1].trim():null;
                             if (!Utils.check(value)) gotoFatalError(1, args[ind]);
@@ -240,7 +249,7 @@ public class Param {
                             set(opts[i].getName(), args[++ind]);
                         }
                     } else {
-                        if (s.indexOf("=") != -1) gotoFatalError(2, args[ind]);
+                        if (s.indexOf('=') != -1) gotoFatalError(2, args[ind]);
                         set(opts[i].getName(), "1");
                     }
 
@@ -280,6 +289,7 @@ public class Param {
             case 0: throw new IllegalArgumentException("unrecognized option `"+arg+"`");
             case 1: throw new IllegalArgumentException("`"+arg+"` requires an argument");
             case 2: throw new IllegalArgumentException("`"+arg+"` doesn't allow an argument");
+            default: throw new IllegalArgumentException("unknown error");
         }
     }
 

@@ -44,13 +44,13 @@ public class Tagger {
         z = 0;
         featureId = 0;
         threadId = 0;
-        x = new ArrayList<List<String>>();
-        node = new ArrayList<List<Node>>();
-        answer = new ArrayList<Integer>();
-        result = new ArrayList<Integer>();
+        x = new ArrayList<>();
+        node = new ArrayList<>();
+        answer = new ArrayList<>();
+        result = new ArrayList<>();
         agenda = null;
-        penalty = new ArrayList<List<Double>>();
-        featureCache = new ArrayList<List<Integer>>();
+        penalty = new ArrayList<>();
+        featureCache = new ArrayList<>();
     }
 
     public void forwardbackward() {
@@ -81,9 +81,9 @@ public class Tagger {
                 Node best = null;
                 List<Path> lpath = node.get(i).get(j).lpath;
                 for (Path p : lpath) {
-                    double cost = p.lnode.bestCost + p.cost + node.get(i).get(j).cost;
-                    if (cost > bestc) {
-                        bestc = cost;
+                    double c = p.lnode.bestCost + p.cost + node.get(i).get(j).cost;
+                    if (c > bestc) {
+                        bestc = c;
                         best = p.lnode;
                     }
                 }
@@ -136,11 +136,7 @@ public class Tagger {
 
     public boolean initNbest() {
         if (agenda == null) {
-            agenda = new PriorityQueue<QueueElement>(10, new Comparator<QueueElement>() {
-                public int compare(QueueElement o1, QueueElement o2) {
-                    return (int) (o1.fx - o2.fx);
-                }
-            });
+            agenda = new PriorityQueue<>(10, (o1, o2) -> (int)(o1.fx - o2.fx));
         }
         agenda.clear();
         int k = x.size() - 1;
@@ -159,7 +155,7 @@ public class Tagger {
         return node.get(i).get(j);
     }
 
-    public void set_node(Node n, int i, int j) {
+    public void setNode(Node n, int i, int j) {
         node.get(i).set(j, n);
     }
 
@@ -179,9 +175,7 @@ public class Tagger {
     }
 
     public void parse() {
-        if (!featureIndex.buildFeatures(this)) {
-            throw new IllegalStateException("Failed to build featureIndex.");
-        }
+        featureIndex.buildFeatures(this);
         if (x.isEmpty()) {
             return;
         }
@@ -282,12 +276,12 @@ public class Tagger {
         this.threadId = threadId;
     }
 
-    public FeatureIndex getFeature_index_() {
+    public FeatureIndex getFeatureIndex() {
         return featureIndex;
     }
 
-    public void setFeature_index_(FeatureIndex feature_index_) {
-        this.featureIndex = feature_index_;
+    public void setFeatureIndex(FeatureIndex featureIndex) {
+        this.featureIndex = featureIndex;
     }
 
     public List<List<String>> getX() {

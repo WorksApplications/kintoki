@@ -24,7 +24,7 @@ import java.util.Scanner;
 
 public class Cabocha {
 
-    public final static Option longOptions[] = {
+    static final Option[] longOptions = {
             new Option("output-format",   'f', 0, "TYPE",
                     "set output format style\n\t\t\t    "+
                     "0 - tree(default)\n\t\t\t    "+
@@ -91,9 +91,7 @@ public class Cabocha {
      * @throws IOException IOexception will be thrown when error occurs in reading files (such as model file, resource file)
      */
     public Tree parse(String sent) throws IOException {
-        Tree tree = parser.parse(sent);
-
-        return tree;
+        return parser.parse(sent);
     }
 
     /**
@@ -104,9 +102,7 @@ public class Cabocha {
      * @throws IOException IOexception will be thrown when error occurs in reading files (such as model file, resource file)
      */
     public Tree parse(Tree sent) throws IOException {
-        Tree tree = parser.parse(sent);
-
-        return tree;
+        return parser.parse(sent);
     }
 
     /**

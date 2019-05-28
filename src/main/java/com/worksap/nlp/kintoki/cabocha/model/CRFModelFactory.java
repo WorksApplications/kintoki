@@ -23,7 +23,9 @@ import java.io.IOException;
 
 public class CRFModelFactory {
 
-    public synchronized static Tagger createTagger(Param param) throws IOException {
+    private CRFModelFactory() {}
+
+    public static synchronized Tagger createTagger(Param param) throws IOException {
         Tagger tagger = new Tagger();
         String path = param.getString(Param.CHUNKER_MODEL);
         int nbest = param.getInt(Param.NBEST);

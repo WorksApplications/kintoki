@@ -176,17 +176,17 @@ public class DependencyParserTest {
 
     @Test
     public void parse() throws Exception {
-        assertEquals(tree.getChunkSize(), 6);
+        assertEquals(6, tree.getChunkSize());
 
         DependencyParser parser = new DependencyParser();
         parser.open(param);
         parser.parse(tree);
-        assertEquals(tree.chunk(0).getLink(), 5);
-        assertEquals(tree.chunk(1).getLink(), 2);
-        assertEquals(tree.chunk(2).getLink(), 3);
-        assertEquals(tree.chunk(3).getLink(), 5);
-        assertEquals(tree.chunk(4).getLink(), 5);
-        assertEquals(tree.chunk(5).getLink(), -1);
+        assertEquals(5, tree.chunk(0).getLink());
+        assertEquals(2, tree.chunk(1).getLink());
+        assertEquals(3, tree.chunk(2).getLink());
+        assertEquals(5, tree.chunk(3).getLink());
+        assertEquals(5, tree.chunk(4).getLink());
+        assertEquals(-1, tree.chunk(5).getLink());
     }
 
 }

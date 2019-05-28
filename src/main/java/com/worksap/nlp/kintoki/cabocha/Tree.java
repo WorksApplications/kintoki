@@ -22,14 +22,17 @@ import com.worksap.nlp.sudachi.Morpheme;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Tree {
 
+    private static final String EOS_NL = "EOS\n";
+
     private OutputLayerType outputLayer;
     private String sentence;
-    private List<Token> tokens = new ArrayList<Token>();
-    private List<Chunk> chunks = new ArrayList<Chunk>();
+    private List<Token> tokens = new ArrayList<>();
+    private List<Chunk> chunks = new ArrayList<>();
 
     public void setSentence(String sentence){
         this.sentence = sentence;
@@ -96,7 +99,7 @@ public class Tree {
                             }
 
                             if (chunk != null) {
-                                if (chunk.getTokens().size() == 0) {
+                                if (chunk.getTokens().isEmpty()) {
                                     return false;
                                 }
                                 getChunks().add(chunk);
@@ -135,7 +138,8 @@ public class Tree {
                             token.setFeature(column[1]);
                             token.setFeatureList(Arrays.asList(column[1].split(",")));
                             getTokens().add(token);
-                            if (inputLayer.getValue() > Constant.CABOCHA_INPUT_POS){
+                            if (chunk != null &&
+                                inputLayer.getValue() > Constant.CABOCHA_INPUT_POS) {
                                 chunk.getTokens().add(token);
                             }
                         } else {
@@ -174,11 +178,11 @@ public class Tree {
                 writeLattice(tree, sb, outputLayer);
                 break;
             case FORMAT_TREE_LATTICE:
-                writeTree(tree, sb, outputLayer);
+                writeTree(tree, sb);
                 writeLattice(tree, sb, outputLayer);
                 break;
             case FORMAT_TREE:
-                writeTree(tree, sb, outputLayer);
+                writeTree(tree, sb);
                 break;
             case FORMAT_XML:
                 writeXml(tree, sb, outputLayer);
@@ -226,6 +230,9 @@ public class Tree {
                                     + chunk.getHeadPos() + "/" + chunk.getFuncPos()
                                     + " " + chunk.getScore());
                             break;
+                        default:
+                            // nothing
+                            break;
                     }
                     sb.append("\n");
 
@@ -239,17 +246,21 @@ public class Tree {
                 }
             }
 
-            sb.append("EOS\n");
+            sb.append(EOS_NL);
         }
     }
 
-    private void writeTree(Tree tree, StringBuilder sb, OutputLayerType outputLayer) {
+    private void writeTree(Tree tree, StringBuilder sb) {
         int size = tree.getChunkSize();
-        int maxLen = tree.getChunks().stream()
-                    .map(chunk -> chunk.getTokens().stream().
-                            map(Token::getSurface).collect(Collectors.joining()).length()
-                    )
-                    .collect(Collectors.reducing(Integer::max)).get();
+        Optional<Integer> maxLength = tree.getChunks().stream()
+            .map(chunk -> chunk.getTokens().stream().
+                 map(Token::getSurface).collect(Collectors.joining()).length())
+            .collect(Collectors.reducing(Integer::max));
+        if (!maxLength.isPresent()) {
+            sb.append(EOS_NL);
+            return;
+        }
+        int maxLen = maxLength.get();
         boolean[] e = new boolean[size];
 
         for (int i = 0; i < size; ++i) {
@@ -279,7 +290,7 @@ public class Tree {
             sb.append("\n");
         }
 
-        sb.append("EOS\n");
+        sb.append(EOS_NL);
     }
 
     private void writeXml(Tree tree, StringBuilder sb, OutputLayerType outputLayer) {
@@ -290,7 +301,11 @@ public class Tree {
 
         for (int i = 0; i < size; ++i) {
             Chunk chunk = tree.chunk(i);
-            if (chunk !=null && outputLayer != OutputLayerType.OUTPUT_POS) {
+            if (chunk == null) {
+                continue;
+            }
+
+            if (outputLayer != OutputLayerType.OUTPUT_POS) {
                 if (ci > 0) {
                     sb.append(" </chunk>\n");
                 }
@@ -372,7 +387,7 @@ public class Tree {
                 }
 
                 String category = "_";
-                if (token.getFeatureList().size() > 0) {
+                if (!token.getFeatureList().isEmpty()) {
                     category = token.getFeatureList().get(0);
                 }
 
