@@ -39,7 +39,7 @@ public class FastSVMModel extends SVMModel {
     private DoubleArray dicDa;
     private DoubleArray featureDa;
 
-    private static final int kPKEBase = 0xfffff;  // 1048575
+    private static final int PKE_BASE = 0xfffff;  // 1048575
 
     @Override
     public int id(String key) {
@@ -151,7 +151,7 @@ public class FastSVMModel extends SVMModel {
                 DoubleArray.TraverseResult result
                     = featureDa.traverse(k.id, keyPos, k.len, nodePos2);
                 if (result.result >= 0) {
-                    score += (result.result - kPKEBase);
+                    score += (result.result - PKE_BASE);
                 }
             }
         }
@@ -169,7 +169,7 @@ public class FastSVMModel extends SVMModel {
                 DoubleArray.TraverseResult result
                     = featureDa.traverse(k.id, keyPos, k.len, nodePos2);
                 if (result.result >= 0) {
-                    score += (result.result - kPKEBase);
+                    score += (result.result - PKE_BASE);
                 }
             }
         }

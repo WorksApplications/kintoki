@@ -280,8 +280,8 @@ public class Tagger {
         return featureIndex;
     }
 
-    public void setFeatureIndex(FeatureIndex feature_index) {
-        this.featureIndex = feature_index;
+    public void setFeatureIndex(FeatureIndex featureIndex) {
+        this.featureIndex = featureIndex;
     }
 
     public List<List<String>> getX() {

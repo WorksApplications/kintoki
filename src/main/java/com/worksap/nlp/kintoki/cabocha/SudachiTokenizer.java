@@ -40,7 +40,7 @@ public class SudachiTokenizer {
         tokenizer = dictionary.create();
     }
 
-    private synchronized static void load(String dictPath) {
+    private static synchronized void load(String dictPath) {
         if (dictionary == null) {
             try {
                 dictionary = new DictionaryFactory().create(dictPath, null);

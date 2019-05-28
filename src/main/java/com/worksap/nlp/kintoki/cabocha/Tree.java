@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 public class Tree {
 
+    private static final String EOS_NL = "EOS\n";
+
     private OutputLayerType outputLayer;
     private String sentence;
     private List<Token> tokens = new ArrayList<>();
@@ -244,7 +246,7 @@ public class Tree {
                 }
             }
 
-            sb.append("EOS\n");
+            sb.append(EOS_NL);
         }
     }
 
@@ -255,7 +257,7 @@ public class Tree {
                  map(Token::getSurface).collect(Collectors.joining()).length())
             .collect(Collectors.reducing(Integer::max));
         if (!maxLength.isPresent()) {
-            sb.append("EOS\n");
+            sb.append(EOS_NL);
             return;
         }
         int maxLen = maxLength.get();
@@ -288,7 +290,7 @@ public class Tree {
             sb.append("\n");
         }
 
-        sb.append("EOS\n");
+        sb.append(EOS_NL);
     }
 
     private void writeXml(Tree tree, StringBuilder sb, OutputLayerType outputLayer) {
