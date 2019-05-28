@@ -24,7 +24,7 @@ import java.util.List;
 
 public class Parser {
 
-    private List<Analyzer> analyzer = new ArrayList<Analyzer>();
+    private List<Analyzer> analyzer = new ArrayList<>();
     private Tree tree;
     private FormatType outputFormat;
     private InputLayerType inputLayer;

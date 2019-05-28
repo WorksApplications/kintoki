@@ -30,18 +30,16 @@ public class FastSVMModel extends SVMModel {
 
     private static final int DICTIONARY_MAGIC_ID = 0xef522177;
 
-    private int degree;
     private int bias;
     private float normalizeFactor;
-    private int featureSize;
     private int freqFeatureSize;
-    private List<Integer> nodePos;
+    private List<Integer> nodePosList;
     private List<Integer> weight1;
     private List<Integer> weight2;
     private DoubleArray dicDa;
     private DoubleArray featureDa;
 
-    private final int kPKEBase = 0xfffff;  // 1048575
+    private static final int kPKEBase = 0xfffff;  // 1048575
 
     @Override
     public int id(String key) {
@@ -65,7 +63,7 @@ public class FastSVMModel extends SVMModel {
         String parameter = ByteUtil.getString(bytes, allPsize, StandardCharsets.UTF_8);
         normalizeFactor = bytes.getFloat();
         bias = bytes.getInt();
-        featureSize = bytes.getInt();       // unsigned int
+        int featureSize = bytes.getInt();   // unsigned int
         freqFeatureSize = bytes.getInt();   // unsigned int
         int dicDaSize = bytes.getInt();     // unsigned int
         int featureDaSize = bytes.getInt(); // unsigned int
@@ -80,9 +78,9 @@ public class FastSVMModel extends SVMModel {
         featureDa = new DoubleArray();
         featureDa.setArray(array, size);
 
-        this.nodePos = new ArrayList<>();
+        nodePosList = new ArrayList<>();
         for (int i=0; i<featureSize; i++) {
-            this.nodePos.add(bytes.getInt()); // unsigned int
+            nodePosList.add(bytes.getInt()); // unsigned int
         }
         this.weight1 = new ArrayList<>();
         for (int i=0; i<featureSize; i++) {
@@ -116,6 +114,7 @@ public class FastSVMModel extends SVMModel {
         featureKey.len = length;
     }
 
+    @Override
     public double classify(List<Integer> x) {
         int size = x.size();
         int score = -bias;
@@ -141,7 +140,7 @@ public class FastSVMModel extends SVMModel {
         }
 
         for (int i1 = 0; i1 < freqSize; ++i1) {
-            int nodePos = this.nodePos.get(x.get(i1));
+            int nodePos = nodePosList.get(x.get(i1));
             if (nodePos == 0) {
                 continue;
             }
@@ -159,7 +158,7 @@ public class FastSVMModel extends SVMModel {
 
         for (int i1 = freqSize; i1 < size; ++i1) {
             score += weight1.get(x.get(i1));
-            int nodePos = this.nodePos.get(x.get(i1));
+            int nodePos = nodePosList.get(x.get(i1));
             if (nodePos == 0) {
                 continue;
             }
@@ -180,7 +179,7 @@ public class FastSVMModel extends SVMModel {
 
     @Override
     public void close() {
-
+        // do nothing
     }
 
 }

@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class SudachiTokenizer {
 
     private static Dictionary dictionary;
-    private static final int maxLength = 5000;
+    private static final int MAX_LENGTH = 5000;
     private static final String[] spliters = {"\n","。","、"," "};
     private Tokenizer tokenizer;
 
@@ -40,16 +40,12 @@ public class SudachiTokenizer {
         tokenizer = dictionary.create();
     }
 
-    private static void load(String dictPath) {
+    private synchronized static void load(String dictPath) {
         if (dictionary == null) {
-            synchronized (SudachiTokenizer.class) {
-                if (dictionary == null) {
-                    try {
-                        dictionary = new DictionaryFactory().create(dictPath, null);
-                    } catch (IOException e) {
-                        throw new IllegalStateException("check dict:" + dictPath, e);
-                    }
-                }
+            try {
+                dictionary = new DictionaryFactory().create(dictPath, null);
+            } catch (IOException e) {
+                throw new IllegalStateException("check dict:" + dictPath, e);
             }
         }
     }
@@ -63,13 +59,13 @@ public class SudachiTokenizer {
         if (!Utils.check((text))) {
             return Collections.emptyList();
         }
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         List<String> sents = splitText(text);
         for (String sent:sents) {
             tokens.addAll(tokenizer
                     .tokenize(SplitMode.A, sent)
                     .stream()
-                    .map(t -> t.surface())
+                    .map(Morpheme::surface)
                     .collect(Collectors.toList()));
         }
         return tokens;
@@ -92,31 +88,29 @@ public class SudachiTokenizer {
     }
 
     private List<String> splitText(String text){
-        List<String> allSents = new ArrayList<String>();
-        if (text.length()>maxLength){
+        List<String> allSents = new ArrayList<>();
+        if (text.length() > MAX_LENGTH){
             boolean isSplited = false;
-            for (String spliter:spliters){
+            for (String spliter : spliters){
                 String[] sents = text.split(spliter);
-                if (sents!=null){
-                    if (sents.length>1){
-                        for (String sent:sents){
-                            if (sent.length()>maxLength){
-                                List<String> subSents = splitText(sent);
-                                allSents.addAll(subSents);
-                            }else{
-                                allSents.add(sent);
-                            }
+                if (sents != null && sents.length > 1) {
+                    for (String sent : sents) {
+                        if (sent.length() > MAX_LENGTH) {
+                            List<String> subSents = splitText(sent);
+                            allSents.addAll(subSents);
+                        } else {
+                            allSents.add(sent);
                         }
-                        isSplited = true;
-                        break;
                     }
+                    isSplited = true;
+                    break;
                 }
             }
             if (!isSplited) {
-                while(text.length() > maxLength) {
-                    String subSent =  text.substring(0, maxLength);
+                while(text.length() > MAX_LENGTH) {
+                    String subSent =  text.substring(0, MAX_LENGTH);
                     allSents.add(subSent);
-                    text = text.substring(maxLength);
+                    text = text.substring(MAX_LENGTH);
                 }
                 allSents.add(text);
             }

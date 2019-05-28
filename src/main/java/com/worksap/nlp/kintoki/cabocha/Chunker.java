@@ -35,7 +35,7 @@ public class Chunker extends Analyzer {
     }
 
     private void loadBinModel(Param param) throws IOException {
-        this.tagger = (Tagger) CRFModelFactory.createTagger(param);
+        this.tagger = CRFModelFactory.createTagger(param);
     }
 
     @Override
@@ -78,17 +78,17 @@ public class Chunker extends Analyzer {
     }
 
     private String getPos(List<String> featureList){
-        String pos = "";
+        StringBuilder pos = new StringBuilder();
         for (int j=0; j<featureList.size(); j++) {
             if (("*").equals(featureList.get(j))) {
                 break;
             }
             if (j>0) {
-                pos += "-";
+                pos.append("-");
             }
-            pos += featureList.get(j);
+            pos.append(featureList.get(j));
         }
-        return pos;
+        return pos.toString();
     }
 
 }

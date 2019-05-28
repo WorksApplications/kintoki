@@ -46,9 +46,9 @@ public abstract class FeatureIndex {
         checkMaxXsize = false;
         maxXsize = 0;
         threadNum = 1;
-        unigramTempls = new ArrayList<String>();
-        bigramTempls = new ArrayList<String>();
-        y = new ArrayList<String>();
+        unigramTempls = new ArrayList<>();
+        bigramTempls = new ArrayList<>();
+        y = new ArrayList<>();
     }
 
     protected abstract int getID(String s);
@@ -88,8 +88,8 @@ public abstract class FeatureIndex {
     }
 
     public String getIndex(String[] idxStr, int pos, Tagger tagger) {
-        int row = Integer.valueOf(idxStr[0]);
-        int col = Integer.valueOf(idxStr[1]);
+        int row = Integer.parseInt(idxStr[0]);
+        int col = Integer.parseInt(idxStr[1]);
         int idx = row + pos;
         if (row < -EOS.length || row > EOS.length || col < 0 || col >= tagger.xsize()) {
             return null;
@@ -129,7 +129,7 @@ public abstract class FeatureIndex {
         return sb.toString();
     }
 
-    private boolean buildFeatureFromTempl(List<Integer> feature, List<String> templs, int pos, Tagger tagger) {
+    private void buildFeatureFromTempl(List<Integer> feature, List<String> templs, int pos, Tagger tagger) {
         for (String tmpl : templs) {
             String featureID = applyRule(tmpl, pos, tagger);
             if (featureID == null || featureID.length() == 0) {
@@ -140,31 +140,25 @@ public abstract class FeatureIndex {
                 feature.add(id);
             }
         }
-        return true;
     }
 
-    public boolean buildFeatures(Tagger tagger) {
-        List<Integer> feature = new ArrayList<Integer>();
+    public void buildFeatures(Tagger tagger) {
+        List<Integer> feature = new ArrayList<>();
         List<List<Integer>> featureCache = tagger.getFeatureCache();
         tagger.setFeatureId(featureCache.size());
 
         for (int cur = 0; cur < tagger.size(); cur++) {
-            if (!buildFeatureFromTempl(feature, unigramTempls, cur, tagger)) {
-                return false;
-            }
+            buildFeatureFromTempl(feature, unigramTempls, cur, tagger);
             feature.add(-1);
             featureCache.add(feature);
-            feature = new ArrayList<Integer>();
+            feature = new ArrayList<>();
         }
         for (int cur = 1; cur < tagger.size(); cur++) {
-            if (!buildFeatureFromTempl(feature, bigramTempls, cur, tagger)) {
-                return false;
-            }
+            buildFeatureFromTempl(feature, bigramTempls, cur, tagger);
             feature.add(-1);
             featureCache.add(feature);
-            feature = new ArrayList<Integer>();
+            feature = new ArrayList<>();
         }
-        return true;
     }
 
     public void rebuildFeatures(Tagger tagger) {
@@ -178,7 +172,7 @@ public abstract class FeatureIndex {
                 n.x = pos;
                 n.y = i;
                 n.fVector = f;
-                tagger.set_node(n, pos, i);
+                tagger.setNode(n, pos, i);
             }
         }
         for (int pos = 1; pos < tagger.size(); pos++) {

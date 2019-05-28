@@ -36,9 +36,9 @@ public class Path {
         cost = 0.0;
     }
 
-    public void add(Node _lnode, Node _rnode) {
-        lnode = _lnode;
-        rnode = _rnode;
+    public void add(Node lnode, Node rnode) {
+        this.lnode = lnode;
+        this.rnode = rnode;
         lnode.rpath.add(this);
         rnode.lpath.add(this);
     }

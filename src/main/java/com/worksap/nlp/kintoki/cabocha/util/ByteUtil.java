@@ -29,6 +29,8 @@ public class ByteUtil
 {
     private static final ByteOrder ORDER = ByteOrder.LITTLE_ENDIAN;
 
+    private ByteUtil() {}
+
     public static ByteBuffer readAsByteBuffer(String path) throws IOException {
         try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(path))) {
             int size = (int)channel.size();

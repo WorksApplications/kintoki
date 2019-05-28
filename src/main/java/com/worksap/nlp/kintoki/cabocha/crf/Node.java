@@ -30,11 +30,11 @@ public class Node {
     public List<Integer> fVector;
     public List<Path> lpath;
     public List<Path> rpath;
-    public static int MINUS_LOG_EPSILON = 50;
+    public static final int MINUS_LOG_EPSILON = 50;
 
     public Node() {
-        lpath = new ArrayList<Path>();
-        rpath = new ArrayList<Path>();
+        lpath = new ArrayList<>();
+        rpath = new ArrayList<>();
         clear();
         bestCost = 0.0;
         prev = null;

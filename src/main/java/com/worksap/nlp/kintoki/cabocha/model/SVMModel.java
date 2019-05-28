@@ -20,26 +20,20 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class SVMModel implements SVMModelInterface {
+public abstract class SVMModel implements SVMModelInterface {
 
-    public int size() { return alpha_.size(); }
+    public int size() { return alpha.size(); }
 
-    public double y(int i) { return alpha_.get(i) > 0 ? +1 : -1; }
+    public double y(int i) { return alpha.get(i) > 0 ? +1 : -1; }
 
-    public List<Integer> x(int i) { return x_.get(i); }
-
-    public void open(String filename) throws IOException {}
-
-    public void close() {}
+    public List<Integer> x(int i) { return x.get(i); }
 
     public int id(String key) { return 0; }
 
     public double classify(List<Integer> x) { return 0; }
 
-    public void add(double alpha, List<Integer> x) {}
-
-    protected List<Double> alpha_;
-    protected List<List<Integer>> x_;
+    protected List<Double> alpha;
+    protected List<List<Integer>> x;
     protected Map<String, String> param;
 
 }
