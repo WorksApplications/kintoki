@@ -456,7 +456,7 @@ EOS
 ```
 
 # Models
-We provide two models, `chunk.bccwj.model` and `dep.bccwj.model` for Chunking and Parsing. We use BCCWJ-DepPara3  (https://github.com/masayu-a/BCCWJ1_1-DepPara3) to generate training data for the model, you can also use you own dataset to train models for Kintoki. 
+We provide two models, `chunk.bccwj.model` and `dep.bccwj.model` for Chunking and Parsing. We use BCCWJ-DepPara [1]  (without PA register) to generate training data for the model, you can also use you own dataset to train models for Kintoki. 
 
 - Training model
 
@@ -479,3 +479,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+# References
+
+[1] 浅原 正幸, 松本 裕治, 『現代日本語書き言葉均衡コーパス』に対する 文節係り受け・並列構造アノテーション, 自然言語処理, 2018, 25 巻, 4 号, p. 331-356, 公開日 2018/12/15, Online ISSN 2185-8314, Print ISSN 1340-7619, https://doi.org/10.5715/jnlp.25.331, https://www.jstage.jst.go.jp/article/jnlp/25/4/25_331/_article/-char/ja, 抄録:
