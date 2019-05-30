@@ -27,11 +27,13 @@ public class Chunker extends Analyzer {
     private static final double CRF_COST_FACTOR = 1.0;
 
     private Tagger tagger;
+    private int beginLabel;
 
     @Override
     public void open(Param param) throws IOException {
         String path = param.getString(Param.CHUNKER_MODEL);
         tagger = Tagger.openBinaryModel(path, CRF_COST_FACTOR);
+        beginLabel = tagger.ynames().indexOf("B");
     }
 
     @Override
@@ -46,8 +48,7 @@ public class Chunker extends Analyzer {
         int tokenPos = 0;
         List<Token> tokens = new ArrayList<>();
         for (int i = 0; i < tokenSize; i++) {
-            String tag = tagger.yname(tagger.y(i));
-            if ((i > 0 && tag.equals("B"))) {
+            if (i > 0 && tagger.y(i) == beginLabel) {
                 Chunk chunk = new Chunk();
                 chunk.setTokenPos(tokenPos);
                 chunk.getTokens().addAll(tokens);

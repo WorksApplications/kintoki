@@ -19,6 +19,7 @@ package com.worksap.nlp.kintoki.cabocha.crf;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,8 +172,8 @@ public class Tagger {
         return result.get(i);
     }
 
-    public String yname(int i) {
-        return featureIndex.getY().get(i);
+    public List<String> ynames() {
+        return Collections.unmodifiableList(featureIndex.getY());
     }
 
     String x(int i, int j) {

@@ -77,7 +77,7 @@ public class TaggerTest {
         tagger.add("花子", "名詞-固有名詞-人名-名");
         tagger.add("が", "助詞-格助詞");
         tagger.parse();
-     
+
         assertEquals(0, tagger.y(0));
         assertEquals(1, tagger.y(1));
         assertEquals(0, tagger.y(2));
@@ -91,8 +91,8 @@ public class TaggerTest {
     }
 
     @Test
-    public void yname() {
-        assertEquals("B", tagger.yname(0));
-        assertEquals("I", tagger.yname(1));
+    public void ynames() {
+        assertEquals("B", tagger.ynames().get(0));
+        assertEquals("I", tagger.ynames().get(1));
     }
 }
