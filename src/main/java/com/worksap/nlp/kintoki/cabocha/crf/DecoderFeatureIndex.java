@@ -42,7 +42,7 @@ public class DecoderFeatureIndex extends FeatureIndex {
         ByteBuffer bytes = ByteUtil.readAsByteBuffer(path);
         int version = bytes.getInt(); // unsigned int
         if (MODEL_VERSION / 100 != version / 100) {
-            throw new IllegalArgumentException("Invalid model");
+            throw new IOException("Invalid model");
         }
         int type = bytes.getInt();
         featureIndex.costFactor = bytes.getDouble();
