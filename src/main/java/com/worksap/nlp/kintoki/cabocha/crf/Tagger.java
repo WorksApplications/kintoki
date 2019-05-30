@@ -33,7 +33,6 @@ public class Tagger {
     private List<List<String>> x;
     private List<List<Node>> lattice;
     private List<Integer> result;
-    private List<List<Double>> penalty;
     private List<List<Integer>> featureCache;
 
     private Tagger(FeatureIndex featureIndex) {
@@ -43,7 +42,6 @@ public class Tagger {
         x = new ArrayList<>();
         lattice = new ArrayList<>();
         result = new ArrayList<>();
-        penalty = new ArrayList<>();
         featureCache = new ArrayList<>();
     }
 
@@ -108,15 +106,6 @@ public class Tagger {
                 List<Path> lpath = node.lpath;
                 for (Path p : lpath) {
                     featureIndex.calcCost(p);
-                }
-            }
-        }
-
-        // Add penalty for Dual decomposition.
-        if (!penalty.isEmpty()) {
-            for (int i = 0; i < x.size(); i++) {
-                for (int j = 0; j < ysize; j++) {
-                    lattice.get(i).get(j).cost += penalty.get(i).get(j);
                 }
             }
         }

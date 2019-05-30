@@ -20,17 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Node {
-    public int x;
-    public int y;
-    public double alpha;
-    public double beta;
-    public double cost;
-    public double bestCost;
-    public Node prev;
-    public List<Integer> fVector;
-    public List<Path> lpath;
-    public List<Path> rpath;
-    public static final int MINUS_LOG_EPSILON = 50;
+    int x;
+    int y;
+    double cost;
+    double bestCost;
+    Node prev;
+    List<Integer> fVector;
+    List<Path> lpath;
+    List<Path> rpath;
 
     Node() {
         lpath = new ArrayList<>();
@@ -40,40 +37,9 @@ class Node {
         prev = null;
     }
 
-    static double logsumexp(double x, double y, boolean flg) {
-        if (flg) {
-            return y;
-        }
-        double vmin = Math.min(x, y);
-        double vmax = Math.max(x, y);
-        if (vmax > vmin + MINUS_LOG_EPSILON) {
-            return vmax;
-        } else {
-            return vmax + Math.log(Math.exp(vmin - vmax) + 1.0);
-        }
-    }
-
-    void calcAlpha() {
-        alpha = 0.0;
-        for (Path p : lpath) {
-            alpha = logsumexp(alpha, p.cost + p.lnode.alpha, p == lpath.get(0));
-        }
-        alpha += cost;
-    }
-
-    void calcBeta() {
-        beta = 0.0;
-        for (Path p : rpath) {
-            beta = logsumexp(beta, p.cost + p.rnode.beta, p == rpath.get(0));
-        }
-        beta += cost;
-    }
-
     void clear() {
         x = 0;
         y = 0;
-        alpha = 0;
-        beta = 0;
         cost = 0;
         prev = null;
         fVector = null;

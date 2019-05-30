@@ -25,7 +25,6 @@ abstract class FeatureIndex {
     private static final String[] EOS = { "_B+1", "_B+2", "_B+3", "_B+4", "_B+5", "_B+6", "_B+7", "_B+8" };
     protected int maxId;
     protected double[] alpha;
-    protected float[] alphaFloat;
     protected double costFactor = 1.0;
     protected int xsize;
     protected boolean checkMaxXsize;
@@ -39,37 +38,19 @@ abstract class FeatureIndex {
     protected abstract int getID(String s);
 
     void calcCost(Node node) {
-        node.cost = 0.0;
-        if (alphaFloat != null) {
-            float c = 0.0f;
-            for (int i = 0; node.fVector.get(i) != -1; i++) {
-                c += alphaFloat[node.fVector.get(i) + node.y];
-            }
-            node.cost = costFactor * c;
-        } else {
-            double c = 0.0;
-            for (int i = 0; node.fVector.get(i) != -1; i++) {
-                c += alpha[node.fVector.get(i) + node.y];
-            }
-            node.cost = costFactor * c;
+        double c = 0.0;
+        for (int i = 0; node.fVector.get(i) != -1; i++) {
+            c += alpha[node.fVector.get(i) + node.y];
         }
+        node.cost = costFactor * c;
     }
 
     void calcCost(Path path) {
-        path.cost = 0.0;
-        if (alphaFloat != null) {
-            float c = 0.0f;
-            for (int i = 0; path.fvector.get(i) != -1; i++) {
-                c += alphaFloat[path.fvector.get(i) + path.lnode.y * y.size() + path.rnode.y];
-            }
-            path.cost = costFactor * c;
-        } else {
-            double c = 0.0;
-            for (int i = 0; path.fvector.get(i) != -1; i++) {
-                c += alpha[path.fvector.get(i) + path.lnode.y * y.size() + path.rnode.y];
-            }
-            path.cost = costFactor * c;
+        double c = 0.0;
+        for (int i = 0; path.fvector.get(i) != -1; i++) {
+            c += alpha[path.fvector.get(i) + path.lnode.y * y.size() + path.rnode.y];
         }
+        path.cost = costFactor * c;
     }
 
     private String getIndex(String[] idxStr, int pos, Tagger tagger) {
