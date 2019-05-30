@@ -26,7 +26,7 @@ public class Tagger {
     private int featureId;
     private FeatureIndex featureIndex;
     private List<List<String>> x;
-    private List<List<Node>> node;
+    private List<List<Node>> lattice;
     private List<Integer> result;
     private List<List<Double>> penalty;
     private List<List<Integer>> featureCache;
@@ -37,7 +37,7 @@ public class Tagger {
         z = 0;
         featureId = 0;
         x = new ArrayList<>();
-        node = new ArrayList<>();
+        lattice = new ArrayList<>();
         result = new ArrayList<>();
         penalty = new ArrayList<>();
         featureCache = new ArrayList<>();
@@ -54,30 +54,29 @@ public class Tagger {
     }
 
     private void viterbi() {
-        for (int i = 0; i < x.size(); i++) {
-            for (int j = 0; j < ysize; j++) {
-                double bestc = -1e37;
+        for (List<Node> current : lattice) {
+            for (Node node : current) {
+                double bestc = Double.NEGATIVE_INFINITY;
                 Node best = null;
-                List<Path> lpath = node.get(i).get(j).lpath;
+                List<Path> lpath = node.lpath;
                 for (Path p : lpath) {
-                    double c = p.lnode.bestCost + p.cost + node.get(i).get(j).cost;
+                    double c = p.lnode.bestCost + p.cost + node.cost;
                     if (c > bestc) {
                         bestc = c;
                         best = p.lnode;
                     }
                 }
-                node.get(i).get(j).prev = best;
-                node.get(i).get(j).bestCost = best != null ? bestc : node.get(i).get(j).cost;
+                node.prev = best;
+                node.bestCost = best != null ? bestc : node.cost;
             }
         }
 
-        double bestc = -1e37;
+        double bestc = Double.NEGATIVE_INFINITY;
         Node best = null;
-        int s = x.size() - 1;
-        for (int j = 0; j < ysize; j++) {
-            if (bestc < node.get(s).get(j).bestCost) {
-                best = node.get(s).get(j);
-                bestc = node.get(s).get(j).bestCost;
+        for (Node node : lattice.get(x.size() - 1)) {
+            if (bestc < node.bestCost) {
+                best = node;
+                bestc = node.bestCost;
             }
         }
 
@@ -93,10 +92,10 @@ public class Tagger {
 
         featureIndex.rebuildFeatures(this);
 
-        for (int i = 0; i < x.size(); i++) {
-            for (int j = 0; j < ysize; j++) {
-                featureIndex.calcCost(node.get(i).get(j));
-                List<Path> lpath = node.get(i).get(j).lpath;
+        for (List<Node> current : lattice) {
+            for (Node node : current) {
+                featureIndex.calcCost(node);
+                List<Path> lpath = node.lpath;
                 for (Path p : lpath) {
                     featureIndex.calcCost(p);
                 }
@@ -107,18 +106,18 @@ public class Tagger {
         if (!penalty.isEmpty()) {
             for (int i = 0; i < x.size(); i++) {
                 for (int j = 0; j < ysize; j++) {
-                    node.get(i).get(j).cost += penalty.get(i).get(j);
+                    lattice.get(i).get(j).cost += penalty.get(i).get(j);
                 }
             }
         }
     }
 
     Node node(int i, int j) {
-        return node.get(i).get(j);
+        return lattice.get(i).get(j);
     }
 
     void setNode(Node n, int i, int j) {
-        node.get(i).set(j, n);
+        lattice.get(i).set(j, n);
     }
 
     public void add(String... columns) {
@@ -130,7 +129,7 @@ public class Tagger {
         x.add(tmpX);
         result.add(0);
         List<Node> l = Arrays.asList(new Node[ysize]);
-        node.add(l);
+        lattice.add(l);
     }
 
     public void parse() {
@@ -144,7 +143,7 @@ public class Tagger {
 
     public void clear() {
         x.clear();
-        node.clear();
+        lattice.clear();
         result.clear();
         featureCache.clear();
         z = 0.0;
