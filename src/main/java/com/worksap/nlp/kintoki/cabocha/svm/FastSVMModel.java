@@ -24,11 +24,15 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FastSVMModel extends SVMModel {
 
+    private static final int SVM_MODEL_VERSION = 102;
     private static final int DICTIONARY_MAGIC_ID = 0xef522177;
+    private static final int PKE_BASE = 0xfffff; // 1048575
 
     private int bias;
     private float normalizeFactor;
@@ -39,61 +43,66 @@ public class FastSVMModel extends SVMModel {
     private DoubleArray dicDa;
     private DoubleArray featureDa;
 
-    private static final int PKE_BASE = 0xfffff; // 1048575
-
-    @Override
-    public int id(String key) {
-        return dicDa.exactMatchSearch(key.getBytes(StandardCharsets.UTF_8))[0];
-    }
-
-    @Override
-    public void open(String path) throws IOException {
-        openBinModel(path);
-    }
-
-    public void openBinModel(String path) throws IOException {
+    public static SVMModel openBinaryModel(String path) throws IOException {
         ByteBuffer bytes = ByteUtil.readAsByteBuffer(path);
         int magic = bytes.getInt(); // unsigned int
         if ((magic ^ DICTIONARY_MAGIC_ID) != bytes.limit()) {
             throw new IOException("dictionary file is broken");
         }
-
         int version = bytes.getInt(); // unsigned int
-        int allPsize = bytes.getInt(); // unsigned int
-        String parameter = ByteUtil.getString(bytes, allPsize, StandardCharsets.UTF_8);
-        normalizeFactor = bytes.getFloat();
-        bias = bytes.getInt();
+        if (version != SVM_MODEL_VERSION) {
+            throw new IOException("Invalid model");
+        }
+        readParameter(bytes);
+
+        FastSVMModel model = new FastSVMModel();
+        model.normalizeFactor = bytes.getFloat();
+        model.bias = bytes.getInt();
         int featureSize = bytes.getInt(); // unsigned int
-        freqFeatureSize = bytes.getInt(); // unsigned int
+        model.freqFeatureSize = bytes.getInt(); // unsigned int
         int dicDaSize = bytes.getInt(); // unsigned int
         int featureDaSize = bytes.getInt(); // unsigned int
 
         int size = dicDaSize / 4;
         IntBuffer array = ByteUtil.getIntBuffer(bytes, dicDaSize);
-        dicDa = new DoubleArray();
-        dicDa.setArray(array, size);
+        model.dicDa = new DoubleArray();
+        model.dicDa.setArray(array, size);
 
         size = featureDaSize / 4;
         array = ByteUtil.getIntBuffer(bytes, featureDaSize);
-        featureDa = new DoubleArray();
-        featureDa.setArray(array, size);
+        model.featureDa = new DoubleArray();
+        model.featureDa.setArray(array, size);
 
-        nodePosList = new ArrayList<>();
+        model.nodePosList = new ArrayList<>();
         for (int i = 0; i < featureSize; i++) {
-            nodePosList.add(bytes.getInt()); // unsigned int
+            model.nodePosList.add(bytes.getInt()); // unsigned int
         }
-        this.weight1 = new ArrayList<>();
+        model.weight1 = new ArrayList<>();
         for (int i = 0; i < featureSize; i++) {
-            this.weight1.add(bytes.getInt());
+            model.weight1.add(bytes.getInt());
         }
-        this.weight2 = new ArrayList<>();
-        long len = (freqFeatureSize * (freqFeatureSize - 1)) / 2;
+        model.weight2 = new ArrayList<>();
+        long len = (model.freqFeatureSize * (model.freqFeatureSize - 1)) / 2;
         for (int i = 0; i < len; i++) {
-            this.weight2.add(bytes.getInt());
+            model.weight2.add(bytes.getInt());
         }
         if (bytes.position() != bytes.limit()) {
             throw new IOException("The offset is not equal to the length of byte array.");
         }
+
+        return model;
+    }
+
+    private static Map<String, String> readParameter(ByteBuffer bytes) {
+        int allPsize = bytes.getInt(); // unsigned int
+        String[] params = ByteUtil.getString(bytes, allPsize, StandardCharsets.UTF_8).split("\t");
+
+        Map<String, String> parameters = new HashMap<>();
+        for (int i = 0; i < params.length; i += 2) {
+            parameters.put(params[i], params[i + 1]);
+        }
+
+        return parameters;
     }
 
     class FeatureKey {
@@ -101,7 +110,8 @@ public class FastSVMModel extends SVMModel {
         byte len;
     }
 
-    private void encodeBER(int value, FeatureKey featureKey) {
+    private FeatureKey encodeBER(int value) {
+        FeatureKey featureKey = new FeatureKey();
         byte length = 0;
         ++value;
         byte[] array = featureKey.id;
@@ -112,24 +122,40 @@ public class FastSVMModel extends SVMModel {
             array[length++] = (byte) (value & 0x7f);
         }
         featureKey.len = length;
+        return featureKey;
+    }
+
+    @Override
+    public int id(String key) {
+        return dicDa.exactMatchSearch(key.getBytes(StandardCharsets.UTF_8))[0];
     }
 
     @Override
     public double classify(List<Integer> x) {
         int size = x.size();
         int score = -bias;
+        List<FeatureKey> keys = new ArrayList<>(size);
+        int freqSize = encodeKeys(x, keys) + 1;
+
+        score += classify1(x, freqSize);
+        score += classify2(x, keys, freqSize);
+
+        return score * normalizeFactor;
+    }
+
+    private int encodeKeys(List<Integer> x, List<FeatureKey> keys) {
         int freqSize = 0;
-        List<FeatureKey> key = new ArrayList<>(size);
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < x.size(); ++i) {
             if (x.get(i) < freqFeatureSize) {
                 freqSize = i;
             }
-            FeatureKey featureKey = new FeatureKey();
-            encodeBER(x.get(i), featureKey);
-            key.add(featureKey);
+            keys.add(encodeBER(x.get(i)));
         }
-        ++freqSize;
+        return freqSize;
+    }
 
+    private int classify1(List<Integer> x, int freqSize) {
+        int score = 0;
         int kOffset = 2 * freqFeatureSize - 3;
         for (int i1 = 0; i1 < freqSize; ++i1) {
             score += weight1.get(x.get(i1));
@@ -138,46 +164,28 @@ public class FastSVMModel extends SVMModel {
                 score += weight2.get(pos + x.get(i2));
             }
         }
+        return score;
+    }
 
-        for (int i1 = 0; i1 < freqSize; ++i1) {
+    private int classify2(List<Integer> x, List<FeatureKey> keys, int freqSize) {
+        int score = 0;
+        for (int i1 = 0; i1 < x.size(); ++i1) {
+            if (i1 >= freqSize) {
+                score += weight1.get(x.get(i1));
+            }
             int nodePos = nodePosList.get(x.get(i1));
             if (nodePos == 0) {
                 continue;
             }
-            for (int i2 = freqSize; i2 < size; ++i2) {
-                int nodePos2 = nodePos;
+            for (int i2 = (i1 < freqSize) ? freqSize : i1 + 1; i2 < x.size(); ++i2) {
                 int keyPos = 0;
-                FeatureKey k = key.get(i2);
-                DoubleArray.TraverseResult result = featureDa.traverse(k.id, keyPos, k.len, nodePos2);
+                FeatureKey k = keys.get(i2);
+                DoubleArray.TraverseResult result = featureDa.traverse(k.id, keyPos, k.len, nodePos);
                 if (result.result >= 0) {
                     score += (result.result - PKE_BASE);
                 }
             }
         }
-
-        for (int i1 = freqSize; i1 < size; ++i1) {
-            score += weight1.get(x.get(i1));
-            int nodePos = nodePosList.get(x.get(i1));
-            if (nodePos == 0) {
-                continue;
-            }
-            for (int i2 = i1 + 1; i2 < size; ++i2) {
-                int nodePos2 = nodePos;
-                int keyPos = 0;
-                FeatureKey k = key.get(i2);
-                DoubleArray.TraverseResult result = featureDa.traverse(k.id, keyPos, k.len, nodePos2);
-                if (result.result >= 0) {
-                    score += (result.result - PKE_BASE);
-                }
-            }
-        }
-
-        return score * normalizeFactor;
+        return score;
     }
-
-    @Override
-    public void close() {
-        // do nothing
-    }
-
 }

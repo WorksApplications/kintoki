@@ -16,8 +16,8 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
+import com.worksap.nlp.kintoki.cabocha.svm.SVMModel;
 import com.worksap.nlp.kintoki.cabocha.svm.FastSVMModel;
-import com.worksap.nlp.kintoki.cabocha.svm.SVMModelFactory;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -27,14 +27,14 @@ import java.util.stream.Collectors;
 
 public class DependencyParser extends Analyzer {
 
-    private FastSVMModel svmModel = null;
+    private SVMModel svmModel = null;
     private DependencyParserData data = null;
 
     @Override
     public void open(Param param) throws IOException {
         if (getActionMode() == Constant.PARSING_MODE) {
             String modelFile = param.getString(Param.PARSER_MODEL);
-            svmModel = SVMModelFactory.loadModel(modelFile);
+            svmModel = FastSVMModel.openBinaryModel(modelFile);
         }
     }
 

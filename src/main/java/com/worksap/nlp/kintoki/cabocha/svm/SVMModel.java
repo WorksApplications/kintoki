@@ -17,32 +17,10 @@
 package com.worksap.nlp.kintoki.cabocha.svm;
 
 import java.util.List;
-import java.util.Map;
 
-public abstract class SVMModel implements SVMModelInterface {
+public abstract class SVMModel {
 
-    public int size() {
-        return alpha.size();
-    }
+    public abstract int id(String key);
 
-    public double y(int i) {
-        return alpha.get(i) > 0 ? +1 : -1;
-    }
-
-    public List<Integer> x(int i) {
-        return x.get(i);
-    }
-
-    public int id(String key) {
-        return 0;
-    }
-
-    public double classify(List<Integer> x) {
-        return 0;
-    }
-
-    protected List<Double> alpha;
-    protected List<List<Integer>> x;
-    protected Map<String, String> param;
-
+    public abstract double classify(List<Integer> x);
 }

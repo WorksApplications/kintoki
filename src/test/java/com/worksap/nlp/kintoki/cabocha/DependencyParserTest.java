@@ -17,7 +17,7 @@
 package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.kintoki.cabocha.svm.FastSVMModel;
-import com.worksap.nlp.kintoki.cabocha.svm.SVMModelFactory;
+import com.worksap.nlp.kintoki.cabocha.svm.SVMModel;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -169,7 +169,7 @@ public class DependencyParserTest {
     @Test
     public void open() throws IOException {
         String modelFile = param.getString(Param.PARSER_MODEL);
-        FastSVMModel svmModel = SVMModelFactory.loadModel(modelFile);
+        SVMModel svmModel = FastSVMModel.openBinaryModel(modelFile);
         assertNotNull(svmModel);
     }
 
