@@ -68,23 +68,23 @@ public class DependencyParser extends Analyzer {
             for (int k = 0; k < chunk.getFeatureListSize(); ++k) {
                 String feature = chunk.getFeatureList().get(k);
                 switch (feature.charAt(0)) {
-                    case 'F':
-                        chunkInfo.getStrStaticFeature().add(feature);
-                        break;
-                    case 'L':
-                        chunkInfo.getStrLeftContextFeature().add(feature);
-                        break;
-                    case 'R':
-                        chunkInfo.getStrRightContextFeature().add(feature);
-                        break;
-                    case 'G':
-                        chunkInfo.getStrGapFeature().add(feature);
-                        break;
-                    case 'A':
-                        chunkInfo.getStrChildFeature().add(feature);
-                        break;
-                    default:
-                        System.out.println("Unknown feature "+feature);
+                case 'F':
+                    chunkInfo.getStrStaticFeature().add(feature);
+                    break;
+                case 'L':
+                    chunkInfo.getStrLeftContextFeature().add(feature);
+                    break;
+                case 'R':
+                    chunkInfo.getStrRightContextFeature().add(feature);
+                    break;
+                case 'G':
+                    chunkInfo.getStrGapFeature().add(feature);
+                    break;
+                case 'A':
+                    chunkInfo.getStrChildFeature().add(feature);
+                    break;
+                default:
+                    System.out.println("Unknown feature " + feature);
                 }
             }
             data.getChunkInfo().add(chunkInfo);
@@ -109,13 +109,11 @@ public class DependencyParser extends Analyzer {
             // Here we assume that a chunk modifes the next chunk,
             // if the dependency relation is unknown. We don't use the fake
             // dependency for training.
-            boolean isFakeLink = (getActionMode() == Constant.TRAINING_MODE &&
-                    dst != size - 1 &&
-                    tree.chunk(src).getLink() == -1);
+            boolean isFakeLink = (getActionMode() == Constant.TRAINING_MODE && dst != size - 1
+                    && tree.chunk(src).getLink() == -1);
 
             // if agenda is empty, src == -1.
-            while (src != -1 && (dst == size - 1 || isFakeLink
-                                 || (score = estimate(tree, src, dst)) > 0)) {
+            while (src != -1 && (dst == size - 1 || isFakeLink || (score = estimate(tree, src, dst)) > 0)) {
                 hypo.getHead().set(src, dst);
                 hypo.getScore().set(src, score);
                 // store children for dynamic_features
@@ -160,7 +158,7 @@ public class DependencyParser extends Analyzer {
             if (chunkInfo.getStaticFeature().isEmpty()) {
                 for (int i = 0; i < chunkInfo.getStrStaticFeature().size(); ++i) {
                     String feature = chunkInfo.getStrStaticFeature().get(i).substring(1);
-                    chunkInfo.getStrStaticFeature().set(i, "S"+feature);
+                    chunkInfo.getStrStaticFeature().set(i, "S" + feature);
                     addFeature2(chunkInfo.getStrStaticFeature().get(i), chunkInfo.getStaticFeature());
                 }
             }
@@ -172,7 +170,7 @@ public class DependencyParser extends Analyzer {
             if (chunkInfo.getDst1StaticFeature().isEmpty()) {
                 for (int i = 0; i < chunkInfo.getStrStaticFeature().size(); ++i) {
                     String feature = chunkInfo.getStrStaticFeature().get(i).substring(1);
-                    chunkInfo.getStrStaticFeature().set(i, "D"+feature);
+                    chunkInfo.getStrStaticFeature().set(i, "D" + feature);
                     addFeature2(chunkInfo.getStrStaticFeature().get(i), chunkInfo.getDst1StaticFeature());
                 }
             }
@@ -183,8 +181,7 @@ public class DependencyParser extends Analyzer {
             ChunkInfo chunkInfo = data.chunkInfo(src - 1);
             if (chunkInfo.getLeftContextFeature().isEmpty()) {
                 for (int i = 0; i < chunkInfo.getStrLeftContextFeature().size(); ++i) {
-                    addFeature2(chunkInfo.getStrLeftContextFeature().get(i),
-                            chunkInfo.getLeftContextFeature());
+                    addFeature2(chunkInfo.getStrLeftContextFeature().get(i), chunkInfo.getLeftContextFeature());
                 }
             }
             copyFeature(chunkInfo.getLeftContextFeature());
@@ -194,8 +191,7 @@ public class DependencyParser extends Analyzer {
             ChunkInfo chunkInfo = data.chunkInfo(dst + 1);
             if (chunkInfo.getRight1ContextFeature().isEmpty()) {
                 for (int i = 0; i < chunkInfo.getStrRightContextFeature().size(); ++i) {
-                    addFeature2(chunkInfo.getStrRightContextFeature().get(i),
-                            chunkInfo.getRight1ContextFeature());
+                    addFeature2(chunkInfo.getStrRightContextFeature().get(i), chunkInfo.getRight1ContextFeature());
                 }
             }
             copyFeature(chunkInfo.getRight1ContextFeature());
@@ -207,7 +203,7 @@ public class DependencyParser extends Analyzer {
             if (chunkInfo.getSrcChildFeature().isEmpty()) {
                 for (int j = 0; j < chunkInfo.getStrChildFeature().size(); ++j) {
                     String feature = chunkInfo.getStrChildFeature().get(j).substring(1);
-                    chunkInfo.getStrChildFeature().set(j, "a"+feature);
+                    chunkInfo.getStrChildFeature().set(j, "a" + feature);
                     addFeature2(chunkInfo.getStrChildFeature().get(j), chunkInfo.getSrcChildFeature());
                 }
             }
@@ -220,7 +216,7 @@ public class DependencyParser extends Analyzer {
             if (chunkInfo.getDst1ChildFeature().isEmpty()) {
                 for (int j = 0; j < chunkInfo.getStrChildFeature().size(); ++j) {
                     String feature = chunkInfo.getStrChildFeature().get(j).substring(1);
-                    chunkInfo.getStrChildFeature().set(j, "A"+feature);
+                    chunkInfo.getStrChildFeature().set(j, "A" + feature);
                     addFeature2(chunkInfo.getStrChildFeature().get(j), chunkInfo.getDst1ChildFeature());
                 }
             }
@@ -245,10 +241,18 @@ public class DependencyParser extends Analyzer {
 
         // bracket status
         switch (bracketStatus) {
-            case 0: addFeature("GNB:1"); break;  // nothing
-            case 1: addFeature("GOB:1"); break;  // open only
-            case 2: addFeature("GCB:1"); break;  // close only
-            default: addFeature("GBB:1"); break;  // both
+        case 0:
+            addFeature("GNB:1");
+            break; // nothing
+        case 1:
+            addFeature("GOB:1");
+            break; // open only
+        case 2:
+            addFeature("GCB:1");
+            break; // close only
+        default:
+            addFeature("GBB:1");
+            break; // both
         }
 
         fp = fp.stream().sorted().distinct().collect(Collectors.toList());
@@ -272,12 +276,16 @@ public class DependencyParser extends Analyzer {
 
     private void addFeature(String key) {
         int id = this.svmModel.id(key);
-        if (id != -1) { this.data.getFp().add(id); }
+        if (id != -1) {
+            this.data.getFp().add(id);
+        }
     }
 
     private void addFeature2(String key, List<Integer> array) {
         int id = this.svmModel.id(key);
-        if (id != -1) { array.add(id); }
+        if (id != -1) {
+            array.add(id);
+        }
     }
 
     private void copyFeature(List<Integer> feature) {

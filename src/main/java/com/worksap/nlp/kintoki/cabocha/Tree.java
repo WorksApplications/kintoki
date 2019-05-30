@@ -34,7 +34,7 @@ public class Tree {
     private List<Token> tokens = new ArrayList<>();
     private List<Chunk> chunks = new ArrayList<>();
 
-    public void setSentence(String sentence){
+    public void setSentence(String sentence) {
         this.sentence = sentence;
     }
 
@@ -54,23 +54,23 @@ public class Tree {
         this.chunks = chunks;
     }
 
-    public String getSentence(){
+    public String getSentence() {
         return sentence;
     }
 
-    public int sentenceSize(){
+    public int sentenceSize() {
         return this.sentence.length();
     }
 
-    public Chunk chunk(int index){
+    public Chunk chunk(int index) {
         return this.chunks.get(index);
     }
 
-    public Token token(int index){
+    public Token token(int index) {
         return this.tokens.get(index);
     }
 
-    public boolean read(String input, InputLayerType inputLayer){
+    public boolean read(String input, InputLayerType inputLayer) {
         if (!Utils.check(input)) {
             return false;
         }
@@ -78,87 +78,88 @@ public class Tree {
         int chunkId = 0;
 
         switch (inputLayer) {
-            case INPUT_RAW_SENTENCE:
-                this.sentence = input;
-                break;
+        case INPUT_RAW_SENTENCE:
+            this.sentence = input;
+            break;
 
-            case INPUT_POS:
-            case INPUT_CHUNK:
-            case INPUT_SELECTION:
-            case INPUT_DEP:
-                Chunk chunk = null;
-                String[] lines = input.split("\\n");
+        case INPUT_POS:
+        case INPUT_CHUNK:
+        case INPUT_SELECTION:
+        case INPUT_DEP:
+            Chunk chunk = null;
+            String[] lines = input.split("\\n");
 
-                for (String line:lines) {
-                    if (line.length() <= 0) break;
-                    if (line.length() >= 3 && line.startsWith("* ")) {
-                        String[] column = line.split(" ");
-                        if (column.length >= 3 && (column[1].charAt(0) == '-' || Character.isDigit(column[1].charAt(0)))) {
-                            if (inputLayer == InputLayerType.INPUT_POS) {
-                                continue;
-                            }
+            for (String line : lines) {
+                if (line.length() <= 0) {
+                    break;
+                }
+                if (line.length() >= 3 && line.startsWith("* ")) {
+                    String[] column = line.split(" ");
+                    if (column.length >= 3 && (column[1].charAt(0) == '-' || Character.isDigit(column[1].charAt(0)))) {
+                        if (inputLayer == InputLayerType.INPUT_POS) {
+                            continue;
+                        }
 
-                            if (chunk != null) {
-                                if (chunk.getTokens().isEmpty()) {
-                                    return false;
-                                }
-                                getChunks().add(chunk);
-                            }
-
-                            if (chunkId != Integer.parseInt(column[1])) {
+                        if (chunk != null) {
+                            if (chunk.getTokens().isEmpty()) {
                                 return false;
                             }
-                            ++chunkId;
+                            getChunks().add(chunk);
+                        }
 
-                            chunk = new Chunk();
-                            chunk.setLink(Integer.parseInt(column[2].substring(0, column[2].length()-1)));
-
-                            if (column.length >= 4) {
-                                int[] value = Arrays.stream(column[3].split("/")).mapToInt(Integer::valueOf).toArray();
-                                chunk.setHeadPos(value[0]);
-                                chunk.setFuncPos(value[1]);
-                            }
-
-                            if (column.length >= 5) {
-                                chunk.setScore(Double.parseDouble(column[4]));
-                            }
-
-                            if (column.length >= 6) {
-                                chunk.setFeatureList(Arrays.asList(column[5].split(",")));
-                            }
-                        } else {
+                        if (chunkId != Integer.parseInt(column[1])) {
                             return false;
                         }
-                    } else {
-                        String[] column = line.split("\t");
-                        if (column.length >=2 && column[0].length() >0 && column[1].length() >0) {
-                            Token token = new Token();
-                            token.setSurface(column[0]);
-                            token.setNormalizedSurface(column[0]);
-                            token.setFeature(column[1]);
-                            token.setFeatureList(Arrays.asList(column[1].split(",")));
-                            getTokens().add(token);
-                            if (chunk != null &&
-                                inputLayer.getValue() > Constant.CABOCHA_INPUT_POS) {
-                                chunk.getTokens().add(token);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
+                        ++chunkId;
 
-                if (chunk != null) {
-                    if (chunk.getTokenSize() == 0) {
+                        chunk = new Chunk();
+                        chunk.setLink(Integer.parseInt(column[2].substring(0, column[2].length() - 1)));
+
+                        if (column.length >= 4) {
+                            int[] value = Arrays.stream(column[3].split("/")).mapToInt(Integer::valueOf).toArray();
+                            chunk.setHeadPos(value[0]);
+                            chunk.setFuncPos(value[1]);
+                        }
+
+                        if (column.length >= 5) {
+                            chunk.setScore(Double.parseDouble(column[4]));
+                        }
+
+                        if (column.length >= 6) {
+                            chunk.setFeatureList(Arrays.asList(column[5].split(",")));
+                        }
+                    } else {
                         return false;
                     }
-                    getChunks().add(chunk);
+                } else {
+                    String[] column = line.split("\t");
+                    if (column.length >= 2 && column[0].length() > 0 && column[1].length() > 0) {
+                        Token token = new Token();
+                        token.setSurface(column[0]);
+                        token.setNormalizedSurface(column[0]);
+                        token.setFeature(column[1]);
+                        token.setFeatureList(Arrays.asList(column[1].split(",")));
+                        getTokens().add(token);
+                        if (chunk != null && inputLayer.getValue() > Constant.CABOCHA_INPUT_POS) {
+                            chunk.getTokens().add(token);
+                        }
+                    } else {
+                        break;
+                    }
                 }
+            }
+
+            if (chunk != null) {
+                if (chunk.getTokenSize() == 0) {
+                    return false;
+                }
+                getChunks().add(chunk);
+            }
         }
 
         // verify chunk link
         for (int i = 0; i < getChunkSize(); ++i) {
-            if (chunk(i).getLink() !=  -1 && (chunk(i).getLink() >= getChunkSize() || chunk(i).getLink() < -1)) {
+            if (chunk(i).getLink() != -1 && (chunk(i).getLink() >= getChunkSize() || chunk(i).getLink() < -1)) {
                 return false;
             }
         }
@@ -174,26 +175,26 @@ public class Tree {
 
     public void writeTree(Tree tree, StringBuilder sb, OutputLayerType outputLayer, FormatType outputFormat) {
         switch (outputFormat) {
-            case FORMAT_LATTICE:
-                writeLattice(tree, sb, outputLayer);
-                break;
-            case FORMAT_TREE_LATTICE:
-                writeTree(tree, sb);
-                writeLattice(tree, sb, outputLayer);
-                break;
-            case FORMAT_TREE:
-                writeTree(tree, sb);
-                break;
-            case FORMAT_XML:
-                writeXml(tree, sb, outputLayer);
-                break;
-            case FORMAT_CONLL:
-                writeConll(tree, sb, outputLayer);
-                break;
-            case FORMAT_NONE:
-                break;
-            default:
-                sb.append("unknown format: "+outputFormat+"\n");
+        case FORMAT_LATTICE:
+            writeLattice(tree, sb, outputLayer);
+            break;
+        case FORMAT_TREE_LATTICE:
+            writeTree(tree, sb);
+            writeLattice(tree, sb, outputLayer);
+            break;
+        case FORMAT_TREE:
+            writeTree(tree, sb);
+            break;
+        case FORMAT_XML:
+            writeXml(tree, sb, outputLayer);
+            break;
+        case FORMAT_CONLL:
+            writeConll(tree, sb, outputLayer);
+            break;
+        case FORMAT_NONE:
+            break;
+        default:
+            sb.append("unknown format: " + outputFormat + "\n");
         }
     }
 
@@ -201,7 +202,7 @@ public class Tree {
         int size = tree.getTokenSize();
         if (outputLayer == OutputLayerType.OUTPUT_RAW_SENTENCE) {
             if (tree.empty()) {
-                sb.append(tree.getSentence()+"\n");
+                sb.append(tree.getSentence() + "\n");
             } else {
                 for (int i = 0; i < size; ++i) {
                     sb.append(tree.token(i).getSurface());
@@ -212,36 +213,34 @@ public class Tree {
             int ci = 0;
 
             if (outputLayer != OutputLayerType.OUTPUT_POS) {
-                for (Chunk chunk:tree.getChunks()) {
+                for (Chunk chunk : tree.getChunks()) {
                     switch (outputLayer) {
-                        case OUTPUT_CHUNK:
-                            sb.append("* " + (ci++) + " " + "-1D ");
-                            break;
-                        case OUTPUT_SELECTION:
-                            sb.append("* " + (ci++) + " " + "-1D "
-                                    + chunk.getHeadPos() + "/" + chunk.getFuncPos()
-                                    + " " + chunk.getScore());
-                            if (chunk.getFeatureList() != null) {
-                                sb.append(" " + String.join(",", chunk.getFeatureList()));
-                            }
-                            break;
-                        case OUTPUT_DEP:
-                            sb.append("* " + (ci++) + " " + chunk.getLink() + "D "
-                                    + chunk.getHeadPos() + "/" + chunk.getFuncPos()
-                                    + " " + chunk.getScore());
-                            break;
-                        default:
-                            // nothing
-                            break;
+                    case OUTPUT_CHUNK:
+                        sb.append("* " + (ci++) + " " + "-1D ");
+                        break;
+                    case OUTPUT_SELECTION:
+                        sb.append("* " + (ci++) + " " + "-1D " + chunk.getHeadPos() + "/" + chunk.getFuncPos() + " "
+                                + chunk.getScore());
+                        if (chunk.getFeatureList() != null) {
+                            sb.append(" " + String.join(",", chunk.getFeatureList()));
+                        }
+                        break;
+                    case OUTPUT_DEP:
+                        sb.append("* " + (ci++) + " " + chunk.getLink() + "D " + chunk.getHeadPos() + "/"
+                                + chunk.getFuncPos() + " " + chunk.getScore());
+                        break;
+                    default:
+                        // nothing
+                        break;
                     }
                     sb.append("\n");
 
-                    for (Token token:chunk.getTokens()) {
+                    for (Token token : chunk.getTokens()) {
                         sb.append(token.getSurface() + "\t" + token.getFeature() + "\n");
                     }
                 }
             } else {
-                for (Token token:tree.getTokens()) {
+                for (Token token : tree.getTokens()) {
                     sb.append(token.getSurface() + "\t" + token.getFeature() + "\n");
                 }
             }
@@ -253,9 +252,8 @@ public class Tree {
     private void writeTree(Tree tree, StringBuilder sb) {
         int size = tree.getChunkSize();
         Optional<Integer> maxLength = tree.getChunks().stream()
-            .map(chunk -> chunk.getTokens().stream().
-                 map(Token::getSurface).collect(Collectors.joining()).length())
-            .collect(Collectors.reducing(Integer::max));
+                .map(chunk -> chunk.getTokens().stream().map(Token::getSurface).collect(Collectors.joining()).length())
+                .collect(Collectors.reducing(Integer::max));
         if (!maxLength.isPresent()) {
             sb.append(EOS_NL);
             return;
@@ -266,15 +264,14 @@ public class Tree {
         for (int i = 0; i < size; ++i) {
             boolean isDep = false;
             int link = tree.chunk(i).getLink();
-            String surface = tree.chunk(i).getTokens().stream()
-                            .map(Token::getSurface).collect(Collectors.joining());
+            String surface = tree.chunk(i).getTokens().stream().map(Token::getSurface).collect(Collectors.joining());
             int rem = maxLen - surface.length() + i * 2;
             for (int j = 0; j < rem; ++j) {
                 sb.append(" ");
             }
             sb.append(surface);
 
-            for (int j = i+1; j < size; j++) {
+            for (int j = i + 1; j < size; j++) {
                 if (link == j) {
                     sb.append("-" + "D");
                     isDep = true;
@@ -323,12 +320,12 @@ public class Tree {
                 sb.append(">\n");
             }
 
-            for (int j = 0; j<chunk.getTokenSize(); j++) {
+            for (int j = 0; j < chunk.getTokenSize(); j++) {
                 Token token = chunk.token(j);
                 sb.append(writeXmlToken(token, j));
             }
 
-            if (ci > 0 ) {
+            if (ci > 0) {
                 sb.append(" </chunk>\n");
             }
         }
@@ -337,10 +334,7 @@ public class Tree {
     }
 
     private String writeXmlString(String str) {
-        return str.replace("\"", "&quot;")
-                .replace("\'", "&apos;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
+        return str.replace("\"", "&quot;").replace("\'", "&apos;").replace("<", "&lt;").replace(">", "&gt;")
                 .replace("&", "&amp;");
     }
 
@@ -366,8 +360,7 @@ public class Tree {
             String dlabel = "_";
             for (int j = 0; j < chunk.getTokenSize(); ++j) {
                 int link = 0;
-                if (j == chunk.getTokenSize() - 1 && chunk.getLink() >= 0 &&
-                                chunk.getLink() < tree.getChunkSize()) {
+                if (j == chunk.getTokenSize() - 1 && chunk.getLink() >= 0 && chunk.getLink() < tree.getChunkSize()) {
                     Chunk head = tree.chunk(chunk.getLink());
                     link = head.getHeadPos() + head.getTokenPos() + 1;
                     dlabel = "D";
@@ -413,7 +406,7 @@ public class Tree {
         sb.append("\n");
     }
 
-    public void read(List<Morpheme> morphemes){
+    public void read(List<Morpheme> morphemes) {
         for (Morpheme m : morphemes) {
             Token token = new Token();
             token.setSurface(m.surface());
@@ -425,14 +418,15 @@ public class Tree {
         }
     }
 
+    public boolean empty() {
+        return this.tokens.isEmpty();
+    }
 
-    public boolean empty() { return this.tokens.isEmpty(); }
-
-    public int getChunkSize(){
+    public int getChunkSize() {
         return this.chunks.size();
     }
 
-    public int getTokenSize(){
+    public int getTokenSize() {
         return this.tokens.size();
     }
 

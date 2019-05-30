@@ -26,7 +26,7 @@ public abstract class Analyzer {
 
     public abstract void parse(Tree tree);
 
-    public Analyzer(){
+    public Analyzer() {
         this.actionMode = Constant.PARSING_MODE;
     }
 

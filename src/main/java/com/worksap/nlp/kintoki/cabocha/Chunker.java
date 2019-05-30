@@ -29,7 +29,7 @@ public class Chunker extends Analyzer {
 
     @Override
     public void open(Param param) throws IOException {
-        if (getActionMode()== Constant.PARSING_MODE){
+        if (getActionMode() == Constant.PARSING_MODE) {
             loadBinModel(param);
         }
     }
@@ -41,11 +41,11 @@ public class Chunker extends Analyzer {
     @Override
     public void parse(Tree tree) {
         int tokenSize = tree.getTokenSize();
-        for (int i=0;i<tokenSize;i++){
+        for (int i = 0; i < tokenSize; i++) {
             String line = "";
             String pos = getPos(tree.token(i).getFeatureList());
             line += tree.token(i).getNormalizedSurface();
-            line += "\t"+pos;
+            line += "\t" + pos;
             tagger.add(line);
         }
 
@@ -53,7 +53,7 @@ public class Chunker extends Analyzer {
 
         int tokenPos = 0;
         List<Token> tokens = new ArrayList<>();
-        for(int i = 0; i<tokenSize; i++) {
+        for (int i = 0; i < tokenSize; i++) {
             String tag = tagger.yname(tagger.y(i));
             if ((i > 0 && tag.equals("B"))) {
                 Chunk chunk = new Chunk();
@@ -64,7 +64,7 @@ public class Chunker extends Analyzer {
                 tokens = new ArrayList<>();
             }
             tokens.add(tree.getTokens().get(i));
-            if (i == tokenSize-1) {
+            if (i == tokenSize - 1) {
                 Chunk chunk = new Chunk();
                 chunk.setTokenPos(tokenPos);
                 chunk.getTokens().addAll(tokens);
@@ -77,13 +77,13 @@ public class Chunker extends Analyzer {
         tree.setOutputLayer(OutputLayerType.OUTPUT_CHUNK);
     }
 
-    private String getPos(List<String> featureList){
+    private String getPos(List<String> featureList) {
         StringBuilder pos = new StringBuilder();
-        for (int j=0; j<featureList.size(); j++) {
+        for (int j = 0; j < featureList.size(); j++) {
             if (("*").equals(featureList.get(j))) {
                 break;
             }
-            if (j>0) {
+            if (j > 0) {
                 pos.append("-");
             }
             pos.append(featureList.get(j));

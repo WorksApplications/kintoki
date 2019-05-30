@@ -21,8 +21,8 @@ import java.util.List;
 
 public abstract class FeatureIndex {
 
-    public static final String[] BOS = {"_B-1", "_B-2", "_B-3", "_B-4", "_B-5", "_B-6", "_B-7", "_B-8"};
-    public static final String[] EOS = {"_B+1", "_B+2", "_B+3", "_B+4", "_B+5", "_B+6", "_B+7", "_B+8"};
+    public static final String[] BOS = { "_B-1", "_B-2", "_B-3", "_B-4", "_B-5", "_B-6", "_B-7", "_B-8" };
+    public static final String[] EOS = { "_B+1", "_B+2", "_B+3", "_B+4", "_B+5", "_B+6", "_B+7", "_B+8" };
     protected int maxId;
     protected double[] alpha;
     protected float[] alphaFloat;
@@ -95,7 +95,7 @@ public abstract class FeatureIndex {
             return null;
         }
 
-        //TODO(taku): very dirty workaround
+        // TODO(taku): very dirty workaround
         if (checkMaxXsize) {
             maxXsize = Math.max(maxXsize, col + 1);
         }

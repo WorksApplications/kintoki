@@ -67,24 +67,24 @@ public class Param {
     }
 
     public String getString(String key) {
-        return (String)conf.get(key);
+        return (String) conf.get(key);
     }
 
     public int getInt(String key) {
-        return (Integer)conf.get(key);
+        return (Integer) conf.get(key);
     }
 
     public double getDouble(String key) {
-        return (Double)conf.get(key);
+        return (Double) conf.get(key);
     }
 
     public void set(String key, Object value) {
         if (value instanceof String) {
             Class klass = keyTypes.get(key);
             if (klass == Integer.class) {
-                conf.put(key, Integer.parseInt((String)value));
+                conf.put(key, Integer.parseInt((String) value));
             } else if (klass == Double.class) {
-                conf.put(key, Double.valueOf((String)value));
+                conf.put(key, Double.valueOf((String) value));
             } else {
                 conf.put(key, value);
             }
@@ -162,14 +162,15 @@ public class Param {
         this.version = Constant.PACKAGE + " of " + Constant.VERSION + "\n";
 
         int max = 0;
-        for (Option opt:opts) {
+        for (Option opt : opts) {
             int l = 1 + opt.getName().length();
-            if (Utils.check(opt.getArgDescription()))
+            if (Utils.check(opt.getArgDescription())) {
                 l += (1 + opt.getArgDescription().length());
+            }
             max = Math.max(l, max);
         }
 
-        for (Option opt:opts) {
+        for (Option opt : opts) {
             int l = opt.getName().length();
             if (Utils.check(opt.getArgDescription()))
                 l += (1 + opt.getArgDescription().length());
@@ -202,7 +203,7 @@ public class Param {
 
         if (argc <= 0) {
             systemName = "unknown";
-            return;  // this is not error
+            return; // this is not error
         }
 
         systemName = System.getProperty("java.home") + "/bin/java -jar ";
@@ -210,9 +211,10 @@ public class Param {
 
         initParam(opts);
 
-        for (int i = 0; i<opts.length; ++i) {
-            if (opts[i].getDefaultValue() != null)
+        for (int i = 0; i < opts.length; ++i) {
+            if (opts[i].getDefaultValue() != null) {
                 set(opts[i].getName(), opts[i].getDefaultValue());
+            }
         }
 
         for (ind = 0; ind < argc; ind++) {
@@ -221,35 +223,47 @@ public class Param {
                 if (args[ind].charAt(1) == '-') {
                     String s = args[ind].substring(2);
                     String name = s.trim();
-                    if (s.indexOf(' ') != -1)
+                    if (s.indexOf(' ') != -1) {
                         name = s.substring(0, s.indexOf(' ')).trim();
-                    if (s.indexOf('=') != -1)
+                    }
+                    if (s.indexOf('=') != -1) {
                         name = s.substring(0, s.indexOf('=')).trim();
-                    if (name.length() == 0) return;
+                    }
+                    if (name.length() == 0) {
+                        return;
+                    }
 
                     boolean hit = false;
                     int i = 0;
-                    for (i = 0; i<opts.length; ++i) {
+                    for (i = 0; i < opts.length; ++i) {
                         if (Utils.check(opts[i].getName()) && opts[i].getName().equals(name)) {
                             hit = true;
                             break;
                         }
                     }
 
-                    if (!hit) gotoFatalError(0, args[ind]);
+                    if (!hit) {
+                        gotoFatalError(0, args[ind]);
+                    }
 
                     if (Utils.check(opts[i].getArgDescription())) {
                         if (s.indexOf('=') != -1) {
                             String[] fields = s.split("=");
-                            String value = fields.length > 1? fields[1].trim():null;
-                            if (!Utils.check(value)) gotoFatalError(1, args[ind]);
+                            String value = fields.length > 1 ? fields[1].trim() : null;
+                            if (!Utils.check(value)) {
+                                gotoFatalError(1, args[ind]);
+                            }
                             set(opts[i].getName(), value);
                         } else {
-                            if (argc == (ind+1)) gotoFatalError(1, args[ind]);
+                            if (argc == (ind + 1)) {
+                                gotoFatalError(1, args[ind]);
+                            }
                             set(opts[i].getName(), args[++ind]);
                         }
                     } else {
-                        if (s.indexOf('=') != -1) gotoFatalError(2, args[ind]);
+                        if (s.indexOf('=') != -1) {
+                            gotoFatalError(2, args[ind]);
+                        }
                         set(opts[i].getName(), "1");
                     }
 
@@ -257,39 +271,49 @@ public class Param {
                 } else if (args[ind].charAt(1) != '\0') {
                     int i = 0;
                     boolean hit = false;
-                    for (i = 0; i<opts.length && Utils.check(opts[i].getName()); ++i) {
+                    for (i = 0; i < opts.length && Utils.check(opts[i].getName()); ++i) {
                         if (opts[i].getShortName() == args[ind].charAt(1)) {
                             hit = true;
                             break;
                         }
                     }
 
-                    if (!hit) gotoFatalError(0, args[ind]);
+                    if (!hit) {
+                        gotoFatalError(0, args[ind]);
+                    }
 
                     if (Utils.check(opts[i].getArgDescription())) {
                         if (args[ind].length() >= 3 && args[ind].charAt(2) != '\0') {
                             set(opts[i].getName(), args[ind].substring(2));
                         } else {
-                            if (argc == (ind+1)) gotoFatalError(1, args[ind]);
+                            if (argc == (ind + 1)) {
+                                gotoFatalError(1, args[ind]);
+                            }
                             set(opts[i].getName(), args[++ind]);
                         }
                     } else {
-                        if (args[ind].length() >= 3 && args[ind].charAt(2) != '\0') gotoFatalError(2, args[ind]);
+                        if (args[ind].length() >= 3 && args[ind].charAt(2) != '\0') {
+                            gotoFatalError(2, args[ind]);
+                        }
                         set(opts[i].getName(), "1");
                     }
                 }
             } else {
-                rest.add(args[ind]);  // others
+                rest.add(args[ind]); // others
             }
         }
     }
 
     private void gotoFatalError(int errno, String arg) {
         switch (errno) {
-            case 0: throw new IllegalArgumentException("unrecognized option `"+arg+"`");
-            case 1: throw new IllegalArgumentException("`"+arg+"` requires an argument");
-            case 2: throw new IllegalArgumentException("`"+arg+"` doesn't allow an argument");
-            default: throw new IllegalArgumentException("unknown error");
+        case 0:
+            throw new IllegalArgumentException("unrecognized option `" + arg + "`");
+        case 1:
+            throw new IllegalArgumentException("`" + arg + "` requires an argument");
+        case 2:
+            throw new IllegalArgumentException("`" + arg + "` doesn't allow an argument");
+        default:
+            throw new IllegalArgumentException("unknown error");
         }
     }
 

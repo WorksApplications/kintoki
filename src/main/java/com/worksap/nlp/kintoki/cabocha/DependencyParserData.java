@@ -37,7 +37,7 @@ public class DependencyParserData {
         return fp;
     }
 
-    public ChunkInfo chunkInfo(int index){
+    public ChunkInfo chunkInfo(int index) {
         return this.chunkInfo.get(index);
     }
 
@@ -54,4 +54,3 @@ public class DependencyParserData {
     }
 
 }
-

@@ -22,8 +22,11 @@ import java.util.List;
 public interface SVMModelInterface {
 
     void open(String filename) throws IOException;
+
     void close();
+
     int id(String key);
+
     double classify(List<Integer> x);
 
 }

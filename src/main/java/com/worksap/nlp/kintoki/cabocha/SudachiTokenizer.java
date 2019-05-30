@@ -33,7 +33,7 @@ public class SudachiTokenizer {
 
     private static Dictionary dictionary;
     private static final int MAX_LENGTH = 5000;
-    private static final String[] spliters = {"\n","。","、"," "};
+    private static final String[] spliters = { "\n", "。", "、", " " };
     private Tokenizer tokenizer;
 
     private SudachiTokenizer() {
@@ -61,12 +61,9 @@ public class SudachiTokenizer {
         }
         List<String> tokens = new ArrayList<>();
         List<String> sents = splitText(text);
-        for (String sent:sents) {
-            tokens.addAll(tokenizer
-                    .tokenize(SplitMode.A, sent)
-                    .stream()
-                    .map(Morpheme::surface)
-                    .collect(Collectors.toList()));
+        for (String sent : sents) {
+            tokens.addAll(
+                    tokenizer.tokenize(SplitMode.A, sent).stream().map(Morpheme::surface).collect(Collectors.toList()));
         }
         return tokens;
     }
@@ -75,9 +72,7 @@ public class SudachiTokenizer {
         if (!Utils.check((text))) {
             return Collections.emptyList();
         }
-        return tokenizer.tokenize(SplitMode.A, text).stream()
-                .map(Morpheme::getWordId)
-                .collect(Collectors.toList());
+        return tokenizer.tokenize(SplitMode.A, text).stream().map(Morpheme::getWordId).collect(Collectors.toList());
     }
 
     public List<Morpheme> parse(String text) {
@@ -87,11 +82,11 @@ public class SudachiTokenizer {
         return tokenizer.tokenize(SplitMode.A, text);
     }
 
-    private List<String> splitText(String text){
+    private List<String> splitText(String text) {
         List<String> allSents = new ArrayList<>();
-        if (text.length() > MAX_LENGTH){
+        if (text.length() > MAX_LENGTH) {
             boolean isSplited = false;
-            for (String spliter : spliters){
+            for (String spliter : spliters) {
                 String[] sents = text.split(spliter);
                 if (sents != null && sents.length > 1) {
                     for (String sent : sents) {
@@ -107,14 +102,14 @@ public class SudachiTokenizer {
                 }
             }
             if (!isSplited) {
-                while(text.length() > MAX_LENGTH) {
-                    String subSent =  text.substring(0, MAX_LENGTH);
+                while (text.length() > MAX_LENGTH) {
+                    String subSent = text.substring(0, MAX_LENGTH);
                     allSents.add(subSent);
                     text = text.substring(MAX_LENGTH);
                 }
                 allSents.add(text);
             }
-        }else{
+        } else {
             allSents.add(text);
         }
         return allSents;

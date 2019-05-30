@@ -23,7 +23,8 @@ import java.io.IOException;
 
 public class CRFModelFactory {
 
-    private CRFModelFactory() {}
+    private CRFModelFactory() {
+    }
 
     public static synchronized Tagger createTagger(Param param) throws IOException {
         Tagger tagger = new Tagger();

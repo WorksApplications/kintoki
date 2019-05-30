@@ -35,20 +35,53 @@ class MockMorpheme implements Morpheme {
         this.partOfSpeech = Arrays.asList(partOfSpeech.split(","));
     }
 
-    public int begin() { return 0; }
-    public int end() { return 0; }
-    public String surface() { return surface; }
-    public List<String> partOfSpeech() { return partOfSpeech; }
-    public short partOfSpeechId() { return 0; }
-    public String dictionaryForm() { return normalizedForm; }
-    public String normalizedForm() { return normalizedForm; }
-    public String readingForm() { return ""; }
+    public int begin() {
+        return 0;
+    }
+
+    public int end() {
+        return 0;
+    }
+
+    public String surface() {
+        return surface;
+    }
+
+    public List<String> partOfSpeech() {
+        return partOfSpeech;
+    }
+
+    public short partOfSpeechId() {
+        return 0;
+    }
+
+    public String dictionaryForm() {
+        return normalizedForm;
+    }
+
+    public String normalizedForm() {
+        return normalizedForm;
+    }
+
+    public String readingForm() {
+        return "";
+    }
+
     public List<Morpheme> split(Tokenizer.SplitMode mode) {
         return Collections.emptyList();
     }
-    public boolean isOOV() { return false; }
-    public int getWordId() { return 0; }
-    public int getDictionaryId() { return 0; }
+
+    public boolean isOOV() {
+        return false;
+    }
+
+    public int getWordId() {
+        return 0;
+    }
+
+    public int getDictionaryId() {
+        return 0;
+    }
 
     static List<Morpheme> getExampleList() {
         List<Morpheme> morphemes = new ArrayList<>();

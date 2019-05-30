@@ -55,7 +55,7 @@ public class Node {
 
     public void calcAlpha() {
         alpha = 0.0;
-        for (Path p: lpath) {
+        for (Path p : lpath) {
             alpha = logsumexp(alpha, p.cost + p.lnode.alpha, p == lpath.get(0));
         }
         alpha += cost;
@@ -63,7 +63,7 @@ public class Node {
 
     public void calcBeta() {
         beta = 0.0;
-        for (Path p: rpath) {
+        for (Path p : rpath) {
             beta = logsumexp(beta, p.cost + p.rnode.beta, p == rpath.get(0));
         }
         beta += cost;

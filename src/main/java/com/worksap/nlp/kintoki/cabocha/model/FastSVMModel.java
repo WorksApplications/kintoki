@@ -39,7 +39,7 @@ public class FastSVMModel extends SVMModel {
     private DoubleArray dicDa;
     private DoubleArray featureDa;
 
-    private static final int PKE_BASE = 0xfffff;  // 1048575
+    private static final int PKE_BASE = 0xfffff; // 1048575
 
     @Override
     public int id(String key) {
@@ -53,19 +53,19 @@ public class FastSVMModel extends SVMModel {
 
     public void openBinModel(String path) throws IOException {
         ByteBuffer bytes = ByteUtil.readAsByteBuffer(path);
-        int magic = bytes.getInt();    // unsigned int
+        int magic = bytes.getInt(); // unsigned int
         if ((magic ^ DICTIONARY_MAGIC_ID) != bytes.limit()) {
             throw new IOException("dictionary file is broken");
         }
 
-        int version = bytes.getInt();  // unsigned int
+        int version = bytes.getInt(); // unsigned int
         int allPsize = bytes.getInt(); // unsigned int
         String parameter = ByteUtil.getString(bytes, allPsize, StandardCharsets.UTF_8);
         normalizeFactor = bytes.getFloat();
         bias = bytes.getInt();
-        int featureSize = bytes.getInt();   // unsigned int
-        freqFeatureSize = bytes.getInt();   // unsigned int
-        int dicDaSize = bytes.getInt();     // unsigned int
+        int featureSize = bytes.getInt(); // unsigned int
+        freqFeatureSize = bytes.getInt(); // unsigned int
+        int dicDaSize = bytes.getInt(); // unsigned int
         int featureDaSize = bytes.getInt(); // unsigned int
 
         int size = dicDaSize / 4;
@@ -79,16 +79,16 @@ public class FastSVMModel extends SVMModel {
         featureDa.setArray(array, size);
 
         nodePosList = new ArrayList<>();
-        for (int i=0; i<featureSize; i++) {
+        for (int i = 0; i < featureSize; i++) {
             nodePosList.add(bytes.getInt()); // unsigned int
         }
         this.weight1 = new ArrayList<>();
-        for (int i=0; i<featureSize; i++) {
+        for (int i = 0; i < featureSize; i++) {
             this.weight1.add(bytes.getInt());
         }
         this.weight2 = new ArrayList<>();
         long len = (freqFeatureSize * (freqFeatureSize - 1)) / 2;
-        for (int i=0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             this.weight2.add(bytes.getInt());
         }
         if (bytes.position() != bytes.limit()) {
@@ -105,11 +105,11 @@ public class FastSVMModel extends SVMModel {
         byte length = 0;
         ++value;
         byte[] array = featureKey.id;
-        array[length++] = (byte)(value & 0x7f);
+        array[length++] = (byte) (value & 0x7f);
         while ((value >>= 7) > 0) {
             ++value;
-            array[length-1] |= 0x80;
-            array[length++] = (byte)(value & 0x7f);
+            array[length - 1] |= 0x80;
+            array[length++] = (byte) (value & 0x7f);
         }
         featureKey.len = length;
     }
@@ -148,8 +148,7 @@ public class FastSVMModel extends SVMModel {
                 int nodePos2 = nodePos;
                 int keyPos = 0;
                 FeatureKey k = key.get(i2);
-                DoubleArray.TraverseResult result
-                    = featureDa.traverse(k.id, keyPos, k.len, nodePos2);
+                DoubleArray.TraverseResult result = featureDa.traverse(k.id, keyPos, k.len, nodePos2);
                 if (result.result >= 0) {
                     score += (result.result - PKE_BASE);
                 }
@@ -166,8 +165,7 @@ public class FastSVMModel extends SVMModel {
                 int nodePos2 = nodePos;
                 int keyPos = 0;
                 FeatureKey k = key.get(i2);
-                DoubleArray.TraverseResult result
-                    = featureDa.traverse(k.id, keyPos, k.len, nodePos2);
+                DoubleArray.TraverseResult result = featureDa.traverse(k.id, keyPos, k.len, nodePos2);
                 if (result.result >= 0) {
                     score += (result.result - PKE_BASE);
                 }

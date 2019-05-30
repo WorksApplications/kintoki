@@ -26,7 +26,6 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-
 public class CabochaTest {
 
     @Rule
@@ -430,12 +429,7 @@ public class CabochaTest {
 
     @Test
     public void testMain() throws IOException {
-        String[] args = {inputFile,
-                "-r", configPath,
-                "-o", outputFile,
-                "-I2", "-O4",
-                "-f2"
-        };
+        String[] args = { inputFile, "-r", configPath, "-o", outputFile, "-I2", "-O4", "-f2" };
 
         Cabocha.main(args);
     }

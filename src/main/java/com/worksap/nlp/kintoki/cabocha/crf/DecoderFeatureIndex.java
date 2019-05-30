@@ -49,7 +49,7 @@ public class DecoderFeatureIndex extends FeatureIndex {
 
         int tmplStrSize = bytes.getInt(); // unsigned int
         String[] tmplStr = ByteUtil.getString(bytes, tmplStrSize, StandardCharsets.UTF_8).split("\0");
-        for (String tmpl:tmplStr) {
+        for (String tmpl : tmplStr) {
             if (tmpl.startsWith("U")) {
                 unigramTempls.add(tmpl);
             } else if (tmpl.startsWith("B")) {
@@ -60,7 +60,7 @@ public class DecoderFeatureIndex extends FeatureIndex {
         dat.setArray(bytes, dsize);
 
         alpha = new double[maxId];
-        for (int i = 0; i< maxId; i++) {
+        for (int i = 0; i < maxId; i++) {
             alpha[i] = bytes.getFloat();
         }
 

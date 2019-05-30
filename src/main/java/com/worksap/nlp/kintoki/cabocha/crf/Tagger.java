@@ -54,7 +54,9 @@ public class Tagger {
     }
 
     public void forwardbackward() {
-        if (x.isEmpty()) return;
+        if (x.isEmpty()) {
+            return;
+        }
 
         for (int i = 0; i < x.size(); i++) {
             for (int j = 0; j < ysize; j++) {
@@ -110,7 +112,9 @@ public class Tagger {
     }
 
     public void buildLattice() {
-        if (x.isEmpty()) return;
+        if (x.isEmpty()) {
+            return;
+        }
 
         featureIndex.rebuildFeatures(this);
 
@@ -136,7 +140,7 @@ public class Tagger {
 
     public boolean initNbest() {
         if (agenda == null) {
-            agenda = new PriorityQueue<>(10, (o1, o2) -> (int)(o1.fx - o2.fx));
+            agenda = new PriorityQueue<>(10, (o1, o2) -> (int) (o1.fx - o2.fx));
         }
         agenda.clear();
         int k = x.size() - 1;

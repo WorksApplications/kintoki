@@ -21,15 +21,25 @@ import java.util.Map;
 
 public abstract class SVMModel implements SVMModelInterface {
 
-    public int size() { return alpha.size(); }
+    public int size() {
+        return alpha.size();
+    }
 
-    public double y(int i) { return alpha.get(i) > 0 ? +1 : -1; }
+    public double y(int i) {
+        return alpha.get(i) > 0 ? +1 : -1;
+    }
 
-    public List<Integer> x(int i) { return x.get(i); }
+    public List<Integer> x(int i) {
+        return x.get(i);
+    }
 
-    public int id(String key) { return 0; }
+    public int id(String key) {
+        return 0;
+    }
 
-    public double classify(List<Integer> x) { return 0; }
+    public double classify(List<Integer> x) {
+        return 0;
+    }
 
     protected List<Double> alpha;
     protected List<List<Integer>> x;

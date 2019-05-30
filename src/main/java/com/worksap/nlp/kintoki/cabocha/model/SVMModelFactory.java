@@ -22,10 +22,11 @@ public class SVMModelFactory {
 
     private static FastSVMModel svmModel = null;
 
-    private SVMModelFactory() {}
+    private SVMModelFactory() {
+    }
 
     public static synchronized FastSVMModel loadModel(String path) throws IOException {
-        if (svmModel == null){
+        if (svmModel == null) {
             svmModel = new FastSVMModel();
             svmModel.openBinModel(path);
         }
