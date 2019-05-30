@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FastSVMModel extends SVMModel {
+public class FastSVMModel implements SVMModel {
 
     private static final int SVM_MODEL_VERSION = 102;
     private static final int DICTIONARY_MAGIC_ID = 0xef522177;

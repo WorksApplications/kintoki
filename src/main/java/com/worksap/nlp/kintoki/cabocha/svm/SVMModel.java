@@ -18,9 +18,9 @@ package com.worksap.nlp.kintoki.cabocha.svm;
 
 import java.util.List;
 
-public abstract class SVMModel {
+public interface SVMModel {
 
-    public abstract int id(String key);
+    int id(String key);
 
-    public abstract double classify(List<Integer> x);
+    double classify(List<Integer> x);
 }
