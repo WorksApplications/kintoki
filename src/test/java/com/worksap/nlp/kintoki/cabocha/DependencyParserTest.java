@@ -16,8 +16,8 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
-import com.worksap.nlp.kintoki.cabocha.model.FastSVMModel;
-import com.worksap.nlp.kintoki.cabocha.model.SVMModelFactory;
+import com.worksap.nlp.kintoki.cabocha.svm.FastSVMModel;
+import com.worksap.nlp.kintoki.cabocha.svm.SVMModelFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

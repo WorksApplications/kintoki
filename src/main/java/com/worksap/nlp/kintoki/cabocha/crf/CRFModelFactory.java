@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.kintoki.cabocha.model;
+package com.worksap.nlp.kintoki.cabocha.crf;
 
 import com.worksap.nlp.kintoki.cabocha.Param;
 import com.worksap.nlp.kintoki.cabocha.crf.Tagger;

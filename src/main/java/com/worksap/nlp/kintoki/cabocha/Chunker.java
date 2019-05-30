@@ -17,7 +17,7 @@
 package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.kintoki.cabocha.crf.Tagger;
-import com.worksap.nlp.kintoki.cabocha.model.CRFModelFactory;
+import com.worksap.nlp.kintoki.cabocha.crf.CRFModelFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;

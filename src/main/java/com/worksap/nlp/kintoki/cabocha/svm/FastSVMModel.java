@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.kintoki.cabocha.model;
+package com.worksap.nlp.kintoki.cabocha.svm;
 
 import com.worksap.nlp.dartsclone.DoubleArray;
 import com.worksap.nlp.kintoki.cabocha.util.ByteUtil;
