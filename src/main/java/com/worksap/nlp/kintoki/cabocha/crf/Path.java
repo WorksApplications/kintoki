@@ -18,25 +18,25 @@ package com.worksap.nlp.kintoki.cabocha.crf;
 
 import java.util.List;
 
-public class Path {
+class Path {
 
-    public Node rnode;
-    public Node lnode;
-    public List<Integer> fvector;
-    public double cost;
+    Node rnode;
+    Node lnode;
+    List<Integer> fvector;
+    double cost;
 
-    public Path() {
+    Path() {
         clear();
     }
 
-    public void clear() {
+    void clear() {
         rnode = null;
         lnode = null;
         fvector = null;
         cost = 0.0;
     }
 
-    public void add(Node lnode, Node rnode) {
+    void add(Node lnode, Node rnode) {
         this.lnode = lnode;
         this.rnode = rnode;
         lnode.rpath.add(this);

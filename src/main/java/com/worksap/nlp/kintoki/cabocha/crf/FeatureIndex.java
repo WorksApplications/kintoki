@@ -19,41 +19,26 @@ package com.worksap.nlp.kintoki.cabocha.crf;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class FeatureIndex {
+abstract class FeatureIndex {
 
-    public static final String[] BOS = { "_B-1", "_B-2", "_B-3", "_B-4", "_B-5", "_B-6", "_B-7", "_B-8" };
-    public static final String[] EOS = { "_B+1", "_B+2", "_B+3", "_B+4", "_B+5", "_B+6", "_B+7", "_B+8" };
+    private static final String[] BOS = { "_B-1", "_B-2", "_B-3", "_B-4", "_B-5", "_B-6", "_B-7", "_B-8" };
+    private static final String[] EOS = { "_B+1", "_B+2", "_B+3", "_B+4", "_B+5", "_B+6", "_B+7", "_B+8" };
     protected int maxId;
     protected double[] alpha;
     protected float[] alphaFloat;
-    protected double costFactor;
+    protected double costFactor = 1.0;
     protected int xsize;
     protected boolean checkMaxXsize;
     protected int maxXsize;
-    protected int threadNum;
     protected List<String> unigramTempls;
     protected List<String> bigramTempls;
     protected List<String> y;
     protected List<List<Path>> pathList;
     protected List<List<Node>> nodeList;
 
-    public FeatureIndex() {
-        maxId = 0;
-        alpha = null;
-        alphaFloat = null;
-        costFactor = 1.0;
-        xsize = 0;
-        checkMaxXsize = false;
-        maxXsize = 0;
-        threadNum = 1;
-        unigramTempls = new ArrayList<>();
-        bigramTempls = new ArrayList<>();
-        y = new ArrayList<>();
-    }
-
     protected abstract int getID(String s);
 
-    public void calcCost(Node node) {
+    void calcCost(Node node) {
         node.cost = 0.0;
         if (alphaFloat != null) {
             float c = 0.0f;
@@ -70,7 +55,7 @@ public abstract class FeatureIndex {
         }
     }
 
-    public void calcCost(Path path) {
+    void calcCost(Path path) {
         path.cost = 0.0;
         if (alphaFloat != null) {
             float c = 0.0f;
@@ -87,7 +72,7 @@ public abstract class FeatureIndex {
         }
     }
 
-    public String getIndex(String[] idxStr, int pos, Tagger tagger) {
+    private String getIndex(String[] idxStr, int pos, Tagger tagger) {
         int row = Integer.parseInt(idxStr[0]);
         int col = Integer.parseInt(idxStr[1]);
         int idx = row + pos;
@@ -108,7 +93,7 @@ public abstract class FeatureIndex {
         }
     }
 
-    public String applyRule(String rule, int pos, Tagger tagger) {
+    private String applyRule(String rule, int pos, Tagger tagger) {
         StringBuilder sb = new StringBuilder();
         for (String tmp : rule.split("%x", -1)) {
             if (tmp.startsWith("U") || tmp.startsWith("B")) {
@@ -142,7 +127,7 @@ public abstract class FeatureIndex {
         }
     }
 
-    public void buildFeatures(Tagger tagger) {
+    void buildFeatures(Tagger tagger) {
         List<Integer> feature = new ArrayList<>();
         List<List<Integer>> featureCache = tagger.getFeatureCache();
         tagger.setFeatureId(featureCache.size());
@@ -161,7 +146,7 @@ public abstract class FeatureIndex {
         }
     }
 
-    public void rebuildFeatures(Tagger tagger) {
+    void rebuildFeatures(Tagger tagger) {
         int fid = tagger.getFeatureId();
         List<List<Integer>> featureCache = tagger.getFeatureCache();
         for (int pos = 0; pos < tagger.size(); pos++) {
@@ -188,107 +173,19 @@ public abstract class FeatureIndex {
         }
     }
 
-    public int size() {
-        return getMaxId();
-    }
-
-    public int ysize() {
+    int ysize() {
         return y.size();
     }
 
-    public int getMaxId() {
-        return maxId;
-    }
-
-    public void setMaxId(int maxId) {
-        this.maxId = maxId;
-    }
-
-    public double[] getAlpha() {
-        return alpha;
-    }
-
-    public void setAlpha(double[] alpha) {
-        this.alpha = alpha;
-    }
-
-    public float[] getAlphaFloat() {
-        return alphaFloat;
-    }
-
-    public void setAlphaFloat(float[] alphaFloat) {
-        this.alphaFloat = alphaFloat;
-    }
-
-    public double getCostFactor() {
-        return costFactor;
-    }
-
-    public void setCostFactor(double costFactor) {
+    void setCostFactor(double costFactor) {
         this.costFactor = costFactor;
     }
 
-    public int getXsize() {
+    int getXsize() {
         return xsize;
     }
 
-    public void setXsize(int xsize) {
-        this.xsize = xsize;
-    }
-
-    public int getMaxXsize() {
-        return maxXsize;
-    }
-
-    public void setMaxXsize(int maxXsize) {
-        this.maxXsize = maxXsize;
-    }
-
-    public int getThreadNum() {
-        return threadNum;
-    }
-
-    public void setThreadNum(int threadNum) {
-        this.threadNum = threadNum;
-    }
-
-    public List<String> getUnigramTempls() {
-        return unigramTempls;
-    }
-
-    public void setUnigramTempls(List<String> unigramTempls) {
-        this.unigramTempls = unigramTempls;
-    }
-
-    public List<String> getBigramTempls() {
-        return bigramTempls;
-    }
-
-    public void setBigramTempls(List<String> bigramTempls) {
-        this.bigramTempls = bigramTempls;
-    }
-
-    public List<String> getY() {
+    List<String> getY() {
         return y;
-    }
-
-    public void setY(List<String> y) {
-        this.y = y;
-    }
-
-    public List<List<Path>> getPathList() {
-        return pathList;
-    }
-
-    public void setPathList(List<List<Path>> pathList) {
-        this.pathList = pathList;
-    }
-
-    public List<List<Node>> getNodeList() {
-        return nodeList;
-    }
-
-    public void setNodeList(List<List<Node>> nodeList) {
-        this.nodeList = nodeList;
     }
 }

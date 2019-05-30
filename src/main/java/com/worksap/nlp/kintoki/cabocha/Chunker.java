@@ -42,11 +42,7 @@ public class Chunker extends Analyzer {
     public void parse(Tree tree) {
         int tokenSize = tree.getTokenSize();
         for (int i = 0; i < tokenSize; i++) {
-            String line = "";
-            String pos = getPos(tree.token(i).getFeatureList());
-            line += tree.token(i).getNormalizedSurface();
-            line += "\t" + pos;
-            tagger.add(line);
+            tagger.add(tree.token(i).getNormalizedSurface(), getPos(tree.token(i).getFeatureList()));
         }
 
         tagger.parse();

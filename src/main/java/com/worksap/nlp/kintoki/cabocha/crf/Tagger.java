@@ -24,11 +24,9 @@ public class Tagger {
     private int vlevel;
     private int nbest;
     private int ysize;
-    private double cost;
     private double z;
     private int featureId;
-    private int threadId;
-    private static FeatureIndex featureIndex;
+    private FeatureIndex featureIndex;
     private List<List<String>> x;
     private List<List<Node>> node;
     private List<Integer> answer;
@@ -37,13 +35,13 @@ public class Tagger {
     private List<List<Double>> penalty;
     private List<List<Integer>> featureCache;
 
-    public Tagger() {
-        vlevel = 0;
-        nbest = 0;
-        ysize = 0;
+    private Tagger(FeatureIndex featureIndex, int nbest, int vlevel) {
+        this.featureIndex = featureIndex;
+        this.vlevel = vlevel;
+        this.nbest = nbest;
+        ysize = featureIndex.ysize();
         z = 0;
         featureId = 0;
-        threadId = 0;
         x = new ArrayList<>();
         node = new ArrayList<>();
         answer = new ArrayList<>();
@@ -53,7 +51,17 @@ public class Tagger {
         featureCache = new ArrayList<>();
     }
 
-    public void forwardbackward() {
+    public static Tagger openBinaryModel(String path, int nbest, int vlevel, double costFactor) throws IOException {
+        if (costFactor <= 0.0) {
+            throw new IllegalArgumentException("cost factor must be positive");
+        }
+        FeatureIndex featureIndex = DecoderFeatureIndex.openBinaryModel(path);
+        featureIndex.setCostFactor(costFactor);
+        Tagger tagger = new Tagger(featureIndex, nbest, vlevel);
+        return tagger;
+    }
+
+    private void forwardbackward() {
         if (x.isEmpty()) {
             return;
         }
@@ -76,7 +84,7 @@ public class Tagger {
         }
     }
 
-    public void viterbi() {
+    private void viterbi() {
         for (int i = 0; i < x.size(); i++) {
             for (int j = 0; j < ysize; j++) {
                 double bestc = -1e37;
@@ -107,11 +115,9 @@ public class Tagger {
         for (Node n = best; n != null; n = n.prev) {
             result.set(n.x, n.y);
         }
-
-        cost = -node.get(x.size() - 1).get(result.get(x.size() - 1)).bestCost;
     }
 
-    public void buildLattice() {
+    private void buildLattice() {
         if (x.isEmpty()) {
             return;
         }
@@ -138,7 +144,7 @@ public class Tagger {
         }
     }
 
-    public boolean initNbest() {
+    private boolean initNbest() {
         if (agenda == null) {
             agenda = new PriorityQueue<>(10, (o1, o2) -> (int) (o1.fx - o2.fx));
         }
@@ -155,21 +161,20 @@ public class Tagger {
         return true;
     }
 
-    public Node node(int i, int j) {
+    Node node(int i, int j) {
         return node.get(i).get(j);
     }
 
-    public void setNode(Node n, int i, int j) {
+    void setNode(Node n, int i, int j) {
         node.get(i).set(j, n);
     }
 
-    public void add(String line) {
+    public void add(String... columns) {
         int xsize = featureIndex.getXsize();
-        String[] cols = line.split("[\t ]", -1);
-        if (cols.length < xsize) {
-            throw new IllegalArgumentException("# x is small: size=" + cols.length + " xsize=" + xsize);
+        if (columns.length < xsize) {
+            throw new IllegalArgumentException("# x is small: size=" + columns.length + " xsize=" + xsize);
         }
-        List<String> tmpX = Arrays.asList(cols);
+        List<String> tmpX = Arrays.asList(columns);
         x.add(tmpX);
         result.add(0);
         int tmpAnswer = 0;
@@ -200,135 +205,32 @@ public class Tagger {
         result.clear();
         featureCache.clear();
         z = 0.0;
-        cost = 0.0;
     }
 
-    public void openBinModel(String path, int nbest, int vlevel, double costFactor) throws IOException {
-        if (costFactor <= 0.0) {
-            throw new IllegalArgumentException("cost factor must be positive");
-        }
-        if (featureIndex == null) {
-            featureIndex = new DecoderFeatureIndex();
-            ((DecoderFeatureIndex) featureIndex).openBinModel(path);
-        }
-        this.nbest = nbest;
-        this.vlevel = vlevel;
-        featureIndex.setCostFactor(costFactor);
-        this.ysize = featureIndex.ysize();
-    }
-
-    class QueueElement {
+    private class QueueElement {
         Node node;
         QueueElement next;
         double fx;
         double gx;
     }
 
-    public int getVlevel() {
-        return vlevel;
-    }
-
-    public void setVlevel(int vlevel) {
-        this.vlevel = vlevel;
-    }
-
-    public int getNbest() {
-        return nbest;
-    }
-
-    public void setNbest(int nbest) {
-        this.nbest = nbest;
-    }
-
-    public int getYsize() {
-        return ysize;
-    }
-
-    public void setYsize(int ysize) {
-        this.ysize = ysize;
-    }
-
-    public double getCost() {
-        return cost;
-    }
-
-    public void setCost(double cost) {
-        this.cost = cost;
-    }
-
-    public double getZ() {
-        return z;
-    }
-
-    public void setZ(double z) {
-        this.z = z;
-    }
-
-    public int getFeatureId() {
+    int getFeatureId() {
         return featureId;
     }
 
-    public void setFeatureId(int featureId) {
+    void setFeatureId(int featureId) {
         this.featureId = featureId;
     }
 
-    public int getThreadId() {
-        return threadId;
-    }
-
-    public void setThreadId(int threadId) {
-        this.threadId = threadId;
-    }
-
-    public FeatureIndex getFeatureIndex() {
-        return featureIndex;
-    }
-
-    public void setFeatureIndex(FeatureIndex featureIndex) {
-        this.featureIndex = featureIndex;
-    }
-
-    public List<List<String>> getX() {
-        return x;
-    }
-
-    public void setX(List<List<String>> x) {
-        this.x = x;
-    }
-
-    public List<List<Node>> getNode() {
-        return node;
-    }
-
-    public void setNode(List<List<Node>> node) {
-        this.node = node;
-    }
-
-    public List<Integer> getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(List<Integer> answer) {
-        this.answer = answer;
-    }
-
-    public List<Integer> getResult() {
-        return result;
-    }
-
-    public void setResult(List<Integer> result) {
-        this.result = result;
-    }
-
-    public List<List<Integer>> getFeatureCache() {
+    List<List<Integer>> getFeatureCache() {
         return featureCache;
     }
 
-    public int size() {
+    int size() {
         return x.size();
     }
 
-    public int xsize() {
+    int xsize() {
         return featureIndex.getXsize();
     }
 
@@ -340,16 +242,7 @@ public class Tagger {
         return featureIndex.getY().get(i);
     }
 
-    public String y2(int i) {
-        return yname(result.get(i));
-    }
-
-    public String x(int i, int j) {
+    String x(int i, int j) {
         return x.get(i).get(j);
     }
-
-    public List<String> x(int i) {
-        return x.get(i);
-    }
-
 }

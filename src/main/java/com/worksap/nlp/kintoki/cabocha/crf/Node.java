@@ -19,7 +19,7 @@ package com.worksap.nlp.kintoki.cabocha.crf;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
+class Node {
     public int x;
     public int y;
     public double alpha;
@@ -32,7 +32,7 @@ public class Node {
     public List<Path> rpath;
     public static final int MINUS_LOG_EPSILON = 50;
 
-    public Node() {
+    Node() {
         lpath = new ArrayList<>();
         rpath = new ArrayList<>();
         clear();
@@ -40,7 +40,7 @@ public class Node {
         prev = null;
     }
 
-    public static double logsumexp(double x, double y, boolean flg) {
+    static double logsumexp(double x, double y, boolean flg) {
         if (flg) {
             return y;
         }
@@ -53,7 +53,7 @@ public class Node {
         }
     }
 
-    public void calcAlpha() {
+    void calcAlpha() {
         alpha = 0.0;
         for (Path p : lpath) {
             alpha = logsumexp(alpha, p.cost + p.lnode.alpha, p == lpath.get(0));
@@ -61,7 +61,7 @@ public class Node {
         alpha += cost;
     }
 
-    public void calcBeta() {
+    void calcBeta() {
         beta = 0.0;
         for (Path p : rpath) {
             beta = logsumexp(beta, p.cost + p.rnode.beta, p == rpath.get(0));
@@ -69,7 +69,7 @@ public class Node {
         beta += cost;
     }
 
-    public void clear() {
+    void clear() {
         x = 0;
         y = 0;
         alpha = 0;

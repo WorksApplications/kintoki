@@ -17,7 +17,6 @@
 package com.worksap.nlp.kintoki.cabocha.crf;
 
 import com.worksap.nlp.kintoki.cabocha.Param;
-import com.worksap.nlp.kintoki.cabocha.crf.Tagger;
 
 import java.io.IOException;
 
@@ -26,16 +25,12 @@ public class CRFModelFactory {
     private CRFModelFactory() {
     }
 
-    public static synchronized Tagger createTagger(Param param) throws IOException {
-        Tagger tagger = new Tagger();
+    public static Tagger createTagger(Param param) throws IOException {
         String path = param.getString(Param.CHUNKER_MODEL);
         int nbest = param.getInt(Param.NBEST);
         int vlevel = param.getInt(Param.VERBOSE);
         double costFactor = param.getDouble(Param.COST_FACTOR);
-
-        tagger.openBinModel(path, nbest, vlevel, costFactor);
-
-        return tagger;
+        return Tagger.openBinaryModel(path, nbest, vlevel, costFactor);
     }
 
 }

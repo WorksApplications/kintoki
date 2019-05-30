@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-class Utils {
+public class Utils {
     static final String[] RESOURCES = { "/chunk.bccwj.model", "/dep.bccwj.model", "/system.dic", "/sudachi.json",
             "/input", };
 
@@ -36,7 +36,7 @@ class Utils {
     static final String INPUT_FILE = "/input";
     static final String OUTPUT_FILE = "/output";
 
-    static void copyResources(Path folder) throws IOException {
+    public static void copyResources(Path folder) throws IOException {
         for (String file : RESOURCES) {
             try {
                 URL src = Utils.class.getResource(file);

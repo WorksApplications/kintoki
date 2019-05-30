@@ -62,10 +62,9 @@ public class DoubleArrayTrieTest {
 
     @Before
     public void setUp() {
-        dat = new DoubleArrayTrie();
         ByteBuffer array = ByteBuffer.wrap(daBytes);
         array.order(ByteOrder.LITTLE_ENDIAN);
-        dat.setArray(array, daBytes.length);
+        dat = new DoubleArrayTrie(array, daBytes.length);
     }
 
     @Test
