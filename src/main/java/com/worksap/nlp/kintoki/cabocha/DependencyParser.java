@@ -32,10 +32,8 @@ public class DependencyParser extends Analyzer {
 
     @Override
     public void open(Param param) throws IOException {
-        if (getActionMode() == Constant.PARSING_MODE) {
-            String modelFile = param.getString(Param.PARSER_MODEL);
-            svmModel = FastSVMModel.openBinaryModel(modelFile);
-        }
+        String modelFile = param.getString(Param.PARSER_MODEL);
+        svmModel = FastSVMModel.openBinaryModel(modelFile);
     }
 
     @Override
@@ -84,7 +82,7 @@ public class DependencyParser extends Analyzer {
                     chunkInfo.getStrChildFeature().add(feature);
                     break;
                 default:
-                    System.out.println("Unknown feature " + feature);
+                    throw new IllegalArgumentException("Unknown feature: " + feature);
                 }
             }
             data.getChunkInfo().add(chunkInfo);
@@ -143,6 +141,26 @@ public class DependencyParser extends Analyzer {
 
         List<Integer> fp = data.getFp();
 
+        setDistanceFeature(src, dst);
+        setStaticFeature(src);
+        setDst1StaticFeature(dst);
+        if (src > 0) {
+            setLeftContextFeature(src);
+        }
+        if (dst < tree.getChunkSize() - 1) {
+            setRight1ContextFeature(dst);
+        }
+        setSrcChildFeature(src, hypo);
+        setDst1ChildFeature(dst, hypo);
+        setGapFeature(src, dst);
+
+        fp = fp.stream().sorted().distinct().collect(Collectors.toList());
+        double score = svmModel.classify(fp);
+        data.getFp().clear();
+        return score;
+    }
+
+    private void setDistanceFeature(int src, int dst) {
         // distance features
         int dist = dst - src;
         if (dist == 1) {
@@ -152,51 +170,53 @@ public class DependencyParser extends Analyzer {
         } else {
             addFeature("DIST:6-");
         }
+    }
 
-        {
-            ChunkInfo chunkInfo = data.chunkInfo(src);
-            if (chunkInfo.getStaticFeature().isEmpty()) {
-                for (int i = 0; i < chunkInfo.getStrStaticFeature().size(); ++i) {
-                    String feature = chunkInfo.getStrStaticFeature().get(i).substring(1);
-                    chunkInfo.getStrStaticFeature().set(i, "S" + feature);
-                    addFeature2(chunkInfo.getStrStaticFeature().get(i), chunkInfo.getStaticFeature());
-                }
+    private void setStaticFeature(int src) {
+        ChunkInfo chunkInfo = data.chunkInfo(src);
+        if (chunkInfo.getStaticFeature().isEmpty()) {
+            for (int i = 0; i < chunkInfo.getStrStaticFeature().size(); ++i) {
+                String feature = chunkInfo.getStrStaticFeature().get(i).substring(1);
+                chunkInfo.getStrStaticFeature().set(i, "S" + feature);
+                addFeature2(chunkInfo.getStrStaticFeature().get(i), chunkInfo.getStaticFeature());
             }
-            copyFeature(chunkInfo.getStaticFeature());
         }
+        copyFeature(chunkInfo.getStaticFeature());
+    }
 
-        {
-            ChunkInfo chunkInfo = data.chunkInfo(dst);
-            if (chunkInfo.getDst1StaticFeature().isEmpty()) {
-                for (int i = 0; i < chunkInfo.getStrStaticFeature().size(); ++i) {
-                    String feature = chunkInfo.getStrStaticFeature().get(i).substring(1);
-                    chunkInfo.getStrStaticFeature().set(i, "D" + feature);
-                    addFeature2(chunkInfo.getStrStaticFeature().get(i), chunkInfo.getDst1StaticFeature());
-                }
+    private void setDst1StaticFeature(int dst) {
+        ChunkInfo chunkInfo = data.chunkInfo(dst);
+        if (chunkInfo.getDst1StaticFeature().isEmpty()) {
+            for (int i = 0; i < chunkInfo.getStrStaticFeature().size(); ++i) {
+                String feature = chunkInfo.getStrStaticFeature().get(i).substring(1);
+                chunkInfo.getStrStaticFeature().set(i, "D" + feature);
+                addFeature2(chunkInfo.getStrStaticFeature().get(i), chunkInfo.getDst1StaticFeature());
             }
-            copyFeature(chunkInfo.getDst1StaticFeature());
         }
+        copyFeature(chunkInfo.getDst1StaticFeature());
+    }
 
-        if (src > 0) {
-            ChunkInfo chunkInfo = data.chunkInfo(src - 1);
-            if (chunkInfo.getLeftContextFeature().isEmpty()) {
-                for (int i = 0; i < chunkInfo.getStrLeftContextFeature().size(); ++i) {
-                    addFeature2(chunkInfo.getStrLeftContextFeature().get(i), chunkInfo.getLeftContextFeature());
-                }
+    private void setLeftContextFeature(int src) {
+        ChunkInfo chunkInfo = data.chunkInfo(src - 1);
+        if (chunkInfo.getLeftContextFeature().isEmpty()) {
+            for (int i = 0; i < chunkInfo.getStrLeftContextFeature().size(); ++i) {
+                addFeature2(chunkInfo.getStrLeftContextFeature().get(i), chunkInfo.getLeftContextFeature());
             }
-            copyFeature(chunkInfo.getLeftContextFeature());
         }
+        copyFeature(chunkInfo.getLeftContextFeature());
+    }
 
-        if (dst < tree.getChunkSize() - 1) {
-            ChunkInfo chunkInfo = data.chunkInfo(dst + 1);
-            if (chunkInfo.getRight1ContextFeature().isEmpty()) {
-                for (int i = 0; i < chunkInfo.getStrRightContextFeature().size(); ++i) {
-                    addFeature2(chunkInfo.getStrRightContextFeature().get(i), chunkInfo.getRight1ContextFeature());
-                }
+    private void setRight1ContextFeature(int dst) {
+        ChunkInfo chunkInfo = data.chunkInfo(dst + 1);
+        if (chunkInfo.getRight1ContextFeature().isEmpty()) {
+            for (int i = 0; i < chunkInfo.getStrRightContextFeature().size(); ++i) {
+                addFeature2(chunkInfo.getStrRightContextFeature().get(i), chunkInfo.getRight1ContextFeature());
             }
-            copyFeature(chunkInfo.getRight1ContextFeature());
         }
+        copyFeature(chunkInfo.getRight1ContextFeature());
+    }
 
+    private void setSrcChildFeature(int src, Hypothesis hypo) {
         for (int i = 0; i < hypo.getChildren().get(src).size(); ++i) {
             int child = hypo.getChildren().get(src).get(i);
             ChunkInfo chunkInfo = data.chunkInfo(child);
@@ -209,7 +229,9 @@ public class DependencyParser extends Analyzer {
             }
             copyFeature(chunkInfo.getSrcChildFeature());
         }
+    }
 
+    private void setDst1ChildFeature(int dst, Hypothesis hypo) {
         for (int i = 0; i < hypo.getChildren().get(dst).size(); ++i) {
             int child = hypo.getChildren().get(dst).get(i);
             ChunkInfo chunkInfo = data.chunkInfo(child);
@@ -222,7 +244,9 @@ public class DependencyParser extends Analyzer {
             }
             copyFeature(chunkInfo.getDst1ChildFeature());
         }
+    }
 
+    private void setGapFeature(int src, int dst) {
         // gap features
         int bracketStatus = 0;
         for (int k = src + 1; k <= dst - 1; ++k) {
@@ -254,16 +278,6 @@ public class DependencyParser extends Analyzer {
             addFeature("GBB:1");
             break; // both
         }
-
-        fp = fp.stream().sorted().distinct().collect(Collectors.toList());
-
-        if (getActionMode() == Constant.PARSING_MODE) {
-            double score = svmModel.classify(fp);
-            data.getFp().clear();
-            return score;
-        }
-
-        return 0.0;
     }
 
     private int myPop(Deque<Integer> agenda) {
