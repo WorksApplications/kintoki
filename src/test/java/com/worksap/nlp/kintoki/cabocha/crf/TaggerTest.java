@@ -48,6 +48,11 @@ public class TaggerTest {
         assertNotNull(tagger);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void openBinaryModelWithNegativeCostFactor() throws IOException {
+        tagger = Tagger.openBinaryModel(modelFileName, -1.0);
+    }
+
     @Test
     public void add() {
         tagger.add("太郎", "名詞-固有名詞-人名-名");
@@ -77,6 +82,12 @@ public class TaggerTest {
         assertEquals(1, tagger.y(1));
         assertEquals(0, tagger.y(2));
         assertEquals(1, tagger.y(3));
+    }
+
+    @Test
+    public void parseWithEmpty() {
+        tagger.parse();
+        assertEquals(0, tagger.size());
     }
 
     @Test
