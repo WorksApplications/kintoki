@@ -21,67 +21,36 @@ import java.util.*;
 
 public class Tagger {
 
-    private int vlevel;
-    private int nbest;
     private int ysize;
     private double z;
     private int featureId;
     private FeatureIndex featureIndex;
     private List<List<String>> x;
     private List<List<Node>> node;
-    private List<Integer> answer;
     private List<Integer> result;
-    private PriorityQueue<QueueElement> agenda;
     private List<List<Double>> penalty;
     private List<List<Integer>> featureCache;
 
-    private Tagger(FeatureIndex featureIndex, int nbest, int vlevel) {
+    private Tagger(FeatureIndex featureIndex) {
         this.featureIndex = featureIndex;
-        this.vlevel = vlevel;
-        this.nbest = nbest;
         ysize = featureIndex.ysize();
         z = 0;
         featureId = 0;
         x = new ArrayList<>();
         node = new ArrayList<>();
-        answer = new ArrayList<>();
         result = new ArrayList<>();
-        agenda = null;
         penalty = new ArrayList<>();
         featureCache = new ArrayList<>();
     }
 
-    public static Tagger openBinaryModel(String path, int nbest, int vlevel, double costFactor) throws IOException {
+    public static Tagger openBinaryModel(String path, double costFactor) throws IOException {
         if (costFactor <= 0.0) {
             throw new IllegalArgumentException("cost factor must be positive");
         }
         FeatureIndex featureIndex = DecoderFeatureIndex.openBinaryModel(path);
         featureIndex.setCostFactor(costFactor);
-        Tagger tagger = new Tagger(featureIndex, nbest, vlevel);
+        Tagger tagger = new Tagger(featureIndex);
         return tagger;
-    }
-
-    private void forwardbackward() {
-        if (x.isEmpty()) {
-            return;
-        }
-
-        for (int i = 0; i < x.size(); i++) {
-            for (int j = 0; j < ysize; j++) {
-                node.get(i).get(j).calcAlpha();
-            }
-        }
-
-        for (int i = x.size() - 1; i >= 0; i--) {
-            for (int j = 0; j < ysize; j++) {
-                node.get(i).get(j).calcBeta();
-            }
-        }
-
-        z = 0.0;
-        for (int j = 0; j < ysize; j++) {
-            z = Node.logsumexp(z, node.get(0).get(j).beta, j == 0);
-        }
     }
 
     private void viterbi() {
@@ -144,23 +113,6 @@ public class Tagger {
         }
     }
 
-    private boolean initNbest() {
-        if (agenda == null) {
-            agenda = new PriorityQueue<>(10, (o1, o2) -> (int) (o1.fx - o2.fx));
-        }
-        agenda.clear();
-        int k = x.size() - 1;
-        for (int i = 0; i < ysize; i++) {
-            QueueElement eos = new QueueElement();
-            eos.node = node.get(k).get(i);
-            eos.fx = -node.get(k).get(i).bestCost;
-            eos.gx = -node.get(k).get(i).cost;
-            eos.next = null;
-            agenda.add(eos);
-        }
-        return true;
-    }
-
     Node node(int i, int j) {
         return node.get(i).get(j);
     }
@@ -177,8 +129,6 @@ public class Tagger {
         List<String> tmpX = Arrays.asList(columns);
         x.add(tmpX);
         result.add(0);
-        int tmpAnswer = 0;
-        answer.add(tmpAnswer);
         List<Node> l = Arrays.asList(new Node[ysize]);
         node.add(l);
     }
@@ -189,29 +139,15 @@ public class Tagger {
             return;
         }
         buildLattice();
-        if (nbest != 0 || vlevel >= 1) {
-            forwardbackward();
-        }
         viterbi();
-        if (nbest != 0) {
-            initNbest();
-        }
     }
 
     public void clear() {
         x.clear();
         node.clear();
-        answer.clear();
         result.clear();
         featureCache.clear();
         z = 0.0;
-    }
-
-    private class QueueElement {
-        Node node;
-        QueueElement next;
-        double fx;
-        double gx;
     }
 
     int getFeatureId() {

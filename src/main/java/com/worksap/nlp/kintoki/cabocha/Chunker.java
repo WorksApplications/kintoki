@@ -17,7 +17,6 @@
 package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.kintoki.cabocha.crf.Tagger;
-import com.worksap.nlp.kintoki.cabocha.crf.CRFModelFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,17 +24,14 @@ import java.util.List;
 
 public class Chunker extends Analyzer {
 
-    private Tagger tagger = null;
+    private static final double CRF_COST_FACTOR = 1.0;
+
+    private Tagger tagger;
 
     @Override
     public void open(Param param) throws IOException {
-        if (getActionMode() == Constant.PARSING_MODE) {
-            loadBinModel(param);
-        }
-    }
-
-    private void loadBinModel(Param param) throws IOException {
-        this.tagger = CRFModelFactory.createTagger(param);
+        String path = param.getString(Param.CHUNKER_MODEL);
+        tagger = Tagger.openBinaryModel(path, CRF_COST_FACTOR);
     }
 
     @Override
