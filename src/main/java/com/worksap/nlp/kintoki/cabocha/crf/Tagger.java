@@ -17,12 +17,17 @@
 package com.worksap.nlp.kintoki.cabocha.crf;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Tagger {
 
+    private static Map<String, FeatureIndex> featureIndexCache = new HashMap<>();
+
     private int ysize;
-    private double z;
     private int featureId;
     private FeatureIndex featureIndex;
     private List<List<String>> x;
@@ -34,7 +39,6 @@ public class Tagger {
     private Tagger(FeatureIndex featureIndex) {
         this.featureIndex = featureIndex;
         ysize = featureIndex.ysize();
-        z = 0;
         featureId = 0;
         x = new ArrayList<>();
         lattice = new ArrayList<>();
@@ -47,10 +51,16 @@ public class Tagger {
         if (costFactor <= 0.0) {
             throw new IllegalArgumentException("cost factor must be positive");
         }
-        FeatureIndex featureIndex = DecoderFeatureIndex.openBinaryModel(path);
+        FeatureIndex featureIndex;
+        synchronized(featureIndexCache) {
+            featureIndex = featureIndexCache.get(path);
+            if (featureIndex == null) {
+                featureIndex = DecoderFeatureIndex.openBinaryModel(path);
+                featureIndexCache.put(path, featureIndex);
+            }
+        }
         featureIndex.setCostFactor(costFactor);
-        Tagger tagger = new Tagger(featureIndex);
-        return tagger;
+        return new Tagger(featureIndex);
     }
 
     private void viterbi() {
@@ -146,7 +156,6 @@ public class Tagger {
         lattice.clear();
         result.clear();
         featureCache.clear();
-        z = 0.0;
     }
 
     int getFeatureId() {
