@@ -164,6 +164,11 @@
       <artifactId>commons-cli</artifactId>
       <version>1.4</version>
     </dependency>
+    <dependency>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+      <version>64.2</version>
+    </dependency>
   </dependencies>
 
   <url>https://github.com/WorksApplications/kintoki</url>

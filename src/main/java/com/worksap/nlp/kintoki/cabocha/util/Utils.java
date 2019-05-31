@@ -16,13 +16,17 @@
 
 package com.worksap.nlp.kintoki.cabocha.util;
 
+import com.ibm.icu.lang.UProperty;
+import com.ibm.icu.lang.UCharacter;
+
 import com.worksap.nlp.kintoki.cabocha.Token;
 
 public class Utils {
 
-    private Utils() {}
+    private Utils() {
+    }
 
-    public static boolean check(String str){
+    public static boolean check(String str) {
         return str != null && !str.trim().isEmpty();
     }
 
@@ -41,4 +45,10 @@ public class Utils {
         return output.toString();
     }
 
+    public static int getEastAsianWidth(String text) {
+        return text.codePoints().map(c -> UCharacter.getIntPropertyValue(c, UProperty.EAST_ASIAN_WIDTH))
+                .map(p -> (p == UCharacter.EastAsianWidth.AMBIGUOUS || p == UCharacter.EastAsianWidth.FULLWIDTH
+                        || p == UCharacter.EastAsianWidth.WIDE) ? 2 : 1)
+                .sum();
+    }
 }

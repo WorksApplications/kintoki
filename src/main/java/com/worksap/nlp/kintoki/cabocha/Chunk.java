@@ -18,6 +18,7 @@ package com.worksap.nlp.kintoki.cabocha;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Chunk {
 
@@ -99,5 +100,9 @@ public class Chunk {
 
     public void setTokenPos(int tokenPos) {
         this.tokenPos = tokenPos;
+    }
+
+    public String getSurface() {
+        return tokens.stream().map(Token::getSurface).collect(Collectors.joining());
     }
 }

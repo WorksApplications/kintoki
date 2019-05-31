@@ -246,7 +246,7 @@ public class Tree {
     private void writeTree(StringBuilder sb) {
         int size = getChunkSize();
         Optional<Integer> maxLength = getChunks().stream()
-                .map(chunk -> chunk.getTokens().stream().map(Token::getSurface).collect(Collectors.joining()).length())
+                .map(chunk -> Utils.getEastAsianWidth(chunk.getSurface()))
                 .collect(Collectors.reducing(Integer::max));
         if (!maxLength.isPresent()) {
             sb.append(EOS_NL);
@@ -258,10 +258,10 @@ public class Tree {
         for (int i = 0; i < size; ++i) {
             boolean isDep = false;
             int link = chunk(i).getLink();
-            String surface = chunk(i).getTokens().stream().map(Token::getSurface).collect(Collectors.joining());
-            int rem = maxLen - surface.length() + i * 2;
+            String surface = chunk(i).getSurface();
+            int rem = maxLen - Utils.getEastAsianWidth(surface) + i * 2;
             for (int j = 0; j < rem; ++j) {
-                sb.append(" ");
+                sb.append(' ');
             }
             sb.append(surface);
 
