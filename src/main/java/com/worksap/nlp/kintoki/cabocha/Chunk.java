@@ -57,6 +57,10 @@ public class Chunk {
         return tokens.size();
     }
 
+    public boolean isEmpty() {
+        return tokens.isEmpty();
+    }
+
     public Token token(int index) {
         return tokens.get(index);
     }

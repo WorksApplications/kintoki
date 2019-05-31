@@ -275,8 +275,10 @@ public class Parser {
 
         tree = new Tree();
 
-        if (!tree.read(text, inputLayer)) {
-            throw new IllegalArgumentException("Format error: [" + text + "] ");
+        try {
+            tree.read(text, inputLayer);
+        } catch (RuntimeException e) {
+            throw new IllegalArgumentException("Format error: [" + text + "] ", e);
         }
 
         return parse(tree);

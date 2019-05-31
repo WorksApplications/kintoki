@@ -51,9 +51,6 @@ public class Param {
         keyTypes.put(Param.SUDACHI_DICT, String.class);
         keyTypes.put(Param.ACTION_MODE, Integer.class);
         keyTypes.put(Param.OUTPUT_FORMAT, Integer.class);
-        keyTypes.put(Param.NBEST, Integer.class);
-        keyTypes.put(Param.VERBOSE, Integer.class);
-        keyTypes.put(Param.COST_FACTOR, Double.class);
     }
 
     private Map<String, Object> conf = new HashMap<>();
