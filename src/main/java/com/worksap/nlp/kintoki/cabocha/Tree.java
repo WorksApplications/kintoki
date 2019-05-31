@@ -192,11 +192,8 @@ public class Tree {
             writeTree(sb);
             break;
         case FORMAT_XML:
-            writeXml(sb, outputLayer);
-            break;
         case FORMAT_CONLL:
-            writeConll(sb, outputLayer);
-            break;
+            throw new UnsupportedOperationException("Not implemented");
         case FORMAT_NONE:
             break;
         default:
@@ -285,121 +282,6 @@ public class Tree {
         }
 
         sb.append(EOS_NL);
-    }
-
-    private void writeXml(StringBuilder sb, OutputLayerType outputLayer) {
-        int ci = 0;
-        int size = getChunkSize();
-
-        sb.append("<sentence>\n");
-
-        for (int i = 0; i < size; ++i) {
-            Chunk chunk = chunk(i);
-            if (chunk == null) {
-                continue;
-            }
-
-            if (outputLayer != OutputLayerType.OUTPUT_POS) {
-                if (ci > 0) {
-                    sb.append(" </chunk>\n");
-                }
-                sb.append(" <chunk id=\"" + (ci++) + "\" link=\"" + chunk.getLink());
-                sb.append("\" rel=\"D");
-                sb.append("\" score=\"" + chunk.getScore());
-                sb.append("\" head=\"" + chunk.getHeadPos());
-                sb.append("\" func=\"" + chunk.getFuncPos() + "\"");
-                if (outputLayer == OutputLayerType.OUTPUT_SELECTION && chunk.getFeatureList() != null) {
-                    String features = String.join("", chunk.getFeatureList());
-                    sb.append(" feature=\"");
-                    sb.append(writeXmlString(features));
-                    sb.append("\"");
-                }
-                sb.append(">\n");
-            }
-
-            for (int j = 0; j < chunk.getTokenSize(); j++) {
-                Token token = chunk.token(j);
-                sb.append(writeXmlToken(token, j));
-            }
-
-            if (ci > 0) {
-                sb.append(" </chunk>\n");
-            }
-        }
-
-        sb.append("</sentence>\n");
-    }
-
-    private String writeXmlString(String str) {
-        return str.replace("\"", "&quot;").replace("\'", "&apos;").replace("<", "&lt;").replace(">", "&gt;")
-                .replace("&", "&amp;");
-    }
-
-    private String writeXmlToken(Token token, int i) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("  <tok id=\"" + i + "\"" + " feature=\"");
-        sb.append(writeXmlString(token.getFeature()));
-        sb.append("\">");
-        sb.append(writeXmlString(token.getSurface()));
-        sb.append("</tok>\n");
-
-        return sb.toString();
-    }
-
-    private void writeConll(StringBuilder sb, OutputLayerType outputLayer) {
-        int size = getChunkSize();
-        int tokenId = 1;
-        String pos;
-
-        for (int i = 0; i < size; ++i) {
-            Chunk chunk = chunk(i);
-            String dlabel = "_";
-            for (int j = 0; j < chunk.getTokenSize(); ++j) {
-                int link = 0;
-                if (j == chunk.getTokenSize() - 1 && chunk.getLink() >= 0 && chunk.getLink() < getChunkSize()) {
-                    Chunk head = chunk(chunk.getLink());
-                    link = head.getHeadPos() + head.getTokenPos() + 1;
-                    dlabel = "D";
-                } else {
-                    link = chunk.getTokenPos() + j + 2;
-                }
-                if (link == getTokenSize() + 1) {
-                    link = 0;
-                }
-                Token token = token(chunk.getTokenPos() + j);
-
-                String lemma = token.getNormalizedSurface();
-
-                pos = Utils.concatFeature(token, 4);
-                if (token.getFeatureList().size() > 7) {
-                    lemma = token.getFeatureList().get(6);
-                }
-
-                String category = "_";
-                if (!token.getFeatureList().isEmpty()) {
-                    category = token.getFeatureList().get(0);
-                }
-
-                sb.append((tokenId++) + "\t" + token.getSurface() + "\t" + lemma);
-                sb.append("\t" + category + "\t" + pos);
-                sb.append("\tfeature=" + token.getFeature());
-
-                if (j == 0 && outputLayer.getValue() >= Constant.CABOCHA_OUTPUT_CHUNK) {
-                    sb.append("|begin_chunk=1");
-                }
-                if (outputLayer.getValue() >= Constant.CABOCHA_OUTPUT_SELECTION) {
-                    if (j == chunk.getHeadPos()) {
-                        sb.append("|head=1");
-                    }
-                    if (j == chunk.getFuncPos()) {
-                        sb.append("|func=1");
-                    }
-                }
-                sb.append("\t" + link + "\t" + dlabel + "\t_\t_\n");
-            }
-        }
-
-        sb.append("\n");
     }
 
     public boolean isEmpty() {
