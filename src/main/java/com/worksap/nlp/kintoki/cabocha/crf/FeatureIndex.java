@@ -32,25 +32,23 @@ abstract class FeatureIndex {
     protected List<String> unigramTempls;
     protected List<String> bigramTempls;
     protected List<String> y;
-    protected List<List<Path>> pathList;
-    protected List<List<Node>> nodeList;
 
     protected abstract int getID(String s);
 
-    void calcCost(Node node) {
+    double calcCost(Node node) {
         double c = 0.0;
         for (int f : node.fVector) {
             c += alpha[f + node.y];
         }
-        node.cost = costFactor * c;
+        return costFactor * c;
     }
 
-    void calcCost(Path path) {
+    double calcPathCost(Node lNode, Node rNode) {
         double c = 0.0;
-        for (int f : path.fvector) {
-            c += alpha[f + path.lnode.y * y.size() + path.rnode.y];
+        for (int f : rNode.lPathFVector) {
+            c += alpha[f + lNode.y * y.size() + rNode.y];
         }
-        path.cost = costFactor * c;
+        return costFactor * c;
     }
 
     private String getIndex(String[] idxStr, int pos, Tagger tagger) {
@@ -131,7 +129,6 @@ abstract class FeatureIndex {
             List<Integer> f = featureCache.get(fid++);
             for (int i = 0; i < y.size(); i++) {
                 Node n = new Node();
-                n.clear();
                 n.x = pos;
                 n.y = i;
                 n.fVector = f;
@@ -140,14 +137,8 @@ abstract class FeatureIndex {
         }
         for (int pos = 1; pos < tagger.size(); pos++) {
             List<Integer> f = featureCache.get(fid++);
-            for (int j = 0; j < y.size(); j++) {
-                Node lNode = tagger.node(pos - 1, j);
-                for (int i = 0; i < y.size(); i++) {
-                    Node rNode = tagger.node(pos, i);
-                    Path p = new Path();
-                    p.add(lNode, rNode);
-                    p.fvector = f;
-                }
+            for (int i = 0; i < y.size(); i++) {
+                tagger.node(pos, i).lPathFVector = f;
             }
         }
     }

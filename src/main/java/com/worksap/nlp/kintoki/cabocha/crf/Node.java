@@ -16,31 +16,13 @@
 
 package com.worksap.nlp.kintoki.cabocha.crf;
 
-import java.util.ArrayList;
 import java.util.List;
 
 class Node {
     int x;
     int y;
-    double cost;
     double bestCost;
     Node prev;
     List<Integer> fVector;
-    List<Path> lpath;
-
-    Node() {
-        lpath = new ArrayList<>();
-        clear();
-        bestCost = 0.0;
-        prev = null;
-    }
-
-    void clear() {
-        x = 0;
-        y = 0;
-        cost = 0;
-        prev = null;
-        fVector = null;
-        lpath.clear();
-    }
+    List<Integer> lPathFVector;
 }

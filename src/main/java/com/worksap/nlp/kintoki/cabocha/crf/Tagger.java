@@ -63,23 +63,6 @@ public class Tagger {
     }
 
     private void viterbi() {
-        for (List<Node> current : lattice) {
-            for (Node node : current) {
-                double bestc = Double.NEGATIVE_INFINITY;
-                Node best = null;
-                List<Path> lpath = node.lpath;
-                for (Path p : lpath) {
-                    double c = p.lnode.bestCost + p.cost + node.cost;
-                    if (c > bestc) {
-                        bestc = c;
-                        best = p.lnode;
-                    }
-                }
-                node.prev = best;
-                node.bestCost = best != null ? bestc : node.cost;
-            }
-        }
-
         double bestc = Double.NEGATIVE_INFINITY;
         Node best = null;
         for (Node node : lattice.get(x.size() - 1)) {
@@ -101,13 +84,26 @@ public class Tagger {
 
         featureIndex.rebuildFeatures(this);
 
-        for (List<Node> current : lattice) {
-            for (Node node : current) {
-                featureIndex.calcCost(node);
-                List<Path> lpath = node.lpath;
-                for (Path p : lpath) {
-                    featureIndex.calcCost(p);
+        for (int position = 0; position < lattice.size(); position++) {
+            for (Node rNode : lattice.get(position)) {
+                double rNodeCost = featureIndex.calcCost(rNode);
+                if (position == 0) {
+                    rNode.bestCost = rNodeCost;
+                } else {
+                    connectNodes(position, rNode, rNodeCost);
                 }
+            }
+        }
+    }
+
+    private void connectNodes(int position, Node rNode, double rNodeCost) {
+        rNode.bestCost = Double.NEGATIVE_INFINITY;
+        for (int ly = 0; ly < ysize; ly++) {
+            Node lNode = node(position - 1, ly);
+            double c = lNode.bestCost + featureIndex.calcPathCost(lNode, rNode) + rNodeCost;
+            if (c > rNode.bestCost) {
+                rNode.bestCost = c;
+                rNode.prev = lNode;
             }
         }
     }
