@@ -18,6 +18,7 @@ package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.sudachi.Morpheme;
 
+import java.io.IOException;
 import java.util.List;
 
 public class MorphAnalyzer extends Analyzer {
@@ -25,7 +26,7 @@ public class MorphAnalyzer extends Analyzer {
     private SudachiTokenizer tokenizer;
 
     @Override
-    public void open(Param param) {
+    public void open(Param param) throws IOException {
         this.tokenizer = SudachiTokenizer.getInstance(param.getString(Param.SUDACHI_DICT));
     }
 

@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import java.io.IOException;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class MorphAnalyzerTest {
 
@@ -57,4 +58,11 @@ public class MorphAnalyzerTest {
                 tree.getTokens().stream().map(t -> t.getSurface()).toArray(String[]::new));
     }
 
+    @Test
+    public void parseWithEmpty() {
+        tree.setSentence("");
+        morpher.parse(tree);
+
+        assertEquals(0, tree.getTokenSize());
+    }
 }
