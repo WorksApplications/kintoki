@@ -39,16 +39,16 @@ abstract class FeatureIndex {
 
     void calcCost(Node node) {
         double c = 0.0;
-        for (int i = 0; node.fVector.get(i) != -1; i++) {
-            c += alpha[node.fVector.get(i) + node.y];
+        for (int f : node.fVector) {
+            c += alpha[f + node.y];
         }
         node.cost = costFactor * c;
     }
 
     void calcCost(Path path) {
         double c = 0.0;
-        for (int i = 0; path.fvector.get(i) != -1; i++) {
-            c += alpha[path.fvector.get(i) + path.lnode.y * y.size() + path.rnode.y];
+        for (int f : path.fvector) {
+            c += alpha[f + path.lnode.y * y.size() + path.rnode.y];
         }
         path.cost = costFactor * c;
     }
@@ -109,21 +109,18 @@ abstract class FeatureIndex {
     }
 
     void buildFeatures(Tagger tagger) {
-        List<Integer> feature = new ArrayList<>();
         List<List<Integer>> featureCache = tagger.getFeatureCache();
         tagger.setFeatureId(featureCache.size());
 
         for (int cur = 0; cur < tagger.size(); cur++) {
+            List<Integer> feature = new ArrayList<>();
             buildFeatureFromTempl(feature, unigramTempls, cur, tagger);
-            feature.add(-1);
             featureCache.add(feature);
-            feature = new ArrayList<>();
         }
         for (int cur = 1; cur < tagger.size(); cur++) {
+            List<Integer> feature = new ArrayList<>();
             buildFeatureFromTempl(feature, bigramTempls, cur, tagger);
-            feature.add(-1);
             featureCache.add(feature);
-            feature = new ArrayList<>();
         }
     }
 
@@ -144,10 +141,11 @@ abstract class FeatureIndex {
         for (int pos = 1; pos < tagger.size(); pos++) {
             List<Integer> f = featureCache.get(fid++);
             for (int j = 0; j < y.size(); j++) {
+                Node lNode = tagger.node(pos - 1, j);
                 for (int i = 0; i < y.size(); i++) {
+                    Node rNode = tagger.node(pos, i);
                     Path p = new Path();
-                    p.clear();
-                    p.add(tagger.node(pos - 1, j), tagger.node(pos, i));
+                    p.add(lNode, rNode);
                     p.fvector = f;
                 }
             }

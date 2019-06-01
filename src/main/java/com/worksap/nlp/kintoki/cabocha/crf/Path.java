@@ -39,7 +39,6 @@ class Path {
     void add(Node lnode, Node rnode) {
         this.lnode = lnode;
         this.rnode = rnode;
-        lnode.rpath.add(this);
         rnode.lpath.add(this);
     }
 }

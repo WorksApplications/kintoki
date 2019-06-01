@@ -27,11 +27,9 @@ class Node {
     Node prev;
     List<Integer> fVector;
     List<Path> lpath;
-    List<Path> rpath;
 
     Node() {
         lpath = new ArrayList<>();
-        rpath = new ArrayList<>();
         clear();
         bestCost = 0.0;
         prev = null;
@@ -44,6 +42,5 @@ class Node {
         prev = null;
         fVector = null;
         lpath.clear();
-        rpath.clear();
     }
 }
