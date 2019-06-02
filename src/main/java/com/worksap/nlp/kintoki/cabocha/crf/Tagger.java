@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Tagger {
 
@@ -51,7 +53,7 @@ public class Tagger {
             throw new IllegalArgumentException("cost factor must be positive");
         }
         FeatureIndex featureIndex;
-        synchronized(featureIndexCache) {
+        synchronized (featureIndexCache) {
             featureIndex = featureIndexCache.get(path);
             if (featureIndex == null) {
                 featureIndex = DecoderFeatureIndex.openBinaryModel(path);
@@ -63,16 +65,13 @@ public class Tagger {
     }
 
     private void viterbi() {
-        double bestc = Double.NEGATIVE_INFINITY;
-        Node best = null;
-        for (Node node : lattice.get(x.size() - 1)) {
-            if (bestc < node.bestCost) {
-                best = node;
-                bestc = node.bestCost;
-            }
+        Optional<Node> best = lattice.get(x.size() - 1).stream()
+                .collect(Collectors.maxBy((a, b) -> Double.compare(a.bestCost, b.bestCost)));
+        if (!best.isPresent()) {
+            throw new IllegalArgumentException("Invalid lattice");
         }
 
-        for (Node n = best; n != null; n = n.prev) {
+        for (Node n = best.get(); n != null; n = n.prev) {
             result.set(n.x, n.y);
         }
     }
