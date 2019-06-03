@@ -158,7 +158,7 @@ public class Selector extends Analyzer {
             } else if (fcform != null) {
                 chunk.getFeatureList().add("A:" + fcform);
             } else {
-                String output = Utils.concatFeature(ftoken, posSize);
+                String output = concatFeature(ftoken, posSize);
                 chunk.getFeatureList().add("A:" + output);
             }
         }
@@ -195,4 +195,18 @@ public class Selector extends Analyzer {
         }
     }
 
+    private static String concatFeature(Token token, int size) {
+        StringBuilder output = new StringBuilder();
+        int minSize = Math.min(token.getFeatureListSize(), size);
+        for (int i = 0; i < minSize; ++i) {
+            if (("*").equals(token.getFeatureList().get(i))) {
+                break;
+            }
+            if (i != 0) {
+                output.append("-");
+            }
+            output.append(token.getFeatureList().get(i));
+        }
+        return output.toString();
+    }
 }
