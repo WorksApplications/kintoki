@@ -106,16 +106,16 @@
             </goals>
             <phase>process-test-resources</phase>
             <configuration>
-	      <mainClass>com.worksap.nlp.sudachi.dictionary.DictionaryBuilder</mainClass>
-	      <arguments>
+              <mainClass>com.worksap.nlp.sudachi.dictionary.DictionaryBuilder</mainClass>
+              <arguments>
                 <argument>-o</argument>
-	        <argument>${project.build.testOutputDirectory}/system.dic</argument>
+                <argument>${project.build.testOutputDirectory}/system.dic</argument>
                 <argument>-m</argument>
-	        <argument>${test.dict.source.directory}/sudachi_matrix.def</argument>
+                <argument>${test.dict.source.directory}/sudachi_matrix.def</argument>
                 <argument>-d</argument>
                 <argument>Sudachi dictionary for the unit tests</argument>
                 <argument>${test.dict.source.directory}/sudachi_dict.csv</argument>
-	      </arguments>
+              </arguments>
             </configuration>
           </execution>
         </executions>
