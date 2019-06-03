@@ -25,7 +25,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DependencyParser extends Analyzer {
+public class DependencyParser implements Analyzer {
 
     private SVMModel svmModel = null;
     private DependencyParserData data = null;
@@ -107,8 +107,7 @@ public class DependencyParser extends Analyzer {
             // Here we assume that a chunk modifes the next chunk,
             // if the dependency relation is unknown. We don't use the fake
             // dependency for training.
-            boolean isFakeLink = (getActionMode() == Constant.TRAINING_MODE && dst != size - 1
-                    && tree.chunk(src).getLink() == -1);
+            boolean isFakeLink = (dst != size - 1 && tree.chunk(src).getLink() == -1);
 
             // if agenda is empty, src == -1.
             while (src != -1 && (dst == size - 1 || isFakeLink || (score = estimate(tree, src, dst)) > 0)) {

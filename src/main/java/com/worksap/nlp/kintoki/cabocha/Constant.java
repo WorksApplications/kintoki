@@ -46,8 +46,6 @@ public class Constant {
 
     public static final int CABOCHA_MAX_LINE_SIZE = 8192;
 
-    public static final int PARSING_MODE = 0;
-    public static final int TRAINING_MODE = 1;
     public static final int MODEL_VERSION = 100;
 
     public static final String CABOCHA_DEFAULT_POSSET = "UNIDIC";

@@ -31,11 +31,7 @@ public class Param {
     public static final String PARSER_MODEL = "parser-model";
     public static final String CHUNKER_MODEL = "chunker-model";
     public static final String SUDACHI_DICT = "sudachi-dict";
-    public static final String ACTION_MODE = "action-mode";
     public static final String OUTPUT_FORMAT = "output-format";
-    public static final String NBEST = "nbest";
-    public static final String VERBOSE = "verbose";
-    public static final String COST_FACTOR = "cost-factor";
     public static final String RC_FILE = "rcfile";
     public static final String OUTPUT = "output";
     public static final String HELP = "help";
@@ -49,7 +45,6 @@ public class Param {
         keyTypes.put(Param.PARSER_MODEL, String.class);
         keyTypes.put(Param.CHUNKER_MODEL, String.class);
         keyTypes.put(Param.SUDACHI_DICT, String.class);
-        keyTypes.put(Param.ACTION_MODE, Integer.class);
         keyTypes.put(Param.OUTPUT_FORMAT, Integer.class);
     }
 

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Chunker extends Analyzer {
+public class Chunker implements Analyzer {
 
     private static final double CRF_COST_FACTOR = 1.0;
 

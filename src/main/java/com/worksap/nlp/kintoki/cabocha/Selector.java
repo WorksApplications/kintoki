@@ -17,14 +17,13 @@
 package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.kintoki.cabocha.util.PropertyUtil;
-import com.worksap.nlp.kintoki.cabocha.util.Utils;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Selector extends Analyzer {
+public class Selector implements Analyzer {
 
     private PatternMatcher patKutouten, patOpenBracket, patCloseBracket;
     private PatternMatcher patDynA, patCase;

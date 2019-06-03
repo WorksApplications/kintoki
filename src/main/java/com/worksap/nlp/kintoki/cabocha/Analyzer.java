@@ -18,24 +18,10 @@ package com.worksap.nlp.kintoki.cabocha;
 
 import java.io.IOException;
 
-public abstract class Analyzer {
-
-    private int actionMode;
+public interface Analyzer {
 
     public abstract void open(Param param) throws IOException;
 
     public abstract void parse(Tree tree);
-
-    public Analyzer() {
-        this.actionMode = Constant.PARSING_MODE;
-    }
-
-    public int getActionMode() {
-        return actionMode;
-    }
-
-    public void setActionMode(int actionMode) {
-        this.actionMode = actionMode;
-    }
 
 }

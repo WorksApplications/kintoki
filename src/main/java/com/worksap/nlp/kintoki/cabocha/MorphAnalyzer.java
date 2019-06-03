@@ -21,7 +21,7 @@ import com.worksap.nlp.sudachi.Morpheme;
 import java.io.IOException;
 import java.util.List;
 
-public class MorphAnalyzer extends Analyzer {
+public class MorphAnalyzer implements Analyzer {
 
     private SudachiTokenizer tokenizer;
 
