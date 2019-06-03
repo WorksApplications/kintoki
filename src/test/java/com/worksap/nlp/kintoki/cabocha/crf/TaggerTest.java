@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 
-import com.worksap.nlp.kintoki.cabocha.Utils;
+import com.worksap.nlp.kintoki.cabocha.TestUtils;
 
 public class TaggerTest {
 
@@ -38,7 +38,7 @@ public class TaggerTest {
 
     @Before
     public void setUp() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
         modelFileName = temporaryFolder.getRoot().toPath().resolve("chunk.bccwj.model").toString();
         tagger = Tagger.openBinaryModel(modelFileName, 1.0);
     }

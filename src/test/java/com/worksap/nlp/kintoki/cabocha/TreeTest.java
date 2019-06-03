@@ -176,4 +176,44 @@ public class TreeTest {
                 + "EOS\n",
                 sb.toString());
     }
+
+    @Test
+    public void writeEmptyRawSentence() {
+        Tree tree = new Tree();
+        tree.setOutputLayer(OutputLayerType.OUTPUT_RAW_SENTENCE);
+        assertEquals("\n", tree.toString(FormatType.FORMAT_LATTICE));
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_TREE));
+    }
+
+    @Test
+    public void writeEmptyPOS() {
+        Tree tree = new Tree();
+        tree.setOutputLayer(OutputLayerType.OUTPUT_POS);
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_LATTICE));
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_TREE));
+    }
+
+    @Test
+    public void writeEmptyChunk() {
+        Tree tree = new Tree();
+        tree.setOutputLayer(OutputLayerType.OUTPUT_CHUNK);
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_LATTICE));
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_TREE));
+    }
+
+    @Test
+    public void writeEmptySelection() {
+        Tree tree = new Tree();
+        tree.setOutputLayer(OutputLayerType.OUTPUT_SELECTION);
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_LATTICE));
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_TREE));
+    }
+
+    @Test
+    public void writeEmptyDep() {
+        Tree tree = new Tree();
+        tree.setOutputLayer(OutputLayerType.OUTPUT_DEP);
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_LATTICE));
+        assertEquals("EOS\n", tree.toString(FormatType.FORMAT_TREE));
+    }
 }

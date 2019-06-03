@@ -36,10 +36,10 @@ public class CabochaTest {
 
     @Before
     public void setUp() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
-        inputFile = Utils.getInput(temporaryFolder.getRoot().toPath());
-        outputFile = Utils.getOutput(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
+        inputFile = TestUtils.getInput(temporaryFolder.getRoot().toPath());
+        outputFile = TestUtils.getOutput(temporaryFolder.getRoot().toPath());
     }
 
     @Test

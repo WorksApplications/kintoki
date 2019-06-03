@@ -40,8 +40,8 @@ public class DependencyParserTest {
 
     @Before
     public void prepare() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
         param.loadConfig(configPath);
 
         List<Chunk> chunks = tree.getChunks();

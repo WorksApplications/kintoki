@@ -27,7 +27,7 @@ public class EastAsianWidth {
         wideRanges = new ArrayList<>();
         try {
             loadDefinition(EastAsianWidth.class.getResourceAsStream("/EastAsianWidth.txt"));
-        } catch (Throwable ignore) {
+        } catch (Exception ignore) {
             // do nothing
             // getEastAsianWidth() always return String#length()
         }

@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Utils {
+public class TestUtils {
     static final String[] RESOURCES = { "/chunk.bccwj.model", "/dep.bccwj.model", "/system.dic", "/sudachi.json",
             "/input", };
 
@@ -39,7 +39,7 @@ public class Utils {
     public static void copyResources(Path folder) throws IOException {
         for (String file : RESOURCES) {
             try {
-                URL src = Utils.class.getResource(file);
+                URL src = TestUtils.class.getResource(file);
                 Path dest = Paths.get(src.toURI()).getFileName();
                 Files.copy(src.openStream(), folder.resolve(dest));
             } catch (URISyntaxException e) {
@@ -52,7 +52,7 @@ public class Utils {
         Path dest = Paths.get(PROPERTY_FILE).getFileName();
         Path configPath = folder.resolve(dest);
         String dir = folder.toString();
-        try (InputStream in = Utils.class.getResourceAsStream(PROPERTY_FILE + ".in");
+        try (InputStream in = TestUtils.class.getResourceAsStream(PROPERTY_FILE + ".in");
                 InputStreamReader r = new InputStreamReader(in);
                 BufferedReader reader = new BufferedReader(r);
                 PrintStream output = new PrintStream(configPath.toFile())) {

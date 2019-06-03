@@ -16,16 +16,13 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
-import com.worksap.nlp.kintoki.cabocha.util.Utils;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
 
-    private List<Analyzer> analyzer = new ArrayList<>();
-    private Tree tree;
+    private List<Analyzer> analyzerList = new ArrayList<>();
     private FormatType outputFormat;
     private InputLayerType inputLayer;
     private OutputLayerType outputLayer;
@@ -39,14 +36,8 @@ public class Parser {
      */
     public Parser() throws IOException {
         this.param = new Param();
-        try {
-            this.param.loadConfig();
-            loadParam(param);
-        } catch (NullPointerException e) {
-            this.outputFormat = FormatType.FORMAT_TREE;
-            this.inputLayer = InputLayerType.INPUT_RAW_SENTENCE;
-            this.outputLayer = OutputLayerType.OUTPUT_DEP;
-        }
+        this.param.loadConfig();
+        loadParam(param);
     }
 
     /**
@@ -58,24 +49,16 @@ public class Parser {
      */
     public Parser(String config) throws IOException {
         this.param = new Param();
-        try {
-            this.param.loadConfig(config);
-            loadParam(param);
-        } catch (NullPointerException e) {
-            this.outputFormat = FormatType.FORMAT_TREE;
-            this.inputLayer = InputLayerType.INPUT_RAW_SENTENCE;
-            this.outputLayer = OutputLayerType.OUTPUT_DEP;
-        }
+        this.param.loadConfig(config);
+        loadParam(param);
     }
 
     /**
      * Create a new instance of Parser class.
      *
      * @param param parameters required in parsing
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
      */
-    public Parser(Param param) throws IOException {
+    public Parser(Param param) {
         this.param = param;
         loadParam(param);
     }
@@ -243,7 +226,7 @@ public class Parser {
 
     private void pushAnalyzer(Analyzer analyzer) throws IOException {
         analyzer.open(param);
-        this.analyzer.add(analyzer);
+        this.analyzerList.add(analyzer);
     }
 
     /**
@@ -255,8 +238,8 @@ public class Parser {
      */
     public Tree parse(Tree tree) {
         tree.setOutputLayer(this.outputLayer);
-        for (int i = 0; i < analyzer.size(); ++i) {
-            analyzer.get(i).parse(tree);
+        for (Analyzer analyzer : analyzerList) {
+            analyzer.parse(tree);
         }
         return tree;
     }
@@ -265,15 +248,10 @@ public class Parser {
      * Parse a given sentence.
      *
      * @param text the sentence to be parsed
-     * @return a tree object will be returned if the parsing is success, otherwise
-     *         return null
+     * @return a tree object will be returned
      */
     public Tree parse(String text) {
-        if (!Utils.check(text)) {
-            return null;
-        }
-
-        tree = new Tree();
+        Tree tree = new Tree();
 
         try {
             tree.read(text, inputLayer);
@@ -290,16 +268,9 @@ public class Parser {
      * @param sent the sentence to be parsed
      * @return a string will be returned if the parsing is success, otherwise return
      *         null
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
      */
-    public String parseToString(String sent) throws IOException {
-        if (!Utils.check(sent)) {
-            return null;
-        }
-
-        parse(sent);
-
+    public String parseToString(String sent) {
+        Tree tree = parse(sent);
         return tree.toString(outputFormat);
     }
 

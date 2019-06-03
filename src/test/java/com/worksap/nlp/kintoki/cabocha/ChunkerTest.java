@@ -37,8 +37,8 @@ public class ChunkerTest {
 
     @Before
     public void setUp() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
 
         param = new Param();
         param.loadConfig(configPath);

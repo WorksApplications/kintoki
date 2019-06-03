@@ -30,7 +30,7 @@ public class Tree {
     private static final String EOS_NL = "EOS\n";
 
     private OutputLayerType outputLayer;
-    private String sentence;
+    private String sentence = "";
     private List<Token> tokens = new ArrayList<>();
     private List<Chunk> chunks = new ArrayList<>();
 
@@ -108,6 +108,9 @@ public class Tree {
     }
 
     private void readCaboChaFormat(String input, InputLayerType inputLayer) {
+        if (input.trim().isEmpty()) {
+            return;
+        }
         int chunkId = 0;
         for (String line : input.split("\n")) {
             if (line.trim().isEmpty()) {

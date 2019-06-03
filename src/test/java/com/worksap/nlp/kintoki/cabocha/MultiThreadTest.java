@@ -36,8 +36,8 @@ public class MultiThreadTest {
 
     @Before
     public void setUp() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
     }
 
     private static Map<Integer, List<String>> mapResult = new HashMap<>();
