@@ -116,7 +116,7 @@ public class Tree {
             if (line.trim().isEmpty()) {
                 throw new IllegalArgumentException("Invalid format");
             }
-            if (line.length() >= 3 && line.startsWith("* ")) {
+            if (line.startsWith("* ")) {
                 if (inputLayer == InputLayerType.INPUT_POS) {
                     continue;
                 }
