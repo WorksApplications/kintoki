@@ -16,7 +16,7 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
-import com.worksap.nlp.kintoki.cabocha.util.Utils;
+import com.worksap.nlp.kintoki.cabocha.util.EastAsianWidth;
 import com.worksap.nlp.sudachi.Morpheme;
 
 import java.util.ArrayList;
@@ -246,7 +246,7 @@ public class Tree {
     private void writeTree(StringBuilder sb) {
         int size = getChunkSize();
         Optional<Integer> maxLength = getChunks().stream()
-                .map(chunk -> Utils.getEastAsianWidth(chunk.getSurface()))
+                .map(chunk -> EastAsianWidth.getEastAsianWidth(chunk.getSurface()))
                 .collect(Collectors.reducing(Integer::max));
         if (!maxLength.isPresent()) {
             sb.append(EOS_NL);
@@ -259,7 +259,7 @@ public class Tree {
             boolean isDep = false;
             int link = chunk(i).getLink();
             String surface = chunk(i).getSurface();
-            int rem = maxLen - Utils.getEastAsianWidth(surface) + i * 2;
+            int rem = maxLen - EastAsianWidth.getEastAsianWidth(surface) + i * 2;
             for (int j = 0; j < rem; ++j) {
                 sb.append(' ');
             }
