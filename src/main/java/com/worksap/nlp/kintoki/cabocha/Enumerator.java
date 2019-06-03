@@ -26,7 +26,7 @@ enum FormatType {
 
     private final int value;
 
-    FormatType(int value){
+    FormatType(int value) {
         this.value = value;
     }
 
@@ -44,7 +44,7 @@ enum InputLayerType {
 
     private final int value;
 
-    InputLayerType(int value){
+    InputLayerType(int value) {
         this.value = value;
     }
 
@@ -62,7 +62,7 @@ enum OutputLayerType {
 
     private final int value;
 
-    OutputLayerType(int value){
+    OutputLayerType(int value) {
         this.value = value;
     }
 
@@ -78,7 +78,7 @@ enum ParserType {
 
     private final int value;
 
-    ParserType(int value){
+    ParserType(int value) {
         this.value = value;
     }
 

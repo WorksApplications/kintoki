@@ -23,9 +23,7 @@ class DoubleArrayTrie {
 
     private int[] array;
 
-    DoubleArrayTrie() {}
-
-    void setArray(ByteBuffer array, int byteSize) {
+    DoubleArrayTrie(ByteBuffer array, int byteSize) {
         int arraySize = byteSize / 4;
         this.array = new int[arraySize];
         for (int i = 0; i < arraySize; ++i) {

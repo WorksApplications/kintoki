@@ -17,20 +17,19 @@
 package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.kintoki.cabocha.util.PropertyUtil;
-import com.worksap.nlp.kintoki.cabocha.util.Utils;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Selector extends Analyzer {
+public class Selector implements Analyzer {
 
     private PatternMatcher patKutouten, patOpenBracket, patCloseBracket;
     private PatternMatcher patDynA, patCase;
     private PatternMatcher patUnidicFunc, patUnidicHead, patUnidicFunc2, patUnidicHead2, patUnidicHeadPre;
 
-    public Selector(){
+    public Selector() {
         super();
         this.patKutouten = new PatternMatcher();
         this.patOpenBracket = new PatternMatcher();
@@ -60,7 +59,7 @@ public class Selector extends Analyzer {
         this.patUnidicHeadPre.compile(patternMap.get("UNIDIC_HEAD_PRE_PAT"));
     }
 
-    private void findHead(Chunk chunk, Ref<Integer> headIndex, Ref<Integer> funcIndex){
+    private void findHead(Chunk chunk, Ref<Integer> headIndex, Ref<Integer> funcIndex) {
         headIndex.set(0);
         funcIndex.set(0);
         int tokenSize = chunk.getTokenSize();
@@ -90,10 +89,10 @@ public class Selector extends Analyzer {
         int chunkSize = tree.getChunkSize();
         int posSize = 2;
 
-        for (int i=0; i<chunkSize; i++){
+        for (int i = 0; i < chunkSize; i++) {
             Chunk chunk = tree.chunk(i);
             int tokenSize = chunk.getTokenSize();
-            for (int j=0; j<tokenSize; j++){
+            for (int j = 0; j < tokenSize; j++) {
                 Token token = chunk.token(j);
                 if (this.patKutouten.match(token.getNormalizedSurface())) {
                     chunk.getFeatureList().add("GPUNC:" + token.getNormalizedSurface());
@@ -126,7 +125,7 @@ public class Selector extends Analyzer {
             Token htoken = chunk.token(headIndex.get());
             Token ftoken = chunk.token(funcIndex.get());
             Token ltoken = chunk.token(0);
-            Token rtoken = chunk.token(tokenSize-1);
+            Token rtoken = chunk.token(tokenSize - 1);
 
             // static features
             emitTokenFeatures("FH", htoken, posSize, chunk.getFeatureList());
@@ -148,18 +147,18 @@ public class Selector extends Analyzer {
             }
 
             if (this.patCase.prefixMatch(ftoken.getFeature())) {
-                chunk.getFeatureList().add("GCASE:"+ftoken.getNormalizedSurface());
+                chunk.getFeatureList().add("GCASE:" + ftoken.getNormalizedSurface());
             }
 
             // dynamic features
             String fcform = getToken(ftoken, posSize + 1);
             if (this.patDynA.prefixMatch(ftoken.getFeature())) {
-                chunk.getFeatureList().add("A:"+ftoken.getNormalizedSurface());
-            } else if (fcform!=null) {
-                chunk.getFeatureList().add("A:"+fcform);
+                chunk.getFeatureList().add("A:" + ftoken.getNormalizedSurface());
+            } else if (fcform != null) {
+                chunk.getFeatureList().add("A:" + fcform);
             } else {
-                String output = Utils.concatFeature(ftoken, posSize);
-                chunk.getFeatureList().add("A:"+output);
+                String output = concatFeature(ftoken, posSize);
+                chunk.getFeatureList().add("A:" + output);
             }
         }
 
@@ -180,7 +179,7 @@ public class Selector extends Analyzer {
         String surface = token.getNormalizedSurface();
         String cform = getToken(token, posSize + 1);
 
-        featureList.add(header+"S:"+surface);
+        featureList.add(header + "S:" + surface);
 
         int size = Math.min(posSize, token.getFeatureListSize());
 
@@ -188,11 +187,25 @@ public class Selector extends Analyzer {
             if (("*").equals(token.getFeatureList().get(k))) {
                 break;
             }
-            featureList.add(header+"P"+k+":"+token.getFeatureList().get(k));
+            featureList.add(header + "P" + k + ":" + token.getFeatureList().get(k));
         }
-        if (cform!=null) {
-            featureList.add(header+"F:"+cform);
+        if (cform != null) {
+            featureList.add(header + "F:" + cform);
         }
     }
 
+    private static String concatFeature(Token token, int size) {
+        StringBuilder output = new StringBuilder();
+        int minSize = Math.min(token.getFeatureListSize(), size);
+        for (int i = 0; i < minSize; ++i) {
+            if (("*").equals(token.getFeatureList().get(i))) {
+                break;
+            }
+            if (i != 0) {
+                output.append("-");
+            }
+            output.append(token.getFeatureList().get(i));
+        }
+        return output.toString();
+    }
 }

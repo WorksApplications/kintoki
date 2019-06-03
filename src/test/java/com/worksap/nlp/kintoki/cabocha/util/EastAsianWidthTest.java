@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.kintoki.cabocha.model;
+package com.worksap.nlp.kintoki.cabocha.util;
 
-import java.util.List;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
 
-public abstract class SVMModel implements SVMModelInterface {
+import org.junit.Test;
 
-    public int size() { return alpha.size(); }
+public class EastAsianWidthTest {
 
-    public double y(int i) { return alpha.get(i) > 0 ? +1 : -1; }
-
-    public List<Integer> x(int i) { return x.get(i); }
-
-    public int id(String key) { return 0; }
-
-    public double classify(List<Integer> x) { return 0; }
-
-    protected List<Double> alpha;
-    protected List<List<Integer>> x;
-    protected Map<String, String> param;
-
+    @Test
+    public void getEastAsianWidth() {
+        assertEquals(3, EastAsianWidth.getEastAsianWidth("abc"));
+        assertEquals(4, EastAsianWidth.getEastAsianWidth("計ab"));
+        assertEquals(3, EastAsianWidth.getEastAsianWidth("ｶﾀ4"));
+        assertEquals(0, EastAsianWidth.getEastAsianWidth(""));
+    }
 }

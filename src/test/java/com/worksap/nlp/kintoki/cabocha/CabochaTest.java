@@ -26,7 +26,6 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-
 public class CabochaTest {
 
     @Rule
@@ -37,10 +36,10 @@ public class CabochaTest {
 
     @Before
     public void setUp() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
-        inputFile = Utils.getInput(temporaryFolder.getRoot().toPath());
-        outputFile = Utils.getOutput(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
+        inputFile = TestUtils.getInput(temporaryFolder.getRoot().toPath());
+        outputFile = TestUtils.getOutput(temporaryFolder.getRoot().toPath());
     }
 
     @Test
@@ -430,12 +429,7 @@ public class CabochaTest {
 
     @Test
     public void testMain() throws IOException {
-        String[] args = {inputFile,
-                "-r", configPath,
-                "-o", outputFile,
-                "-I2", "-O4",
-                "-f2"
-        };
+        String[] args = { inputFile, "-r", configPath, "-o", outputFile, "-I2", "-O4", "-f2" };
 
         Cabocha.main(args);
     }

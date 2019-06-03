@@ -21,52 +21,65 @@ import com.worksap.nlp.kintoki.cabocha.util.ByteUtil;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class DecoderFeatureIndex extends FeatureIndex {
+    private static final int MODEL_VERSION = 100;
     private DoubleArrayTrie dat;
 
-    public DecoderFeatureIndex() {
-        dat = new DoubleArrayTrie();
+    private DecoderFeatureIndex() {
     }
 
-    public int getID(String key) {
+    @Override
+    protected int getID(String key) {
         return dat.exactMatchSearch(key);
     }
 
-    public void openBinModel(String path) throws IOException {
+    static DecoderFeatureIndex openBinaryModel(String path) throws IOException {
+        DecoderFeatureIndex featureIndex = new DecoderFeatureIndex();
         ByteBuffer bytes = ByteUtil.readAsByteBuffer(path);
         int version = bytes.getInt(); // unsigned int
+        if (MODEL_VERSION / 100 != version / 100) {
+            throw new IOException("Invalid model");
+        }
         int type = bytes.getInt();
-        costFactor = bytes.getDouble();
-        maxId = bytes.getInt(); // unsigned int
-        xsize = bytes.getInt(); // unsigned int
+        featureIndex.costFactor = bytes.getDouble();
+        featureIndex.maxId = bytes.getInt(); // unsigned int
+        featureIndex.xsize = bytes.getInt(); // unsigned int
         int dsize = bytes.getInt(); // unsigned int
 
         int yStrSize = bytes.getInt(); // unsigned int
         String yStr = ByteUtil.getString(bytes, yStrSize, StandardCharsets.UTF_8);
-        y.addAll(Arrays.asList(yStr.split("\0")));
+        featureIndex.y = Arrays.asList(yStr.split("\0"));
 
         int tmplStrSize = bytes.getInt(); // unsigned int
         String[] tmplStr = ByteUtil.getString(bytes, tmplStrSize, StandardCharsets.UTF_8).split("\0");
-        for (String tmpl:tmplStr) {
+        List<String> unigramTempls = new ArrayList<>();
+        List<String> bigramTempls = new ArrayList<>();
+        for (String tmpl : tmplStr) {
             if (tmpl.startsWith("U")) {
                 unigramTempls.add(tmpl);
             } else if (tmpl.startsWith("B")) {
                 bigramTempls.add(tmpl);
             }
         }
+        featureIndex.unigramTempls = unigramTempls;
+        featureIndex.bigramTempls = bigramTempls;
 
-        dat.setArray(bytes, dsize);
+        featureIndex.dat = new DoubleArrayTrie(bytes, dsize);
 
-        alpha = new double[maxId];
-        for (int i = 0; i< maxId; i++) {
-            alpha[i] = bytes.getFloat();
+        featureIndex.alpha = new double[featureIndex.maxId];
+        for (int i = 0; i < featureIndex.maxId; i++) {
+            featureIndex.alpha[i] = bytes.getFloat();
         }
 
         if (bytes.position() != bytes.limit()) {
             throw new IOException("The offset is not equal to the length of byte array.");
         }
+
+        return featureIndex;
     }
 
 }

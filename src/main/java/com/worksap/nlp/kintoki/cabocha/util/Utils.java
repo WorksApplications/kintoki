@@ -16,29 +16,12 @@
 
 package com.worksap.nlp.kintoki.cabocha.util;
 
-import com.worksap.nlp.kintoki.cabocha.Token;
-
 public class Utils {
 
-    private Utils() {}
+    private Utils() {
+    }
 
-    public static boolean check(String str){
+    public static boolean check(String str) {
         return str != null && !str.trim().isEmpty();
     }
-
-    public static String concatFeature(Token token, int size) {
-        StringBuilder output = new StringBuilder();
-        int minSize = Math.min(token.getFeatureListSize(), size);
-        for (int i = 0; i < minSize; ++i) {
-            if (("*").equals(token.getFeatureList().get(i))) {
-                break;
-            }
-            if (i != 0) {
-                output.append("-");
-            }
-            output.append(token.getFeatureList().get(i));
-        }
-        return output.toString();
-    }
-
 }

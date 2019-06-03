@@ -16,8 +16,8 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
-import com.worksap.nlp.kintoki.cabocha.model.FastSVMModel;
-import com.worksap.nlp.kintoki.cabocha.model.SVMModelFactory;
+import com.worksap.nlp.kintoki.cabocha.svm.FastSVMModel;
+import com.worksap.nlp.kintoki.cabocha.svm.SVMModel;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +30,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-
 public class DependencyParserTest {
 
     @Rule
@@ -41,8 +40,8 @@ public class DependencyParserTest {
 
     @Before
     public void prepare() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
         param.loadConfig(configPath);
 
         List<Chunk> chunks = tree.getChunks();
@@ -170,7 +169,7 @@ public class DependencyParserTest {
     @Test
     public void open() throws IOException {
         String modelFile = param.getString(Param.PARSER_MODEL);
-        FastSVMModel svmModel = SVMModelFactory.loadModel(modelFile);
+        SVMModel svmModel = FastSVMModel.openBinaryModel(modelFile);
         assertNotNull(svmModel);
     }
 

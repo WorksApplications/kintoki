@@ -29,29 +29,16 @@ public class DependencyParserData {
         return chunkInfo;
     }
 
-    public void setChunkInfo(List<ChunkInfo> chunkInfo) {
-        this.chunkInfo = chunkInfo;
-    }
-
     public List<Integer> getFp() {
         return fp;
     }
 
-    public ChunkInfo chunkInfo(int index){
+    public ChunkInfo chunkInfo(int index) {
         return this.chunkInfo.get(index);
-    }
-
-    public void setFp(List<Integer> fp) {
-        this.fp = fp;
     }
 
     public Hypothesis getHypothesis() {
         return hypothesis;
     }
 
-    public void setHypothesis(Hypothesis hypothesis) {
-        this.hypothesis = hypothesis;
-    }
-
 }
-

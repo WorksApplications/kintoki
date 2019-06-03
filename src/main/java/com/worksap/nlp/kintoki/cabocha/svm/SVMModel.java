@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.worksap.nlp.kintoki.cabocha.model;
+package com.worksap.nlp.kintoki.cabocha.svm;
 
-import java.io.IOException;
 import java.util.List;
 
-public interface SVMModelInterface {
+public interface SVMModel {
 
-    void open(String filename) throws IOException;
-    void close();
     int id(String key);
-    double classify(List<Integer> x);
 
+    double classify(List<Integer> x);
 }

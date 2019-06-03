@@ -19,75 +19,39 @@ package com.worksap.nlp.kintoki.cabocha.crf;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class FeatureIndex {
+abstract class FeatureIndex {
 
-    public static final String[] BOS = {"_B-1", "_B-2", "_B-3", "_B-4", "_B-5", "_B-6", "_B-7", "_B-8"};
-    public static final String[] EOS = {"_B+1", "_B+2", "_B+3", "_B+4", "_B+5", "_B+6", "_B+7", "_B+8"};
+    private static final String[] BOS = { "_B-1", "_B-2", "_B-3", "_B-4", "_B-5", "_B-6", "_B-7", "_B-8" };
+    private static final String[] EOS = { "_B+1", "_B+2", "_B+3", "_B+4", "_B+5", "_B+6", "_B+7", "_B+8" };
     protected int maxId;
     protected double[] alpha;
-    protected float[] alphaFloat;
-    protected double costFactor;
+    protected double costFactor = 1.0;
     protected int xsize;
     protected boolean checkMaxXsize;
     protected int maxXsize;
-    protected int threadNum;
     protected List<String> unigramTempls;
     protected List<String> bigramTempls;
     protected List<String> y;
-    protected List<List<Path>> pathList;
-    protected List<List<Node>> nodeList;
-
-    public FeatureIndex() {
-        maxId = 0;
-        alpha = null;
-        alphaFloat = null;
-        costFactor = 1.0;
-        xsize = 0;
-        checkMaxXsize = false;
-        maxXsize = 0;
-        threadNum = 1;
-        unigramTempls = new ArrayList<>();
-        bigramTempls = new ArrayList<>();
-        y = new ArrayList<>();
-    }
 
     protected abstract int getID(String s);
 
-    public void calcCost(Node node) {
-        node.cost = 0.0;
-        if (alphaFloat != null) {
-            float c = 0.0f;
-            for (int i = 0; node.fVector.get(i) != -1; i++) {
-                c += alphaFloat[node.fVector.get(i) + node.y];
-            }
-            node.cost = costFactor * c;
-        } else {
-            double c = 0.0;
-            for (int i = 0; node.fVector.get(i) != -1; i++) {
-                c += alpha[node.fVector.get(i) + node.y];
-            }
-            node.cost = costFactor * c;
+    double calcCost(Node node) {
+        double c = 0.0;
+        for (int f : node.fVector) {
+            c += alpha[f + node.y];
         }
+        return costFactor * c;
     }
 
-    public void calcCost(Path path) {
-        path.cost = 0.0;
-        if (alphaFloat != null) {
-            float c = 0.0f;
-            for (int i = 0; path.fvector.get(i) != -1; i++) {
-                c += alphaFloat[path.fvector.get(i) + path.lnode.y * y.size() + path.rnode.y];
-            }
-            path.cost = costFactor * c;
-        } else {
-            double c = 0.0;
-            for (int i = 0; path.fvector.get(i) != -1; i++) {
-                c += alpha[path.fvector.get(i) + path.lnode.y * y.size() + path.rnode.y];
-            }
-            path.cost = costFactor * c;
+    double calcPathCost(Node lNode, Node rNode) {
+        double c = 0.0;
+        for (int f : rNode.lPathFVector) {
+            c += alpha[f + lNode.y * y.size() + rNode.y];
         }
+        return costFactor * c;
     }
 
-    public String getIndex(String[] idxStr, int pos, Tagger tagger) {
+    private String getIndex(String[] idxStr, int pos, Tagger tagger) {
         int row = Integer.parseInt(idxStr[0]);
         int col = Integer.parseInt(idxStr[1]);
         int idx = row + pos;
@@ -95,7 +59,7 @@ public abstract class FeatureIndex {
             return null;
         }
 
-        //TODO(taku): very dirty workaround
+        // TODO(taku): very dirty workaround
         if (checkMaxXsize) {
             maxXsize = Math.max(maxXsize, col + 1);
         }
@@ -108,7 +72,7 @@ public abstract class FeatureIndex {
         }
     }
 
-    public String applyRule(String rule, int pos, Tagger tagger) {
+    private String applyRule(String rule, int pos, Tagger tagger) {
         StringBuilder sb = new StringBuilder();
         for (String tmp : rule.split("%x", -1)) {
             if (tmp.startsWith("U") || tmp.startsWith("B")) {
@@ -142,33 +106,29 @@ public abstract class FeatureIndex {
         }
     }
 
-    public void buildFeatures(Tagger tagger) {
-        List<Integer> feature = new ArrayList<>();
+    void buildFeatures(Tagger tagger) {
         List<List<Integer>> featureCache = tagger.getFeatureCache();
         tagger.setFeatureId(featureCache.size());
 
         for (int cur = 0; cur < tagger.size(); cur++) {
+            List<Integer> feature = new ArrayList<>();
             buildFeatureFromTempl(feature, unigramTempls, cur, tagger);
-            feature.add(-1);
             featureCache.add(feature);
-            feature = new ArrayList<>();
         }
         for (int cur = 1; cur < tagger.size(); cur++) {
+            List<Integer> feature = new ArrayList<>();
             buildFeatureFromTempl(feature, bigramTempls, cur, tagger);
-            feature.add(-1);
             featureCache.add(feature);
-            feature = new ArrayList<>();
         }
     }
 
-    public void rebuildFeatures(Tagger tagger) {
+    void rebuildFeatures(Tagger tagger) {
         int fid = tagger.getFeatureId();
         List<List<Integer>> featureCache = tagger.getFeatureCache();
         for (int pos = 0; pos < tagger.size(); pos++) {
             List<Integer> f = featureCache.get(fid++);
             for (int i = 0; i < y.size(); i++) {
                 Node n = new Node();
-                n.clear();
                 n.x = pos;
                 n.y = i;
                 n.fVector = f;
@@ -177,118 +137,25 @@ public abstract class FeatureIndex {
         }
         for (int pos = 1; pos < tagger.size(); pos++) {
             List<Integer> f = featureCache.get(fid++);
-            for (int j = 0; j < y.size(); j++) {
-                for (int i = 0; i < y.size(); i++) {
-                    Path p = new Path();
-                    p.clear();
-                    p.add(tagger.node(pos - 1, j), tagger.node(pos, i));
-                    p.fvector = f;
-                }
+            for (int i = 0; i < y.size(); i++) {
+                tagger.node(pos, i).lPathFVector = f;
             }
         }
     }
 
-    public int size() {
-        return getMaxId();
-    }
-
-    public int ysize() {
+    int ysize() {
         return y.size();
     }
 
-    public int getMaxId() {
-        return maxId;
-    }
-
-    public void setMaxId(int maxId) {
-        this.maxId = maxId;
-    }
-
-    public double[] getAlpha() {
-        return alpha;
-    }
-
-    public void setAlpha(double[] alpha) {
-        this.alpha = alpha;
-    }
-
-    public float[] getAlphaFloat() {
-        return alphaFloat;
-    }
-
-    public void setAlphaFloat(float[] alphaFloat) {
-        this.alphaFloat = alphaFloat;
-    }
-
-    public double getCostFactor() {
-        return costFactor;
-    }
-
-    public void setCostFactor(double costFactor) {
+    void setCostFactor(double costFactor) {
         this.costFactor = costFactor;
     }
 
-    public int getXsize() {
+    int getXsize() {
         return xsize;
     }
 
-    public void setXsize(int xsize) {
-        this.xsize = xsize;
-    }
-
-    public int getMaxXsize() {
-        return maxXsize;
-    }
-
-    public void setMaxXsize(int maxXsize) {
-        this.maxXsize = maxXsize;
-    }
-
-    public int getThreadNum() {
-        return threadNum;
-    }
-
-    public void setThreadNum(int threadNum) {
-        this.threadNum = threadNum;
-    }
-
-    public List<String> getUnigramTempls() {
-        return unigramTempls;
-    }
-
-    public void setUnigramTempls(List<String> unigramTempls) {
-        this.unigramTempls = unigramTempls;
-    }
-
-    public List<String> getBigramTempls() {
-        return bigramTempls;
-    }
-
-    public void setBigramTempls(List<String> bigramTempls) {
-        this.bigramTempls = bigramTempls;
-    }
-
-    public List<String> getY() {
+    List<String> getY() {
         return y;
-    }
-
-    public void setY(List<String> y) {
-        this.y = y;
-    }
-
-    public List<List<Path>> getPathList() {
-        return pathList;
-    }
-
-    public void setPathList(List<List<Path>> pathList) {
-        this.pathList = pathList;
-    }
-
-    public List<List<Node>> getNodeList() {
-        return nodeList;
-    }
-
-    public void setNodeList(List<List<Node>> nodeList) {
-        this.nodeList = nodeList;
     }
 }

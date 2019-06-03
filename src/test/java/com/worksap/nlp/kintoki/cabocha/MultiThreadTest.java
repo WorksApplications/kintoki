@@ -28,7 +28,6 @@ import java.util.Map;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-
 public class MultiThreadTest {
 
     @Rule
@@ -37,8 +36,8 @@ public class MultiThreadTest {
 
     @Before
     public void setUp() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
     }
 
     private static Map<Integer, List<String>> mapResult = new HashMap<>();
@@ -89,11 +88,11 @@ public class MultiThreadTest {
         Tree tree = cabocha.parse(sent);
         final String trueResult = TestHelper.getResultString(tree);
 
-        Integer[] threadIds = {1, 2, 3, 4};
+        Integer[] threadIds = { 1, 2, 3, 4 };
         Thread[] threads = new Thread[threadIds.length];
         final int testCount = 10;
 
-        for (int i= 0; i < threads.length; i++) {
+        for (int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(new CabochaTestThread(threadIds[i], testCount, configPath, sent));
             threads[i].start();
         }

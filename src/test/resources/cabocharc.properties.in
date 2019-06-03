@@ -40,12 +40,3 @@ chunker-model = @@TEST_DIR@@/chunk.bccwj.model
 
 # Sudachi
 sudachi-dict = @@TEST_DIR@@/
-
-# 0 - PARSING_MODE
-# 1 - TRAINING_MODE
-action-mode = 0
-
-# crf param
-nbest = 0
-verbose = 0
-cost-factor = 1.0

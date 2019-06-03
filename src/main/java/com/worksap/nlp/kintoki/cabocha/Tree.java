@@ -16,7 +16,7 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
-import com.worksap.nlp.kintoki.cabocha.util.Utils;
+import com.worksap.nlp.kintoki.cabocha.util.EastAsianWidth;
 import com.worksap.nlp.sudachi.Morpheme;
 
 import java.util.ArrayList;
@@ -30,11 +30,11 @@ public class Tree {
     private static final String EOS_NL = "EOS\n";
 
     private OutputLayerType outputLayer;
-    private String sentence;
+    private String sentence = "";
     private List<Token> tokens = new ArrayList<>();
     private List<Chunk> chunks = new ArrayList<>();
 
-    public void setSentence(String sentence){
+    public void setSentence(String sentence) {
         this.sentence = sentence;
     }
 
@@ -54,208 +54,203 @@ public class Tree {
         this.chunks = chunks;
     }
 
-    public String getSentence(){
-        return sentence;
+    public String getSentence() {
+        if (isEmpty()) {
+            return sentence;
+        } else {
+            return getTokens().stream().map(Token::getSurface).collect(Collectors.joining());
+        }
     }
 
-    public int sentenceSize(){
+    public int sentenceSize() {
         return this.sentence.length();
     }
 
-    public Chunk chunk(int index){
+    public Chunk chunk(int index) {
         return this.chunks.get(index);
     }
 
-    public Token token(int index){
+    public Token token(int index) {
         return this.tokens.get(index);
     }
 
-    public boolean read(String input, InputLayerType inputLayer){
-        if (!Utils.check(input)) {
-            return false;
-        }
-
-        int chunkId = 0;
-
+    public void read(String input, InputLayerType inputLayer) {
         switch (inputLayer) {
-            case INPUT_RAW_SENTENCE:
-                this.sentence = input;
-                break;
-
-            case INPUT_POS:
-            case INPUT_CHUNK:
-            case INPUT_SELECTION:
-            case INPUT_DEP:
-                Chunk chunk = null;
-                String[] lines = input.split("\\n");
-
-                for (String line:lines) {
-                    if (line.length() <= 0) break;
-                    if (line.length() >= 3 && line.startsWith("* ")) {
-                        String[] column = line.split(" ");
-                        if (column.length >= 3 && (column[1].charAt(0) == '-' || Character.isDigit(column[1].charAt(0)))) {
-                            if (inputLayer == InputLayerType.INPUT_POS) {
-                                continue;
-                            }
-
-                            if (chunk != null) {
-                                if (chunk.getTokens().isEmpty()) {
-                                    return false;
-                                }
-                                getChunks().add(chunk);
-                            }
-
-                            if (chunkId != Integer.parseInt(column[1])) {
-                                return false;
-                            }
-                            ++chunkId;
-
-                            chunk = new Chunk();
-                            chunk.setLink(Integer.parseInt(column[2].substring(0, column[2].length()-1)));
-
-                            if (column.length >= 4) {
-                                int[] value = Arrays.stream(column[3].split("/")).mapToInt(Integer::valueOf).toArray();
-                                chunk.setHeadPos(value[0]);
-                                chunk.setFuncPos(value[1]);
-                            }
-
-                            if (column.length >= 5) {
-                                chunk.setScore(Double.parseDouble(column[4]));
-                            }
-
-                            if (column.length >= 6) {
-                                chunk.setFeatureList(Arrays.asList(column[5].split(",")));
-                            }
-                        } else {
-                            return false;
-                        }
-                    } else {
-                        String[] column = line.split("\t");
-                        if (column.length >=2 && column[0].length() >0 && column[1].length() >0) {
-                            Token token = new Token();
-                            token.setSurface(column[0]);
-                            token.setNormalizedSurface(column[0]);
-                            token.setFeature(column[1]);
-                            token.setFeatureList(Arrays.asList(column[1].split(",")));
-                            getTokens().add(token);
-                            if (chunk != null &&
-                                inputLayer.getValue() > Constant.CABOCHA_INPUT_POS) {
-                                chunk.getTokens().add(token);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-                if (chunk != null) {
-                    if (chunk.getTokenSize() == 0) {
-                        return false;
-                    }
-                    getChunks().add(chunk);
-                }
+        case INPUT_RAW_SENTENCE:
+            this.sentence = input;
+            break;
+        case INPUT_POS:
+        case INPUT_CHUNK:
+        case INPUT_SELECTION:
+        case INPUT_DEP:
+            readCaboChaFormat(input, inputLayer);
+            break;
+        default:
+            throw new IllegalArgumentException("Invalid input layer");
         }
 
         // verify chunk link
-        for (int i = 0; i < getChunkSize(); ++i) {
-            if (chunk(i).getLink() !=  -1 && (chunk(i).getLink() >= getChunkSize() || chunk(i).getLink() < -1)) {
-                return false;
+        if (getChunks().stream().map(Chunk::getLink).anyMatch(l -> l != -1 && (l >= getChunkSize() || l < -1))) {
+            throw new IllegalArgumentException("Invalid dependencies");
+        }
+    }
+
+    public void read(List<Morpheme> morphemes) {
+        for (Morpheme m : morphemes) {
+            Token token = new Token();
+            token.setSurface(m.surface());
+            token.setNormalizedSurface(m.normalizedForm());
+            token.setPos(m.partOfSpeech().get(0));
+            token.setFeature(String.join(",", m.partOfSpeech()));
+            token.setFeatureList(m.partOfSpeech());
+            tokens.add(token);
+        }
+    }
+
+    private void readCaboChaFormat(String input, InputLayerType inputLayer) {
+        if (input.trim().isEmpty()) {
+            return;
+        }
+        int chunkId = 0;
+        for (String line : input.split("\n")) {
+            if (line.trim().isEmpty()) {
+                throw new IllegalArgumentException("Invalid format");
+            }
+            if (line.startsWith("* ")) {
+                if (inputLayer == InputLayerType.INPUT_POS) {
+                    continue;
+                }
+                chunks.add(readHeader(line, chunkId));
+                chunkId++;
+            } else {
+                Token token = readToken(line);
+                getTokens().add(token);
+                if (!chunks.isEmpty() && inputLayer.getValue() > Constant.CABOCHA_INPUT_POS) {
+                    addTokenToLastChunk(token);
+                }
             }
         }
+        if (chunks.stream().anyMatch(c -> c.getTokenSize() == 0)) {
+            throw new IllegalArgumentException("Empty chunk");
+        }
+    }
 
-        return true;
+    private Chunk readHeader(String line, int chunkId) {
+        String[] columns = line.split(" ");
+        if (columns.length < 3 || chunkId != Integer.parseInt(columns[1])) {
+            throw new IllegalArgumentException("Invalid header format");
+        }
+
+        Chunk chunk = new Chunk();
+        chunk.setLink(Integer.parseInt(columns[2].substring(0, columns[2].length() - 1)));
+
+        if (columns.length >= 4) {
+            int[] value = Arrays.stream(columns[3].split("/")).mapToInt(Integer::valueOf).toArray();
+            chunk.setHeadPos(value[0]);
+            chunk.setFuncPos(value[1]);
+        }
+
+        if (columns.length >= 5) {
+            chunk.setScore(Double.parseDouble(columns[4]));
+        }
+
+        if (columns.length >= 6) {
+            chunk.setFeatureList(Arrays.asList(columns[5].split(",")));
+        }
+
+        return chunk;
+    }
+
+    private Token readToken(String line) {
+        String[] columns = line.split("\t");
+        if (columns.length < 2 || columns[0].isEmpty() || columns[1].isEmpty()) {
+            throw new IllegalArgumentException("Invalid format");
+        }
+
+        Token token = new Token();
+        token.setSurface(columns[0]);
+        token.setNormalizedSurface(columns[0]);
+        token.setFeature(columns[1]);
+        token.setFeatureList(Arrays.asList(columns[1].split(",")));
+
+        return token;
     }
 
     public String toString(FormatType outputFormat) {
         StringBuilder sb = new StringBuilder();
-        writeTree(this, sb, outputLayer, outputFormat);
+        writeTree(sb, outputLayer, outputFormat);
         return sb.toString();
     }
 
-    public void writeTree(Tree tree, StringBuilder sb, OutputLayerType outputLayer, FormatType outputFormat) {
+    public void writeTree(StringBuilder sb, OutputLayerType outputLayer, FormatType outputFormat) {
         switch (outputFormat) {
-            case FORMAT_LATTICE:
-                writeLattice(tree, sb, outputLayer);
-                break;
-            case FORMAT_TREE_LATTICE:
-                writeTree(tree, sb);
-                writeLattice(tree, sb, outputLayer);
-                break;
-            case FORMAT_TREE:
-                writeTree(tree, sb);
-                break;
-            case FORMAT_XML:
-                writeXml(tree, sb, outputLayer);
-                break;
-            case FORMAT_CONLL:
-                writeConll(tree, sb, outputLayer);
-                break;
-            case FORMAT_NONE:
-                break;
-            default:
-                sb.append("unknown format: "+outputFormat+"\n");
+        case FORMAT_LATTICE:
+            writeLattice(sb, outputLayer);
+            break;
+        case FORMAT_TREE_LATTICE:
+            writeTree(sb);
+            writeLattice(sb, outputLayer);
+            break;
+        case FORMAT_TREE:
+            writeTree(sb);
+            break;
+        case FORMAT_XML:
+        case FORMAT_CONLL:
+            throw new UnsupportedOperationException("Not implemented");
+        case FORMAT_NONE:
+            break;
+        default:
+            throw new IllegalArgumentException("unknown format: " + outputFormat + "\n");
         }
     }
 
-    private void writeLattice(Tree tree, StringBuilder sb, OutputLayerType outputLayer) {
-        int size = tree.getTokenSize();
+    private void writeLattice(StringBuilder sb, OutputLayerType outputLayer) {
         if (outputLayer == OutputLayerType.OUTPUT_RAW_SENTENCE) {
-            if (tree.empty()) {
-                sb.append(tree.getSentence()+"\n");
-            } else {
-                for (int i = 0; i < size; ++i) {
-                    sb.append(tree.token(i).getSurface());
-                }
-                sb.append("\n");
-            }
+            sb.append(getSentence());
+            sb.append("\n");
+        } else if (outputLayer == OutputLayerType.OUTPUT_POS) {
+            sb.append(getTokens().stream().map(t -> t.getSurface() + "\t" + t.getFeature() + "\n")
+                    .collect(Collectors.joining()));
+            sb.append(EOS_NL);
         } else {
             int ci = 0;
-
-            if (outputLayer != OutputLayerType.OUTPUT_POS) {
-                for (Chunk chunk:tree.getChunks()) {
-                    switch (outputLayer) {
-                        case OUTPUT_CHUNK:
-                            sb.append("* " + (ci++) + " " + "-1D ");
-                            break;
-                        case OUTPUT_SELECTION:
-                            sb.append("* " + (ci++) + " " + "-1D "
-                                    + chunk.getHeadPos() + "/" + chunk.getFuncPos()
-                                    + " " + chunk.getScore());
-                            if (chunk.getFeatureList() != null) {
-                                sb.append(" " + String.join(",", chunk.getFeatureList()));
-                            }
-                            break;
-                        case OUTPUT_DEP:
-                            sb.append("* " + (ci++) + " " + chunk.getLink() + "D "
-                                    + chunk.getHeadPos() + "/" + chunk.getFuncPos()
-                                    + " " + chunk.getScore());
-                            break;
-                        default:
-                            // nothing
-                            break;
-                    }
-                    sb.append("\n");
-
-                    for (Token token:chunk.getTokens()) {
-                        sb.append(token.getSurface() + "\t" + token.getFeature() + "\n");
-                    }
-                }
-            } else {
-                for (Token token:tree.getTokens()) {
-                    sb.append(token.getSurface() + "\t" + token.getFeature() + "\n");
-                }
+            for (Chunk chunk : getChunks()) {
+                writeChunk(sb, chunk, ci++, outputLayer);
             }
-
             sb.append(EOS_NL);
         }
     }
 
-    private void writeTree(Tree tree, StringBuilder sb) {
-        int size = tree.getChunkSize();
-        Optional<Integer> maxLength = tree.getChunks().stream()
-            .map(chunk -> chunk.getTokens().stream().
-                 map(Token::getSurface).collect(Collectors.joining()).length())
-            .collect(Collectors.reducing(Integer::max));
+    private void writeChunk(StringBuilder sb, Chunk chunk, int id, OutputLayerType outputLayer) {
+        writeHeader1(sb, id, (outputLayer == OutputLayerType.OUTPUT_DEP) ? chunk.getLink() : -1);
+        if (outputLayer != OutputLayerType.OUTPUT_CHUNK) {
+            writeHeader2(sb, chunk);
+            if (outputLayer == OutputLayerType.OUTPUT_SELECTION && chunk.getFeatureList() != null
+                    && !chunk.getFeatureList().isEmpty()) {
+                sb.append(' ').append(String.join(",", chunk.getFeatureList()));
+            }
+        }
+        sb.append('\n');
+
+        for (Token token : chunk.getTokens()) {
+            sb.append(token.getSurface()).append('\t').append(token.getFeature()).append('\n');
+        }
+    }
+
+    private void writeHeader1(StringBuilder sb, int id, int link) {
+        sb.append("* ").append(id).append(' ').append(link).append("D");
+    }
+
+    private void writeHeader2(StringBuilder sb, Chunk chunk) {
+        sb.append(' ').append(chunk.getHeadPos()).append('/').append(chunk.getFuncPos()).append(' ')
+                .append(chunk.getScore());
+    }
+
+    private void writeTree(StringBuilder sb) {
+        int size = getChunkSize();
+        Optional<Integer> maxLength = getChunks().stream()
+                .map(chunk -> EastAsianWidth.getEastAsianWidth(chunk.getSurface()))
+                .collect(Collectors.reducing(Integer::max));
         if (!maxLength.isPresent()) {
             sb.append(EOS_NL);
             return;
@@ -265,16 +260,15 @@ public class Tree {
 
         for (int i = 0; i < size; ++i) {
             boolean isDep = false;
-            int link = tree.chunk(i).getLink();
-            String surface = tree.chunk(i).getTokens().stream()
-                            .map(Token::getSurface).collect(Collectors.joining());
-            int rem = maxLen - surface.length() + i * 2;
+            int link = chunk(i).getLink();
+            String surface = chunk(i).getSurface();
+            int rem = maxLen - EastAsianWidth.getEastAsianWidth(surface) + i * 2;
             for (int j = 0; j < rem; ++j) {
-                sb.append(" ");
+                sb.append(' ');
             }
             sb.append(surface);
 
-            for (int j = i+1; j < size; j++) {
+            for (int j = i + 1; j < size; j++) {
                 if (link == j) {
                     sb.append("-" + "D");
                     isDep = true;
@@ -293,146 +287,15 @@ public class Tree {
         sb.append(EOS_NL);
     }
 
-    private void writeXml(Tree tree, StringBuilder sb, OutputLayerType outputLayer) {
-        int ci = 0;
-        int size = tree.getChunkSize();
-
-        sb.append("<sentence>\n");
-
-        for (int i = 0; i < size; ++i) {
-            Chunk chunk = tree.chunk(i);
-            if (chunk == null) {
-                continue;
-            }
-
-            if (outputLayer != OutputLayerType.OUTPUT_POS) {
-                if (ci > 0) {
-                    sb.append(" </chunk>\n");
-                }
-                sb.append(" <chunk id=\"" + (ci++) + "\" link=\"" + chunk.getLink());
-                sb.append("\" rel=\"D");
-                sb.append("\" score=\"" + chunk.getScore());
-                sb.append("\" head=\"" + chunk.getHeadPos());
-                sb.append("\" func=\"" + chunk.getFuncPos() + "\"");
-                if (outputLayer == OutputLayerType.OUTPUT_SELECTION && chunk.getFeatureList() != null) {
-                    String features = String.join("", chunk.getFeatureList());
-                    sb.append(" feature=\"");
-                    sb.append(writeXmlString(features));
-                    sb.append("\"");
-                }
-                sb.append(">\n");
-            }
-
-            for (int j = 0; j<chunk.getTokenSize(); j++) {
-                Token token = chunk.token(j);
-                sb.append(writeXmlToken(token, j));
-            }
-
-            if (ci > 0 ) {
-                sb.append(" </chunk>\n");
-            }
-        }
-
-        sb.append("</sentence>\n");
+    public boolean isEmpty() {
+        return this.tokens.isEmpty();
     }
 
-    private String writeXmlString(String str) {
-        return str.replace("\"", "&quot;")
-                .replace("\'", "&apos;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("&", "&amp;");
-    }
-
-    private String writeXmlToken(Token token, int i) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("  <tok id=\"" + i + "\"" + " feature=\"");
-        sb.append(writeXmlString(token.getFeature()));
-        sb.append("\"");
-        sb.append(">");
-        sb.append(writeXmlString(token.getSurface()));
-        sb.append("</tok>\n");
-
-        return sb.toString();
-    }
-
-    private void writeConll(Tree tree, StringBuilder sb, OutputLayerType outputLayer) {
-        int size = tree.getChunkSize();
-        int tokenId = 1;
-        String pos;
-
-        for (int i = 0; i < size; ++i) {
-            Chunk chunk = tree.chunk(i);
-            String dlabel = "_";
-            for (int j = 0; j < chunk.getTokenSize(); ++j) {
-                int link = 0;
-                if (j == chunk.getTokenSize() - 1 && chunk.getLink() >= 0 &&
-                                chunk.getLink() < tree.getChunkSize()) {
-                    Chunk head = tree.chunk(chunk.getLink());
-                    link = head.getHeadPos() + head.getTokenPos() + 1;
-                    dlabel = "D";
-                } else {
-                    link = chunk.getTokenPos() + j + 2;
-                }
-                if (link == tree.getTokenSize() + 1) {
-                    link = 0;
-                }
-                Token token = tree.token(chunk.getTokenPos() + j);
-
-                String lemma = token.getNormalizedSurface();
-
-                pos = Utils.concatFeature(token, 4);
-                if (token.getFeatureList().size() > 7) {
-                    lemma = token.getFeatureList().get(6);
-                }
-
-                String category = "_";
-                if (!token.getFeatureList().isEmpty()) {
-                    category = token.getFeatureList().get(0);
-                }
-
-                sb.append((tokenId++) + "\t" + token.getSurface() + "\t" + lemma);
-                sb.append("\t" + category + "\t" + pos);
-                sb.append("\tfeature=" + token.getFeature());
-
-                if (j == 0 && outputLayer.getValue() >= Constant.CABOCHA_OUTPUT_CHUNK) {
-                    sb.append("|begin_chunk=1");
-                }
-                if (outputLayer.getValue() >= Constant.CABOCHA_OUTPUT_SELECTION) {
-                    if (j == chunk.getHeadPos()) {
-                        sb.append("|head=1");
-                    }
-                    if (j == chunk.getFuncPos()) {
-                        sb.append("|func=1");
-                    }
-                }
-                sb.append("\t" + link + "\t" + dlabel + "\t_\t_\n");
-            }
-        }
-
-        sb.append("\n");
-    }
-
-    public void read(List<Morpheme> morphemes){
-        for (Morpheme m : morphemes) {
-            Token token = new Token();
-            token.setSurface(m.surface());
-            token.setNormalizedSurface(m.normalizedForm());
-            token.setPos(m.partOfSpeech().get(0));
-            token.setFeature(String.join(",", m.partOfSpeech()));
-            token.setFeatureList(m.partOfSpeech());
-            tokens.add(token);
-        }
-    }
-
-
-    public boolean empty() { return this.tokens.isEmpty(); }
-
-    public int getChunkSize(){
+    public int getChunkSize() {
         return this.chunks.size();
     }
 
-    public int getTokenSize(){
+    public int getTokenSize() {
         return this.tokens.size();
     }
 
@@ -444,4 +307,7 @@ public class Tree {
         this.outputLayer = outputLayer;
     }
 
+    private void addTokenToLastChunk(Token token) {
+        chunks.get(chunks.size() - 1).getTokens().add(token);
+    }
 }

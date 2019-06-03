@@ -27,7 +27,7 @@ public class TestHelper {
             Chunk chunk = tree.chunk(i);
             result += "* " + i + " " + chunk.getLink() + "D ";
             result += chunk.getHeadPos() + "/" + chunk.getFuncPos() + "\n";
-            for (int j = 0; j < chunk.getTokenSize();j++) {
+            for (int j = 0; j < chunk.getTokenSize(); j++) {
                 Token token = chunk.token(j);
                 result += token.getSurface() + "\t" + token.getFeature() + "\n";
             }
@@ -41,7 +41,7 @@ public class TestHelper {
         for (int i = 0; i < tree.getChunkSize(); i++) {
             Chunk chunk = tree.chunk(i);
             String text = "";
-            for (int j = 0; j < chunk.getTokenSize();j++) {
+            for (int j = 0; j < chunk.getTokenSize(); j++) {
                 Token token = chunk.token(j);
                 text += token.getSurface();
             }

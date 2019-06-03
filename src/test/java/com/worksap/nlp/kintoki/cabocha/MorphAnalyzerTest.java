@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import java.io.IOException;
 import static org.junit.Assert.assertArrayEquals;
-
+import static org.junit.Assert.assertEquals;
 
 public class MorphAnalyzerTest {
 
@@ -35,8 +35,8 @@ public class MorphAnalyzerTest {
 
     @Before
     public void setUp() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
 
         param = new Param();
         param.loadConfig(configPath);
@@ -54,8 +54,15 @@ public class MorphAnalyzerTest {
         tree.setSentence(sent);
         morpher.parse(tree);
 
-        assertArrayEquals(new String[]{"太郎", "は", "花子", "が", "読ん", "で", "いる", "本", "を", "次郎", "に",
-                "渡し", "た", "。"}, tree.getTokens().stream().map(t -> t.getSurface()).toArray(String[]::new));
+        assertArrayEquals(new String[] { "太郎", "は", "花子", "が", "読ん", "で", "いる", "本", "を", "次郎", "に", "渡し", "た", "。" },
+                tree.getTokens().stream().map(t -> t.getSurface()).toArray(String[]::new));
     }
 
+    @Test
+    public void parseWithEmpty() {
+        tree.setSentence("");
+        morpher.parse(tree);
+
+        assertEquals(0, tree.getTokenSize());
+    }
 }

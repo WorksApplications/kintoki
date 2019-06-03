@@ -17,45 +17,38 @@
 package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.kintoki.cabocha.crf.Tagger;
-import com.worksap.nlp.kintoki.cabocha.model.CRFModelFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Chunker extends Analyzer {
+public class Chunker implements Analyzer {
 
-    private Tagger tagger = null;
+    private static final double CRF_COST_FACTOR = 1.0;
+
+    private Tagger tagger;
+    private int beginLabel;
 
     @Override
     public void open(Param param) throws IOException {
-        if (getActionMode()== Constant.PARSING_MODE){
-            loadBinModel(param);
-        }
-    }
-
-    private void loadBinModel(Param param) throws IOException {
-        this.tagger = CRFModelFactory.createTagger(param);
+        String path = param.getString(Param.CHUNKER_MODEL);
+        tagger = Tagger.openBinaryModel(path, CRF_COST_FACTOR);
+        beginLabel = tagger.ynames().indexOf("B");
     }
 
     @Override
     public void parse(Tree tree) {
         int tokenSize = tree.getTokenSize();
-        for (int i=0;i<tokenSize;i++){
-            String line = "";
-            String pos = getPos(tree.token(i).getFeatureList());
-            line += tree.token(i).getNormalizedSurface();
-            line += "\t"+pos;
-            tagger.add(line);
+        for (int i = 0; i < tokenSize; i++) {
+            tagger.add(tree.token(i).getNormalizedSurface(), getPos(tree.token(i).getFeatureList()));
         }
 
         tagger.parse();
 
         int tokenPos = 0;
         List<Token> tokens = new ArrayList<>();
-        for(int i = 0; i<tokenSize; i++) {
-            String tag = tagger.yname(tagger.y(i));
-            if ((i > 0 && tag.equals("B"))) {
+        for (int i = 0; i < tokenSize; i++) {
+            if (i > 0 && tagger.y(i) == beginLabel) {
                 Chunk chunk = new Chunk();
                 chunk.setTokenPos(tokenPos);
                 chunk.getTokens().addAll(tokens);
@@ -64,7 +57,7 @@ public class Chunker extends Analyzer {
                 tokens = new ArrayList<>();
             }
             tokens.add(tree.getTokens().get(i));
-            if (i == tokenSize-1) {
+            if (i == tokenSize - 1) {
                 Chunk chunk = new Chunk();
                 chunk.setTokenPos(tokenPos);
                 chunk.getTokens().addAll(tokens);
@@ -77,13 +70,13 @@ public class Chunker extends Analyzer {
         tree.setOutputLayer(OutputLayerType.OUTPUT_CHUNK);
     }
 
-    private String getPos(List<String> featureList){
+    private String getPos(List<String> featureList) {
         StringBuilder pos = new StringBuilder();
-        for (int j=0; j<featureList.size(); j++) {
+        for (int j = 0; j < featureList.size(); j++) {
             if (("*").equals(featureList.get(j))) {
                 break;
             }
-            if (j>0) {
+            if (j > 0) {
                 pos.append("-");
             }
             pos.append(featureList.get(j));

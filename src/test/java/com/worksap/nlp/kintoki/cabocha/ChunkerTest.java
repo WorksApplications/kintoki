@@ -25,7 +25,6 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertArrayEquals;
 
-
 public class ChunkerTest {
 
     private static Param param;
@@ -38,8 +37,8 @@ public class ChunkerTest {
 
     @Before
     public void setUp() throws IOException {
-        Utils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = Utils.buildConfig(temporaryFolder.getRoot().toPath());
+        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
 
         param = new Param();
         param.loadConfig(configPath);
@@ -61,7 +60,7 @@ public class ChunkerTest {
         morpher.parse(tree);
         chunker.parse(tree);
 
-        assertArrayEquals(new String[]{"太郎は", "花子が", "読んでいる", "本を", "次郎に", "渡した。"},
+        assertArrayEquals(new String[] { "太郎は", "花子が", "読んでいる", "本を", "次郎に", "渡した。" },
                 TestHelper.getChunkStrings(tree).stream().toArray(String[]::new));
     }
 }
