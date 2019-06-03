@@ -20,3 +20,6 @@ deploy:
     skip_cleanup: true
     on:
       branch: develop
+cache:
+  directories:
+    - $HOME/.m2/repository/
