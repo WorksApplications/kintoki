@@ -1,6 +1,6 @@
 # Kintoki
 
-[![Build Status](https://travis-ci.org/WorksApplications/kintoki.svg?branch=develop)](https://travis-ci.org/WorksApplications/kintoki)
+[![Build Status](https://travis-ci.com/WorksApplications/kintoki.svg?branch=develop)](https://travis-ci.com/WorksApplications/kintoki)
 
 Kintoki is a dependency parser library.
 
