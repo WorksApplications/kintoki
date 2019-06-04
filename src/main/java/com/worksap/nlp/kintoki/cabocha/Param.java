@@ -187,6 +187,7 @@ public class Param {
 
     public void update(Param param) {
         this.conf.putAll(param.conf);
+        this.rest.addAll(param.rest);
     }
 
     public void open(String[] args, Option[] opts) {

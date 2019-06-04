@@ -22,6 +22,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -417,6 +420,35 @@ public class CabochaTest {
     }
 
     @Test
+    public void testCabochaToString() throws IOException {
+        final String sent = "太郎は花子が読んでいる本を次郎に渡した。";
+
+        Cabocha cabocha = new Cabocha(configPath);
+        assertEquals("* 0 5D 0/1 -0.7338868975639343\n"
+            + "太郎\t名詞,固有名詞,人名,名,*,*\n"
+            + "は\t助詞,係助詞,*,*,*,*\n"
+            + "* 1 2D 0/1 0.8796700239181519\n"
+            + "花子\t名詞,固有名詞,人名,名,*,*\n"
+            + "が\t助詞,格助詞,*,*,*,*\n"
+            + "* 2 3D 2/2 0.716005265712738\n"
+            + "読ん\t動詞,一般,*,*,五段-マ行,連用形-撥音便\n"
+            + "で\t助詞,接続助詞,*,*,*,*\n"
+            + "いる\t動詞,非自立可能,*,*,上一段-ア行,連体形-一般\n"
+            + "* 3 5D 0/1 -0.7338868975639343\n"
+            + "本\t名詞,普通名詞,一般,*,*,*\n"
+            + "を\t助詞,格助詞,*,*,*,*\n"
+            + "* 4 5D 0/1 -0.7338868975639343\n"
+            + "次郎\t名詞,固有名詞,人名,名,*,*\n"
+            + "に\t助詞,格助詞,*,*,*,*\n"
+            + "* 5 -1D 0/1 0.0\n"
+            + "渡し\t動詞,一般,*,*,五段-サ行,連用形-一般\n"
+            + "た\t助動詞,*,*,*,助動詞-タ,終止形-一般\n"
+            + "。\t補助記号,句点,*,*,*,*\n"
+            + "EOS\n",
+            cabocha.parseToString(sent));
+    }
+
+    @Test
     public void testCabochaWithParam() throws IOException {
         Param param = new Param();
         param.loadConfig(configPath);
@@ -429,9 +461,11 @@ public class CabochaTest {
 
     @Test
     public void testMain() throws IOException {
-        String[] args = { inputFile, "-r", configPath, "-o", outputFile, "-I2", "-O4", "-f2" };
-
+        String[] args = { inputFile, inputFile, "-r", configPath, "-o", outputFile, "-I0", "-O4", "-f2" };
         Cabocha.main(args);
+        try (Stream<String> lines = Files.lines(Paths.get(outputFile))) {
+            assertEquals(12, lines.filter(l -> l.equals("EOS")).count());
+        }
     }
 
 }
