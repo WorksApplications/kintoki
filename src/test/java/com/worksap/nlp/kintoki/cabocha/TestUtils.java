@@ -29,11 +29,12 @@ import java.nio.file.Paths;
 
 public class TestUtils {
     static final String[] RESOURCES = { "/chunk.bccwj.model", "/dep.bccwj.model", "/system.dic", "/sudachi.json",
-            "/input", };
+            "/input", "/input2" };
 
     static final String PROPERTY_FILE = "/cabocharc.properties";
     static final String REPLACE_DIR = "@@TEST_DIR@@";
     static final String INPUT_FILE = "/input";
+    static final String INPUT_FILE2 = "/input2";
     static final String OUTPUT_FILE = "/output";
 
     public static void copyResources(Path folder) throws IOException {
@@ -63,6 +64,12 @@ public class TestUtils {
 
     static String getInput(Path folder) throws IOException {
         Path dest = Paths.get(INPUT_FILE).getFileName();
+        Path configPath = folder.resolve(dest);
+        return configPath.toString();
+    }
+
+    static String getInput2(Path folder) throws IOException {
+        Path dest = Paths.get(INPUT_FILE2).getFileName();
         Path configPath = folder.resolve(dest);
         return configPath.toString();
     }
