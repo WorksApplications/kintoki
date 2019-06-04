@@ -48,7 +48,7 @@ public class Constant {
     public static final String CABOCHA_DEFAULT_CHARSET = "UTF-8";
 
     public static final String COPYRIGHT = "Kintoki-CaboCha\nCopyright(C) Works Applications, All rights reserved.\n";
-    public static final String VERSION = "0.1.2";
+    public static final String VERSION = "0.2.0";
     public static final String PACKAGE = "Kintoki-CaboCha";
 
 }
