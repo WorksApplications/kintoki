@@ -21,6 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -35,6 +36,7 @@ public class CabochaTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     String configPath;
     String inputFile;
+    String inputFile2;
     String outputFile;
 
     @Before
@@ -42,6 +44,7 @@ public class CabochaTest {
         TestUtils.copyResources(temporaryFolder.getRoot().toPath());
         configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
         inputFile = TestUtils.getInput(temporaryFolder.getRoot().toPath());
+        inputFile2 = TestUtils.getInput2(temporaryFolder.getRoot().toPath());
         outputFile = TestUtils.getOutput(temporaryFolder.getRoot().toPath());
     }
 
@@ -468,4 +471,27 @@ public class CabochaTest {
         }
     }
 
+    @Test
+    public void testMainFromCaboChaFormat() throws IOException {
+        String[] args = { inputFile2, "-r", configPath, "-o", outputFile, "-I2", "-O4", "-f2" };
+        Cabocha.main(args);
+        try (Stream<String> lines = Files.lines(Paths.get(outputFile))) {
+            assertEquals(4, lines.filter(l -> l.equals("EOS")).count());
+        }
+    }
+
+    @Test
+    public void testMainToChunk() throws IOException {
+        String[] args = { inputFile, inputFile, "-r", configPath, "-o", outputFile, "-I0", "-O3", "-f2" };
+        Cabocha.main(args);
+        try (Stream<String> lines = Files.lines(Paths.get(outputFile))) {
+            assertEquals(6, lines.filter(l -> l.equals("EOS")).count());
+        }
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void testMainWithInvalidInputFile() throws IOException {
+        String[] args = { "foo", "-r", configPath, "-o", outputFile, "-I0", "-O4", "-f2" };
+        Cabocha.main(args);
+    }
 }

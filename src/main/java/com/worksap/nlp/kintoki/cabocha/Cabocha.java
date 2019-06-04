@@ -20,7 +20,6 @@ import com.worksap.nlp.kintoki.cabocha.util.Utils;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -189,12 +188,12 @@ public class Cabocha {
             int lineNum = 0;
             while ((line = input.readLine()) != null) {
                 line = line.trim();
+                if (line.isEmpty() || line.equals("EOS")) {
+                    break;
+                }
                 sb.append(line).append('\n');
                 if (++lineNum > Constant.CABOCHA_MAX_LINE_SIZE) {
                     throw new IllegalArgumentException("too long line #line must be <= " + Constant.CABOCHA_MAX_LINE_SIZE);
-                }
-                if (line.isEmpty() || line.equals("EOS")) {
-                    break;
                 }
             }
             if (sb.length() != 0) {
@@ -213,12 +212,6 @@ public class Cabocha {
             return null;
         }
 
-        String outputFile = param.getString(Param.OUTPUT);
-        if (Utils.check(outputFile) && !isValidOutputFile(outputFile)) {
-            System.out.println("invalid output file: " + outputFile);
-            return null;
-        }
-
         Param newParam = new Param();
         String rcfile = param.getString(Param.RC_FILE);
         if (Utils.check(rcfile)) {
@@ -234,11 +227,6 @@ public class Cabocha {
         }
 
         return newParam;
-    }
-
-    private static boolean isValidOutputFile(String path) {
-        File f = new File(path);
-        return !f.exists() || !f.isDirectory();
     }
 
     public static void main(String[] args) throws IOException {
