@@ -40,10 +40,6 @@ public class Constant {
     public static final int CABOCHA_OUTPUT_SELECTION = 3;
     public static final int CABOCHA_OUTPUT_DEP = 4;
 
-    public static final int CABOCHA_TRAIN_NE = 0;
-    public static final int CABOCHA_TRAIN_CHUNK = 1;
-    public static final int CABOCHA_TRAIN_DEP = 2;
-
     public static final int CABOCHA_MAX_LINE_SIZE = 8192;
 
     public static final int MODEL_VERSION = 100;

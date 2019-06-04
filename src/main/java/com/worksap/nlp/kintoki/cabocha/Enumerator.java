@@ -70,19 +70,3 @@ enum OutputLayerType {
         return value;
     }
 }
-
-enum ParserType {
-    TRAIN_NE(Constant.CABOCHA_TRAIN_NE),
-    TRAIN_CHUNK(Constant.CABOCHA_TRAIN_CHUNK),
-    TRAIN_DEP(Constant.CABOCHA_TRAIN_DEP);
-
-    private final int value;
-
-    ParserType(int value) {
-        this.value = value;
-    }
-
-    int getValue() {
-        return value;
-    }
-}
