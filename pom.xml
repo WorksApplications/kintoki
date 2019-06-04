@@ -139,6 +139,7 @@
         <version>1.23.0</version>
         <configuration>
           <java>
+            <googleJavaFormat/>
             <removeUnusedImports/>
             <licenseHeader>
               <file>${basedir}/.license-header</file>
