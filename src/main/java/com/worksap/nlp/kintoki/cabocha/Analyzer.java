@@ -20,8 +20,7 @@ import java.io.IOException;
 
 public interface Analyzer {
 
-    public void open(Param param) throws IOException;
+  public void open(Param param) throws IOException;
 
-    public void parse(Tree tree);
-
+  public void parse(Tree tree);
 }

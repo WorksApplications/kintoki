@@ -21,63 +21,62 @@ import java.util.List;
 
 public class Token {
 
-    private String surface;
-    private String normalizedSurface;
-    private String feature;
-    private List<String> featureList = new ArrayList<>();
-    private String additionalInfo;
-    private String pos;
+  private String surface;
+  private String normalizedSurface;
+  private String feature;
+  private List<String> featureList = new ArrayList<>();
+  private String additionalInfo;
+  private String pos;
 
-    public void setFeatureList(List<String> featureList) {
-        this.featureList = featureList;
-    }
+  public void setFeatureList(List<String> featureList) {
+    this.featureList = featureList;
+  }
 
-    public List<String> getFeatureList() {
-        return featureList;
-    }
+  public List<String> getFeatureList() {
+    return featureList;
+  }
 
-    public String getPos() {
-        return pos;
-    }
+  public String getPos() {
+    return pos;
+  }
 
-    public void setPos(String pos) {
-        this.pos = pos;
-    }
+  public void setPos(String pos) {
+    this.pos = pos;
+  }
 
-    public String getSurface() {
-        return surface;
-    }
+  public String getSurface() {
+    return surface;
+  }
 
-    public void setSurface(String surface) {
-        this.surface = surface;
-    }
+  public void setSurface(String surface) {
+    this.surface = surface;
+  }
 
-    public String getNormalizedSurface() {
-        return normalizedSurface;
-    }
+  public String getNormalizedSurface() {
+    return normalizedSurface;
+  }
 
-    public void setNormalizedSurface(String normalizedSurface) {
-        this.normalizedSurface = normalizedSurface;
-    }
+  public void setNormalizedSurface(String normalizedSurface) {
+    this.normalizedSurface = normalizedSurface;
+  }
 
-    public String getFeature() {
-        return feature;
-    }
+  public String getFeature() {
+    return feature;
+  }
 
-    public void setFeature(String feature) {
-        this.feature = feature;
-    }
+  public void setFeature(String feature) {
+    this.feature = feature;
+  }
 
-    public int getFeatureListSize() {
-        return featureList.size();
-    }
+  public int getFeatureListSize() {
+    return featureList.size();
+  }
 
-    public String getAdditionalInfo() {
-        return additionalInfo;
-    }
+  public String getAdditionalInfo() {
+    return additionalInfo;
+  }
 
-    public void setAdditionalInfo(String additionalInfo) {
-        this.additionalInfo = additionalInfo;
-    }
-
+  public void setAdditionalInfo(String additionalInfo) {
+    this.additionalInfo = additionalInfo;
+  }
 }

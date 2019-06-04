@@ -19,10 +19,10 @@ package com.worksap.nlp.kintoki.cabocha.crf;
 import java.util.List;
 
 class Node {
-    int x;
-    int y;
-    double bestCost;
-    Node prev;
-    List<Integer> fVector;
-    List<Integer> lPathFVector;
+  int x;
+  int y;
+  double bestCost;
+  Node prev;
+  List<Integer> fVector;
+  List<Integer> lPathFVector;
 }

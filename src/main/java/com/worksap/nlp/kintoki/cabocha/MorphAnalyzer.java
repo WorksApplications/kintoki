@@ -17,23 +17,22 @@
 package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.sudachi.Morpheme;
-
 import java.io.IOException;
 import java.util.List;
 
 public class MorphAnalyzer implements Analyzer {
 
-    private SudachiTokenizer tokenizer;
+  private SudachiTokenizer tokenizer;
 
-    @Override
-    public void open(Param param) throws IOException {
-        this.tokenizer = SudachiTokenizer.getInstance(param.getString(Param.SUDACHI_DICT));
-    }
+  @Override
+  public void open(Param param) throws IOException {
+    this.tokenizer = SudachiTokenizer.getInstance(param.getString(Param.SUDACHI_DICT));
+  }
 
-    @Override
-    public void parse(Tree tree) {
-        List<Morpheme> morphemes = tokenizer.parse(tree.getSentence());
-        tree.read(morphemes);
-        tree.setOutputLayer(OutputLayerType.OUTPUT_POS);
-    }
+  @Override
+  public void parse(Tree tree) {
+    List<Morpheme> morphemes = tokenizer.parse(tree.getSentence());
+    tree.read(morphemes);
+    tree.setOutputLayer(OutputLayerType.OUTPUT_POS);
+  }
 }

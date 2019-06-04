@@ -16,176 +16,173 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import com.worksap.nlp.kintoki.cabocha.svm.FastSVMModel;
 import com.worksap.nlp.kintoki.cabocha.svm.SVMModel;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class DependencyParserTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    Tree tree = new Tree();
-    Param param = new Param();
+  Tree tree = new Tree();
+  Param param = new Param();
 
-    @Before
-    public void prepare() throws IOException {
-        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
-        param.loadConfig(configPath);
+  @Before
+  public void prepare() throws IOException {
+    TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+    String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
+    param.loadConfig(configPath);
 
-        List<Chunk> chunks = tree.getChunks();
-        Chunk chunk = new Chunk();
-        Token token = new Token();
-        token.setSurface("太郎");
-        token.setNormalizedSurface("太郎");
-        token.setPos("名詞");
-        token.setFeature("名詞,固有名詞,人名,名,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        token = new Token();
-        token.setSurface("は");
-        token.setNormalizedSurface("は");
-        token.setPos("助詞");
-        token.setFeature("助詞,係助詞,*,*,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        chunks.add(chunk);
+    List<Chunk> chunks = tree.getChunks();
+    Chunk chunk = new Chunk();
+    Token token = new Token();
+    token.setSurface("太郎");
+    token.setNormalizedSurface("太郎");
+    token.setPos("名詞");
+    token.setFeature("名詞,固有名詞,人名,名,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    token = new Token();
+    token.setSurface("は");
+    token.setNormalizedSurface("は");
+    token.setPos("助詞");
+    token.setFeature("助詞,係助詞,*,*,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    chunks.add(chunk);
 
-        chunk = new Chunk();
-        token = new Token();
-        token.setSurface("花子");
-        token.setNormalizedSurface("花子");
-        token.setPos("名詞");
-        token.setFeature("名詞,固有名詞,人名,名,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        token = new Token();
-        token.setSurface("が");
-        token.setNormalizedSurface("が");
-        token.setPos("助詞");
-        token.setFeature("助詞,格助詞,*,*,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        chunks.add(chunk);
+    chunk = new Chunk();
+    token = new Token();
+    token.setSurface("花子");
+    token.setNormalizedSurface("花子");
+    token.setPos("名詞");
+    token.setFeature("名詞,固有名詞,人名,名,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    token = new Token();
+    token.setSurface("が");
+    token.setNormalizedSurface("が");
+    token.setPos("助詞");
+    token.setFeature("助詞,格助詞,*,*,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    chunks.add(chunk);
 
-        chunk = new Chunk();
-        token = new Token();
-        token.setSurface("読ん");
-        token.setNormalizedSurface("読ん");
-        token.setPos("動詞");
-        token.setFeature("動詞,一般,*,*,五段-マ行,連用形-撥音便");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        token = new Token();
-        token.setSurface("で");
-        token.setNormalizedSurface("で");
-        token.setPos("助詞");
-        token.setFeature("助詞,接続助詞,*,*,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        token = new Token();
-        token.setSurface("いる");
-        token.setNormalizedSurface("いる");
-        token.setPos("動詞");
-        token.setFeature("動詞,非自立可能,*,*,上一段-ア行,連体形-一般");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        chunks.add(chunk);
+    chunk = new Chunk();
+    token = new Token();
+    token.setSurface("読ん");
+    token.setNormalizedSurface("読ん");
+    token.setPos("動詞");
+    token.setFeature("動詞,一般,*,*,五段-マ行,連用形-撥音便");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    token = new Token();
+    token.setSurface("で");
+    token.setNormalizedSurface("で");
+    token.setPos("助詞");
+    token.setFeature("助詞,接続助詞,*,*,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    token = new Token();
+    token.setSurface("いる");
+    token.setNormalizedSurface("いる");
+    token.setPos("動詞");
+    token.setFeature("動詞,非自立可能,*,*,上一段-ア行,連体形-一般");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    chunks.add(chunk);
 
-        chunk = new Chunk();
-        token = new Token();
-        token.setSurface("本");
-        token.setNormalizedSurface("本");
-        token.setPos("名詞");
-        token.setFeature("名詞,普通名詞,一般,*,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        token = new Token();
-        token.setSurface("を");
-        token.setNormalizedSurface("を");
-        token.setPos("助詞");
-        token.setFeature("助詞,格助詞,*,*,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        chunks.add(chunk);
+    chunk = new Chunk();
+    token = new Token();
+    token.setSurface("本");
+    token.setNormalizedSurface("本");
+    token.setPos("名詞");
+    token.setFeature("名詞,普通名詞,一般,*,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    token = new Token();
+    token.setSurface("を");
+    token.setNormalizedSurface("を");
+    token.setPos("助詞");
+    token.setFeature("助詞,格助詞,*,*,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    chunks.add(chunk);
 
-        chunk = new Chunk();
-        token = new Token();
-        token.setSurface("次郎");
-        token.setNormalizedSurface("次郎");
-        token.setPos("名詞");
-        token.setFeature("名詞,固有名詞,人名,名,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        token = new Token();
-        token.setSurface("に");
-        token.setNormalizedSurface("に");
-        token.setPos("助詞");
-        token.setFeature("助詞,格助詞,*,*,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        chunks.add(chunk);
+    chunk = new Chunk();
+    token = new Token();
+    token.setSurface("次郎");
+    token.setNormalizedSurface("次郎");
+    token.setPos("名詞");
+    token.setFeature("名詞,固有名詞,人名,名,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    token = new Token();
+    token.setSurface("に");
+    token.setNormalizedSurface("に");
+    token.setPos("助詞");
+    token.setFeature("助詞,格助詞,*,*,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    chunks.add(chunk);
 
-        chunk = new Chunk();
-        token = new Token();
-        token.setSurface("渡し");
-        token.setNormalizedSurface("渡し");
-        token.setPos("動詞");
-        token.setFeature("動詞,一般,*,*,五段-サ行,連用形-一般");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        token = new Token();
-        token.setSurface("た");
-        token.setNormalizedSurface("た");
-        token.setPos("助動詞");
-        token.setFeature("助動詞,*,*,*,助動詞-タ,終止形-一般");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        token = new Token();
-        token.setSurface("。");
-        token.setNormalizedSurface("。");
-        token.setPos("補助記号");
-        token.setFeature("補助記号,句点,*,*,*,*");
-        token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
-        chunk.getTokens().add(token);
-        chunks.add(chunk);
+    chunk = new Chunk();
+    token = new Token();
+    token.setSurface("渡し");
+    token.setNormalizedSurface("渡し");
+    token.setPos("動詞");
+    token.setFeature("動詞,一般,*,*,五段-サ行,連用形-一般");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    token = new Token();
+    token.setSurface("た");
+    token.setNormalizedSurface("た");
+    token.setPos("助動詞");
+    token.setFeature("助動詞,*,*,*,助動詞-タ,終止形-一般");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    token = new Token();
+    token.setSurface("。");
+    token.setNormalizedSurface("。");
+    token.setPos("補助記号");
+    token.setFeature("補助記号,句点,*,*,*,*");
+    token.setFeatureList(Arrays.asList(token.getFeature().split(",")));
+    chunk.getTokens().add(token);
+    chunks.add(chunk);
 
-        Selector selector = new Selector();
-        selector.open(null);
-        selector.parse(tree);
-    }
+    Selector selector = new Selector();
+    selector.open(null);
+    selector.parse(tree);
+  }
 
-    @Test
-    public void open() throws IOException {
-        String modelFile = param.getString(Param.PARSER_MODEL);
-        SVMModel svmModel = FastSVMModel.openBinaryModel(modelFile);
-        assertNotNull(svmModel);
-    }
+  @Test
+  public void open() throws IOException {
+    String modelFile = param.getString(Param.PARSER_MODEL);
+    SVMModel svmModel = FastSVMModel.openBinaryModel(modelFile);
+    assertNotNull(svmModel);
+  }
 
-    @Test
-    public void parse() throws Exception {
-        assertEquals(6, tree.getChunkSize());
+  @Test
+  public void parse() throws Exception {
+    assertEquals(6, tree.getChunkSize());
 
-        DependencyParser parser = new DependencyParser();
-        parser.open(param);
-        parser.parse(tree);
-        assertEquals(5, tree.chunk(0).getLink());
-        assertEquals(2, tree.chunk(1).getLink());
-        assertEquals(3, tree.chunk(2).getLink());
-        assertEquals(5, tree.chunk(3).getLink());
-        assertEquals(5, tree.chunk(4).getLink());
-        assertEquals(-1, tree.chunk(5).getLink());
-    }
-
+    DependencyParser parser = new DependencyParser();
+    parser.open(param);
+    parser.parse(tree);
+    assertEquals(5, tree.chunk(0).getLink());
+    assertEquals(2, tree.chunk(1).getLink());
+    assertEquals(3, tree.chunk(2).getLink());
+    assertEquals(5, tree.chunk(3).getLink());
+    assertEquals(5, tree.chunk(4).getLink());
+    assertEquals(-1, tree.chunk(5).getLink());
+  }
 }

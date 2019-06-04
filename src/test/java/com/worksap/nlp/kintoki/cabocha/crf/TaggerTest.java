@@ -16,83 +16,80 @@
 
 package com.worksap.nlp.kintoki.cabocha.crf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import com.worksap.nlp.kintoki.cabocha.TestUtils;
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-
-import com.worksap.nlp.kintoki.cabocha.TestUtils;
-
 public class TaggerTest {
 
-    private Tagger tagger;
-    private String modelFileName;
+  private Tagger tagger;
+  private String modelFileName;
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Before
-    public void setUp() throws IOException {
-        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
-        modelFileName = temporaryFolder.getRoot().toPath().resolve("chunk.bccwj.model").toString();
-        tagger = Tagger.openBinaryModel(modelFileName, 1.0);
-    }
+  @Before
+  public void setUp() throws IOException {
+    TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+    modelFileName = temporaryFolder.getRoot().toPath().resolve("chunk.bccwj.model").toString();
+    tagger = Tagger.openBinaryModel(modelFileName, 1.0);
+  }
 
-    @Test
-    public void openBinaryModel() {
-        assertNotNull(tagger);
-    }
+  @Test
+  public void openBinaryModel() {
+    assertNotNull(tagger);
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void openBinaryModelWithNegativeCostFactor() throws IOException {
-        tagger = Tagger.openBinaryModel(modelFileName, -1.0);
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void openBinaryModelWithNegativeCostFactor() throws IOException {
+    tagger = Tagger.openBinaryModel(modelFileName, -1.0);
+  }
 
-    @Test
-    public void add() {
-        tagger.add("太郎", "名詞-固有名詞-人名-名");
-        assertEquals(1, tagger.size());
-        tagger.add("は", "助詞-係助詞");
-        assertEquals(2, tagger.size());
-        tagger.clear();
-        assertEquals(0, tagger.size());
-        tagger.add("太郎", "名詞-固有名詞-人名-名");
-        assertEquals(1, tagger.size());
-    }
+  @Test
+  public void add() {
+    tagger.add("太郎", "名詞-固有名詞-人名-名");
+    assertEquals(1, tagger.size());
+    tagger.add("は", "助詞-係助詞");
+    assertEquals(2, tagger.size());
+    tagger.clear();
+    assertEquals(0, tagger.size());
+    tagger.add("太郎", "名詞-固有名詞-人名-名");
+    assertEquals(1, tagger.size());
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void addWithTooFewColumns() {
-        tagger.add("太郎");
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void addWithTooFewColumns() {
+    tagger.add("太郎");
+  }
 
-    @Test
-    public void parse() {
-        tagger.add("太郎", "名詞-固有名詞-人名-名");
-        tagger.add("は", "助詞-係助詞");
-        tagger.add("花子", "名詞-固有名詞-人名-名");
-        tagger.add("が", "助詞-格助詞");
-        tagger.parse();
+  @Test
+  public void parse() {
+    tagger.add("太郎", "名詞-固有名詞-人名-名");
+    tagger.add("は", "助詞-係助詞");
+    tagger.add("花子", "名詞-固有名詞-人名-名");
+    tagger.add("が", "助詞-格助詞");
+    tagger.parse();
 
-        assertEquals(0, tagger.y(0));
-        assertEquals(1, tagger.y(1));
-        assertEquals(0, tagger.y(2));
-        assertEquals(1, tagger.y(3));
-    }
+    assertEquals(0, tagger.y(0));
+    assertEquals(1, tagger.y(1));
+    assertEquals(0, tagger.y(2));
+    assertEquals(1, tagger.y(3));
+  }
 
-    @Test
-    public void parseWithEmpty() {
-        tagger.parse();
-        assertEquals(0, tagger.size());
-    }
+  @Test
+  public void parseWithEmpty() {
+    tagger.parse();
+    assertEquals(0, tagger.size());
+  }
 
-    @Test
-    public void ynames() {
-        assertEquals("B", tagger.ynames().get(0));
-        assertEquals("I", tagger.ynames().get(1));
-    }
+  @Test
+  public void ynames() {
+    assertEquals("B", tagger.ynames().get(0));
+    assertEquals("I", tagger.ynames().get(1));
+  }
 }

@@ -21,45 +21,45 @@ import java.nio.charset.StandardCharsets;
 
 class DoubleArrayTrie {
 
-    private int[] array;
+  private int[] array;
 
-    DoubleArrayTrie(ByteBuffer array, int byteSize) {
-        int arraySize = byteSize / 4;
-        this.array = new int[arraySize];
-        for (int i = 0; i < arraySize; ++i) {
-            this.array[i] = array.getInt();
-        }
+  DoubleArrayTrie(ByteBuffer array, int byteSize) {
+    int arraySize = byteSize / 4;
+    this.array = new int[arraySize];
+    for (int i = 0; i < arraySize; ++i) {
+      this.array[i] = array.getInt();
     }
+  }
 
-    int exactMatchSearch(String key) {
-        byte[] k = key.getBytes(StandardCharsets.UTF_8);
+  int exactMatchSearch(String key) {
+    byte[] k = key.getBytes(StandardCharsets.UTF_8);
 
-        int result = -1;
-        int b = getBase(0);
-        int p;
+    int result = -1;
+    int b = getBase(0);
+    int p;
 
-        for (int i = 0; i < k.length; ++i) {
-            p = b + Byte.toUnsignedInt(k[i]) + 1;
-            if (b == getCheck(p)) {
-                b = getBase(p);
-            } else {
-                return result;
-            }
-        }
-
-        p = b;
-        int n = getBase(p);
-        if (b == getCheck(p) && n < 0) {
-            result = -n - 1;
-        }
+    for (int i = 0; i < k.length; ++i) {
+      p = b + Byte.toUnsignedInt(k[i]) + 1;
+      if (b == getCheck(p)) {
+        b = getBase(p);
+      } else {
         return result;
+      }
     }
 
-    private int getBase(int i) {
-        return array[i * 2];
+    p = b;
+    int n = getBase(p);
+    if (b == getCheck(p) && n < 0) {
+      result = -n - 1;
     }
+    return result;
+  }
 
-    private int getCheck(int i) {
-        return array[i * 2 + 1];
-    }
+  private int getBase(int i) {
+    return array[i * 2];
+  }
+
+  private int getCheck(int i) {
+    return array[i * 2 + 1];
+  }
 }

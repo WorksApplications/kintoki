@@ -16,51 +16,50 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
-
-import static org.junit.Assert.assertArrayEquals;
-
 public class ChunkerTest {
 
-    private static Param param;
-    private static Analyzer morpher;
-    private static Analyzer chunker;
-    private static Tree tree;
+  private static Param param;
+  private static Analyzer morpher;
+  private static Analyzer chunker;
+  private static Tree tree;
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Before
-    public void setUp() throws IOException {
-        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
+  @Before
+  public void setUp() throws IOException {
+    TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+    String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
 
-        param = new Param();
-        param.loadConfig(configPath);
+    param = new Param();
+    param.loadConfig(configPath);
 
-        morpher = new MorphAnalyzer();
-        morpher.open(param);
+    morpher = new MorphAnalyzer();
+    morpher.open(param);
 
-        chunker = new Chunker();
-        chunker.open(param);
+    chunker = new Chunker();
+    chunker.open(param);
 
-        tree = new Tree();
-    }
+    tree = new Tree();
+  }
 
-    @Test
-    public void parse() {
-        final String sent = "太郎は花子が読んでいる本を次郎に渡した。";
+  @Test
+  public void parse() {
+    final String sent = "太郎は花子が読んでいる本を次郎に渡した。";
 
-        tree.setSentence(sent);
-        morpher.parse(tree);
-        chunker.parse(tree);
+    tree.setSentence(sent);
+    morpher.parse(tree);
+    chunker.parse(tree);
 
-        assertArrayEquals(new String[] { "太郎は", "花子が", "読んでいる", "本を", "次郎に", "渡した。" },
-                TestHelper.getChunkStrings(tree).stream().toArray(String[]::new));
-    }
+    assertArrayEquals(
+        new String[] {"太郎は", "花子が", "読んでいる", "本を", "次郎に", "渡した。"},
+        TestHelper.getChunkStrings(tree).stream().toArray(String[]::new));
+  }
 }

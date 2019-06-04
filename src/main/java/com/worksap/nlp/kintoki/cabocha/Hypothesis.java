@@ -21,52 +21,52 @@ import java.util.List;
 
 public class Hypothesis {
 
-    private List<Integer> head;
-    private List<Double> score;
-    private List<List<Integer>> children;
-    double hscore;
+  private List<Integer> head;
+  private List<Double> score;
+  private List<List<Integer>> children;
+  double hscore;
 
-    public void init(int size) {
-        head = new ArrayList<>();
-        score = new ArrayList<>();
-        children = new ArrayList<>();
-        hscore = 0.0;
-        for (int i = 0; i < size; ++i) {
-            head.add(-1);
-            score.add((double) 0);
-            children.add(new ArrayList<>());
-        }
+  public void init(int size) {
+    head = new ArrayList<>();
+    score = new ArrayList<>();
+    children = new ArrayList<>();
+    hscore = 0.0;
+    for (int i = 0; i < size; ++i) {
+      head.add(-1);
+      score.add((double) 0);
+      children.add(new ArrayList<>());
     }
+  }
 
-    public List<Integer> getHead() {
-        return head;
-    }
+  public List<Integer> getHead() {
+    return head;
+  }
 
-    public void setHead(List<Integer> head) {
-        this.head = head;
-    }
+  public void setHead(List<Integer> head) {
+    this.head = head;
+  }
 
-    public List<Double> getScore() {
-        return score;
-    }
+  public List<Double> getScore() {
+    return score;
+  }
 
-    public void setScore(List<Double> score) {
-        this.score = score;
-    }
+  public void setScore(List<Double> score) {
+    this.score = score;
+  }
 
-    public List<List<Integer>> getChildren() {
-        return children;
-    }
+  public List<List<Integer>> getChildren() {
+    return children;
+  }
 
-    public void setChildren(List<List<Integer>> children) {
-        this.children = children;
-    }
+  public void setChildren(List<List<Integer>> children) {
+    this.children = children;
+  }
 
-    public double getHscore() {
-        return hscore;
-    }
+  public double getHscore() {
+    return hscore;
+  }
 
-    public void setHscore(double hscore) {
-        this.hscore = hscore;
-    }
+  public void setHscore(double hscore) {
+    this.hscore = hscore;
+  }
 }

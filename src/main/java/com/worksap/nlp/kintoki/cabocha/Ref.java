@@ -18,18 +18,17 @@ package com.worksap.nlp.kintoki.cabocha;
 
 public class Ref<T> {
 
-    private T value;
+  private T value;
 
-    public Ref(T value) {
-        this.value = value;
-    }
+  public Ref(T value) {
+    this.value = value;
+  }
 
-    public void set(T value) {
-        this.value = value;
-    }
+  public void set(T value) {
+    this.value = value;
+  }
 
-    public T get() {
-        return this.value;
-    }
-
+  public T get() {
+    return this.value;
+  }
 }

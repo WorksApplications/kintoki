@@ -22,11 +22,11 @@ import org.junit.Test;
 
 public class EastAsianWidthTest {
 
-    @Test
-    public void getEastAsianWidth() {
-        assertEquals(3, EastAsianWidth.getEastAsianWidth("abc"));
-        assertEquals(4, EastAsianWidth.getEastAsianWidth("計ab"));
-        assertEquals(3, EastAsianWidth.getEastAsianWidth("ｶﾀ4"));
-        assertEquals(0, EastAsianWidth.getEastAsianWidth(""));
-    }
+  @Test
+  public void getEastAsianWidth() {
+    assertEquals(3, EastAsianWidth.getEastAsianWidth("abc"));
+    assertEquals(4, EastAsianWidth.getEastAsianWidth("計ab"));
+    assertEquals(3, EastAsianWidth.getEastAsianWidth("ｶﾀ4"));
+    assertEquals(0, EastAsianWidth.getEastAsianWidth(""));
+  }
 }

@@ -28,55 +28,56 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TestUtils {
-    static final String[] RESOURCES = { "/chunk.bccwj.model", "/dep.bccwj.model", "/system.dic", "/sudachi.json",
-            "/input", "/input2" };
+  static final String[] RESOURCES = {
+    "/chunk.bccwj.model", "/dep.bccwj.model", "/system.dic", "/sudachi.json", "/input", "/input2"
+  };
 
-    static final String PROPERTY_FILE = "/cabocharc.properties";
-    static final String REPLACE_DIR = "@@TEST_DIR@@";
-    static final String INPUT_FILE = "/input";
-    static final String INPUT_FILE2 = "/input2";
-    static final String OUTPUT_FILE = "/output";
+  static final String PROPERTY_FILE = "/cabocharc.properties";
+  static final String REPLACE_DIR = "@@TEST_DIR@@";
+  static final String INPUT_FILE = "/input";
+  static final String INPUT_FILE2 = "/input2";
+  static final String OUTPUT_FILE = "/output";
 
-    public static void copyResources(Path folder) throws IOException {
-        for (String file : RESOURCES) {
-            try {
-                URL src = TestUtils.class.getResource(file);
-                Path dest = Paths.get(src.toURI()).getFileName();
-                Files.copy(src.openStream(), folder.resolve(dest));
-            } catch (URISyntaxException e) {
-                throw new IOException(e);
-            }
-        }
+  public static void copyResources(Path folder) throws IOException {
+    for (String file : RESOURCES) {
+      try {
+        URL src = TestUtils.class.getResource(file);
+        Path dest = Paths.get(src.toURI()).getFileName();
+        Files.copy(src.openStream(), folder.resolve(dest));
+      } catch (URISyntaxException e) {
+        throw new IOException(e);
+      }
     }
+  }
 
-    static String buildConfig(Path folder) throws IOException {
-        Path dest = Paths.get(PROPERTY_FILE).getFileName();
-        Path configPath = folder.resolve(dest);
-        String dir = folder.toString();
-        try (InputStream in = TestUtils.class.getResourceAsStream(PROPERTY_FILE + ".in");
-                InputStreamReader r = new InputStreamReader(in);
-                BufferedReader reader = new BufferedReader(r);
-                PrintStream output = new PrintStream(configPath.toFile())) {
-            reader.lines().forEach(l -> output.println(l.replace(REPLACE_DIR, dir)));
-        }
-        return configPath.toString();
+  static String buildConfig(Path folder) throws IOException {
+    Path dest = Paths.get(PROPERTY_FILE).getFileName();
+    Path configPath = folder.resolve(dest);
+    String dir = folder.toString();
+    try (InputStream in = TestUtils.class.getResourceAsStream(PROPERTY_FILE + ".in");
+        InputStreamReader r = new InputStreamReader(in);
+        BufferedReader reader = new BufferedReader(r);
+        PrintStream output = new PrintStream(configPath.toFile())) {
+      reader.lines().forEach(l -> output.println(l.replace(REPLACE_DIR, dir)));
     }
+    return configPath.toString();
+  }
 
-    static String getInput(Path folder) throws IOException {
-        Path dest = Paths.get(INPUT_FILE).getFileName();
-        Path configPath = folder.resolve(dest);
-        return configPath.toString();
-    }
+  static String getInput(Path folder) throws IOException {
+    Path dest = Paths.get(INPUT_FILE).getFileName();
+    Path configPath = folder.resolve(dest);
+    return configPath.toString();
+  }
 
-    static String getInput2(Path folder) throws IOException {
-        Path dest = Paths.get(INPUT_FILE2).getFileName();
-        Path configPath = folder.resolve(dest);
-        return configPath.toString();
-    }
+  static String getInput2(Path folder) throws IOException {
+    Path dest = Paths.get(INPUT_FILE2).getFileName();
+    Path configPath = folder.resolve(dest);
+    return configPath.toString();
+  }
 
-    static String getOutput(Path folder) throws IOException {
-        Path dest = Paths.get(OUTPUT_FILE).getFileName();
-        Path configPath = folder.resolve(dest);
-        return configPath.toString();
-    }
+  static String getOutput(Path folder) throws IOException {
+    Path dest = Paths.get(OUTPUT_FILE).getFileName();
+    Path configPath = folder.resolve(dest);
+    return configPath.toString();
+  }
 }

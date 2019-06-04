@@ -28,150 +28,152 @@ import java.util.stream.Collectors;
 
 public class Tagger {
 
-    private static Map<String, FeatureIndex> featureIndexCache = new HashMap<>();
+  private static Map<String, FeatureIndex> featureIndexCache = new HashMap<>();
 
-    private int ysize;
-    private int featureId;
-    private FeatureIndex featureIndex;
-    private List<List<String>> x;
-    private List<List<Node>> lattice;
-    private List<Integer> result;
-    private List<List<Integer>> featureCache;
+  private int ysize;
+  private int featureId;
+  private FeatureIndex featureIndex;
+  private List<List<String>> x;
+  private List<List<Node>> lattice;
+  private List<Integer> result;
+  private List<List<Integer>> featureCache;
 
-    private Tagger(FeatureIndex featureIndex) {
-        this.featureIndex = featureIndex;
-        ysize = featureIndex.ysize();
-        featureId = 0;
-        x = new ArrayList<>();
-        lattice = new ArrayList<>();
-        result = new ArrayList<>();
-        featureCache = new ArrayList<>();
+  private Tagger(FeatureIndex featureIndex) {
+    this.featureIndex = featureIndex;
+    ysize = featureIndex.ysize();
+    featureId = 0;
+    x = new ArrayList<>();
+    lattice = new ArrayList<>();
+    result = new ArrayList<>();
+    featureCache = new ArrayList<>();
+  }
+
+  public static Tagger openBinaryModel(String path, double costFactor) throws IOException {
+    if (costFactor <= 0.0) {
+      throw new IllegalArgumentException("cost factor must be positive");
+    }
+    FeatureIndex featureIndex;
+    synchronized (featureIndexCache) {
+      featureIndex = featureIndexCache.get(path);
+      if (featureIndex == null) {
+        featureIndex = DecoderFeatureIndex.openBinaryModel(path);
+        featureIndexCache.put(path, featureIndex);
+      }
+    }
+    featureIndex.setCostFactor(costFactor);
+    return new Tagger(featureIndex);
+  }
+
+  private void viterbi() {
+    Optional<Node> best =
+        lattice.get(x.size() - 1).stream()
+            .collect(Collectors.maxBy((a, b) -> Double.compare(a.bestCost, b.bestCost)));
+    if (!best.isPresent()) {
+      throw new IllegalArgumentException("Invalid lattice");
     }
 
-    public static Tagger openBinaryModel(String path, double costFactor) throws IOException {
-        if (costFactor <= 0.0) {
-            throw new IllegalArgumentException("cost factor must be positive");
+    for (Node n = best.get(); n != null; n = n.prev) {
+      result.set(n.x, n.y);
+    }
+  }
+
+  private void buildLattice() {
+    if (x.isEmpty()) {
+      return;
+    }
+
+    featureIndex.rebuildFeatures(this);
+
+    for (int position = 0; position < lattice.size(); position++) {
+      for (Node rNode : lattice.get(position)) {
+        double rNodeCost = featureIndex.calcCost(rNode);
+        if (position == 0) {
+          rNode.bestCost = rNodeCost;
+        } else {
+          connectNodes(position, rNode, rNodeCost);
         }
-        FeatureIndex featureIndex;
-        synchronized (featureIndexCache) {
-            featureIndex = featureIndexCache.get(path);
-            if (featureIndex == null) {
-                featureIndex = DecoderFeatureIndex.openBinaryModel(path);
-                featureIndexCache.put(path, featureIndex);
-            }
-        }
-        featureIndex.setCostFactor(costFactor);
-        return new Tagger(featureIndex);
+      }
     }
+  }
 
-    private void viterbi() {
-        Optional<Node> best = lattice.get(x.size() - 1).stream()
-                .collect(Collectors.maxBy((a, b) -> Double.compare(a.bestCost, b.bestCost)));
-        if (!best.isPresent()) {
-            throw new IllegalArgumentException("Invalid lattice");
-        }
-
-        for (Node n = best.get(); n != null; n = n.prev) {
-            result.set(n.x, n.y);
-        }
+  private void connectNodes(int position, Node rNode, double rNodeCost) {
+    rNode.bestCost = Double.NEGATIVE_INFINITY;
+    for (int ly = 0; ly < ysize; ly++) {
+      Node lNode = node(position - 1, ly);
+      double c = lNode.bestCost + featureIndex.calcPathCost(lNode, rNode) + rNodeCost;
+      if (c > rNode.bestCost) {
+        rNode.bestCost = c;
+        rNode.prev = lNode;
+      }
     }
+  }
 
-    private void buildLattice() {
-        if (x.isEmpty()) {
-            return;
-        }
+  Node node(int i, int j) {
+    return lattice.get(i).get(j);
+  }
 
-        featureIndex.rebuildFeatures(this);
+  void setNode(Node n, int i, int j) {
+    lattice.get(i).set(j, n);
+  }
 
-        for (int position = 0; position < lattice.size(); position++) {
-            for (Node rNode : lattice.get(position)) {
-                double rNodeCost = featureIndex.calcCost(rNode);
-                if (position == 0) {
-                    rNode.bestCost = rNodeCost;
-                } else {
-                    connectNodes(position, rNode, rNodeCost);
-                }
-            }
-        }
+  public void add(String... columns) {
+    int xsize = featureIndex.getXsize();
+    if (columns.length < xsize) {
+      throw new IllegalArgumentException(
+          "# x is small: size=" + columns.length + " xsize=" + xsize);
     }
+    List<String> tmpX = Arrays.asList(columns);
+    x.add(tmpX);
+    result.add(0);
+    List<Node> l = Arrays.asList(new Node[ysize]);
+    lattice.add(l);
+  }
 
-    private void connectNodes(int position, Node rNode, double rNodeCost) {
-        rNode.bestCost = Double.NEGATIVE_INFINITY;
-        for (int ly = 0; ly < ysize; ly++) {
-            Node lNode = node(position - 1, ly);
-            double c = lNode.bestCost + featureIndex.calcPathCost(lNode, rNode) + rNodeCost;
-            if (c > rNode.bestCost) {
-                rNode.bestCost = c;
-                rNode.prev = lNode;
-            }
-        }
+  public void parse() {
+    featureIndex.buildFeatures(this);
+    if (x.isEmpty()) {
+      return;
     }
+    buildLattice();
+    viterbi();
+  }
 
-    Node node(int i, int j) {
-        return lattice.get(i).get(j);
-    }
+  public void clear() {
+    x.clear();
+    lattice.clear();
+    result.clear();
+    featureCache.clear();
+  }
 
-    void setNode(Node n, int i, int j) {
-        lattice.get(i).set(j, n);
-    }
+  int getFeatureId() {
+    return featureId;
+  }
 
-    public void add(String... columns) {
-        int xsize = featureIndex.getXsize();
-        if (columns.length < xsize) {
-            throw new IllegalArgumentException("# x is small: size=" + columns.length + " xsize=" + xsize);
-        }
-        List<String> tmpX = Arrays.asList(columns);
-        x.add(tmpX);
-        result.add(0);
-        List<Node> l = Arrays.asList(new Node[ysize]);
-        lattice.add(l);
-    }
+  void setFeatureId(int featureId) {
+    this.featureId = featureId;
+  }
 
-    public void parse() {
-        featureIndex.buildFeatures(this);
-        if (x.isEmpty()) {
-            return;
-        }
-        buildLattice();
-        viterbi();
-    }
+  List<List<Integer>> getFeatureCache() {
+    return featureCache;
+  }
 
-    public void clear() {
-        x.clear();
-        lattice.clear();
-        result.clear();
-        featureCache.clear();
-    }
+  int size() {
+    return x.size();
+  }
 
-    int getFeatureId() {
-        return featureId;
-    }
+  int xsize() {
+    return featureIndex.getXsize();
+  }
 
-    void setFeatureId(int featureId) {
-        this.featureId = featureId;
-    }
+  public int y(int i) {
+    return result.get(i);
+  }
 
-    List<List<Integer>> getFeatureCache() {
-        return featureCache;
-    }
+  public List<String> ynames() {
+    return Collections.unmodifiableList(featureIndex.getY());
+  }
 
-    int size() {
-        return x.size();
-    }
-
-    int xsize() {
-        return featureIndex.getXsize();
-    }
-
-    public int y(int i) {
-        return result.get(i);
-    }
-
-    public List<String> ynames() {
-        return Collections.unmodifiableList(featureIndex.getY());
-    }
-
-    String x(int i, int j) {
-        return x.get(i).get(j);
-    }
+  String x(int i, int j) {
+    return x.get(i).get(j);
+  }
 }

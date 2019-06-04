@@ -16,81 +16,78 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class SelectorTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private static Param param;
-    private static Analyzer morpher;
-    private static Analyzer chunker;
-    private static Analyzer selecter;
-    private static Tree tree;
+  private static Param param;
+  private static Analyzer morpher;
+  private static Analyzer chunker;
+  private static Analyzer selecter;
+  private static Tree tree;
 
-    @Before
-    public void setUp() throws IOException {
-        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
-        param = new Param();
-        param.loadConfig(configPath);
+  @Before
+  public void setUp() throws IOException {
+    TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+    String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
+    param = new Param();
+    param.loadConfig(configPath);
 
-        morpher = new MorphAnalyzer();
-        morpher.open(param);
+    morpher = new MorphAnalyzer();
+    morpher.open(param);
 
-        chunker = new Chunker();
-        chunker.open(param);
+    chunker = new Chunker();
+    chunker.open(param);
 
-        selecter = new Selector();
-        selecter.open(param);
+    selecter = new Selector();
+    selecter.open(param);
 
-        tree = new Tree();
-    }
+    tree = new Tree();
+  }
 
-    @Test
-    public void parse() {
-        final String sent = "太郎は花子が読んでいる本を次郎に渡した。";
+  @Test
+  public void parse() {
+    final String sent = "太郎は花子が読んでいる本を次郎に渡した。";
 
-        tree.setSentence(sent);
-        morpher.parse(tree);
-        chunker.parse(tree);
-        selecter.parse(tree);
+    tree.setSentence(sent);
+    morpher.parse(tree);
+    chunker.parse(tree);
+    selecter.parse(tree);
 
-        assertNotNull(tree.getChunks());
-        assertEquals(6, tree.getChunkSize());
+    assertNotNull(tree.getChunks());
+    assertEquals(6, tree.getChunkSize());
 
-        Chunk chunk = tree.chunk(0);
-        assertEquals(0, chunk.getHeadPos());
-        assertEquals(1, chunk.getFuncPos());
+    Chunk chunk = tree.chunk(0);
+    assertEquals(0, chunk.getHeadPos());
+    assertEquals(1, chunk.getFuncPos());
 
-        chunk = tree.chunk(1);
-        assertEquals(0, chunk.getHeadPos());
-        assertEquals(1, chunk.getFuncPos());
+    chunk = tree.chunk(1);
+    assertEquals(0, chunk.getHeadPos());
+    assertEquals(1, chunk.getFuncPos());
 
-        chunk = tree.chunk(2);
-        assertEquals(2, chunk.getHeadPos());
-        assertEquals(2, chunk.getFuncPos());
+    chunk = tree.chunk(2);
+    assertEquals(2, chunk.getHeadPos());
+    assertEquals(2, chunk.getFuncPos());
 
-        chunk = tree.chunk(3);
-        assertEquals(0, chunk.getHeadPos());
-        assertEquals(1, chunk.getFuncPos());
+    chunk = tree.chunk(3);
+    assertEquals(0, chunk.getHeadPos());
+    assertEquals(1, chunk.getFuncPos());
 
-        chunk = tree.chunk(4);
-        assertEquals(0, chunk.getHeadPos());
-        assertEquals(1, chunk.getFuncPos());
+    chunk = tree.chunk(4);
+    assertEquals(0, chunk.getHeadPos());
+    assertEquals(1, chunk.getFuncPos());
 
-        chunk = tree.chunk(5);
-        assertEquals(0, chunk.getHeadPos());
-        assertEquals(1, chunk.getFuncPos());
-    }
-
+    chunk = tree.chunk(5);
+    assertEquals(0, chunk.getHeadPos());
+    assertEquals(1, chunk.getFuncPos());
+  }
 }

@@ -21,53 +21,52 @@ import java.util.List;
 
 public class PatternMatcher {
 
-    private boolean matchedResult;
-    private List<String> patterns = new ArrayList<>();
+  private boolean matchedResult;
+  private List<String> patterns = new ArrayList<>();
 
-    public PatternMatcher() {
-        this.matchedResult = true;
+  public PatternMatcher() {
+    this.matchedResult = true;
+  }
+
+  public boolean compile(String pattern) {
+    if (pattern.startsWith("!")) {
+      this.matchedResult = false;
+      pattern = pattern.substring(1);
     }
 
-    public boolean compile(String pattern) {
-        if (pattern.startsWith("!")) {
-            this.matchedResult = false;
-            pattern = pattern.substring(1);
-        }
-
-        if (pattern.length() >= 3 && pattern.startsWith("(") && pattern.endsWith(")")) {
-            pattern = pattern.substring(1, pattern.length() - 1);
-            String[] items = pattern.split("\\|");
-            for (String item : items) {
-                this.patterns.add(item);
-            }
-        } else {
-            this.patterns.add(pattern);
-        }
-
-        return !patterns.isEmpty();
+    if (pattern.length() >= 3 && pattern.startsWith("(") && pattern.endsWith(")")) {
+      pattern = pattern.substring(1, pattern.length() - 1);
+      String[] items = pattern.split("\\|");
+      for (String item : items) {
+        this.patterns.add(item);
+      }
+    } else {
+      this.patterns.add(pattern);
     }
 
-    public boolean match(String str) {
-        for (int i = 0; i < this.patterns.size(); ++i) {
-            if (this.patterns.get(i).equals(str)) {
-                return this.matchedResult;
-            }
-        }
-        return !this.matchedResult;
-    }
+    return !patterns.isEmpty();
+  }
 
-    public boolean prefixMatch(String str) {
-        int len = str.length();
-        for (int i = 0; i < this.patterns.size(); ++i) {
-            String pat = this.patterns.get(i);
-            if (len < pat.length()) {
-                continue;
-            }
-            if (str.startsWith(pat)) {
-                return matchedResult;
-            }
-        }
-        return !this.matchedResult;
+  public boolean match(String str) {
+    for (int i = 0; i < this.patterns.size(); ++i) {
+      if (this.patterns.get(i).equals(str)) {
+        return this.matchedResult;
+      }
     }
+    return !this.matchedResult;
+  }
 
+  public boolean prefixMatch(String str) {
+    int len = str.length();
+    for (int i = 0; i < this.patterns.size(); ++i) {
+      String pat = this.patterns.get(i);
+      if (len < pat.length()) {
+        continue;
+      }
+      if (str.startsWith(pat)) {
+        return matchedResult;
+      }
+    }
+    return !this.matchedResult;
+  }
 }

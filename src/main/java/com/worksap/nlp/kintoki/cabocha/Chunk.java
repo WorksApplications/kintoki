@@ -22,87 +22,87 @@ import java.util.stream.Collectors;
 
 public class Chunk {
 
-    private int link;
-    private int headPos;
-    private int funcPos;
-    private int tokenPos;
-    private List<Token> tokens = new ArrayList<>();
-    private double score;
-    private List<String> featureList = new ArrayList<>();
+  private int link;
+  private int headPos;
+  private int funcPos;
+  private int tokenPos;
+  private List<Token> tokens = new ArrayList<>();
+  private double score;
+  private List<String> featureList = new ArrayList<>();
 
-    public int getLink() {
-        return link;
-    }
+  public int getLink() {
+    return link;
+  }
 
-    public void setLink(int link) {
-        this.link = link;
-    }
+  public void setLink(int link) {
+    this.link = link;
+  }
 
-    public int getHeadPos() {
-        return headPos;
-    }
+  public int getHeadPos() {
+    return headPos;
+  }
 
-    public void setHeadPos(int headPos) {
-        this.headPos = headPos;
-    }
+  public void setHeadPos(int headPos) {
+    this.headPos = headPos;
+  }
 
-    public int getFuncPos() {
-        return funcPos;
-    }
+  public int getFuncPos() {
+    return funcPos;
+  }
 
-    public void setFuncPos(int funcPos) {
-        this.funcPos = funcPos;
-    }
+  public void setFuncPos(int funcPos) {
+    this.funcPos = funcPos;
+  }
 
-    public int getTokenSize() {
-        return tokens.size();
-    }
+  public int getTokenSize() {
+    return tokens.size();
+  }
 
-    public boolean isEmpty() {
-        return tokens.isEmpty();
-    }
+  public boolean isEmpty() {
+    return tokens.isEmpty();
+  }
 
-    public Token token(int index) {
-        return tokens.get(index);
-    }
+  public Token token(int index) {
+    return tokens.get(index);
+  }
 
-    public List<Token> getTokens() {
-        return tokens;
-    }
+  public List<Token> getTokens() {
+    return tokens;
+  }
 
-    public void setTokens(List<Token> tokens) {
-        this.tokens = tokens;
-    }
+  public void setTokens(List<Token> tokens) {
+    this.tokens = tokens;
+  }
 
-    public double getScore() {
-        return score;
-    }
+  public double getScore() {
+    return score;
+  }
 
-    public void setScore(double score) {
-        this.score = score;
-    }
+  public void setScore(double score) {
+    this.score = score;
+  }
 
-    public List<String> getFeatureList() {
-        return featureList;
-    }
+  public List<String> getFeatureList() {
+    return featureList;
+  }
 
-    public void setFeatureList(List<String> featureList) {
-        this.featureList = featureList;
-    }
+  public void setFeatureList(List<String> featureList) {
+    this.featureList = featureList;
+  }
 
-    public int getFeatureListSize() {
-        return this.featureList.size();
-    }
+  public int getFeatureListSize() {
+    return this.featureList.size();
+  }
 
-    public int getTokenPos() {
-        return tokenPos;
-    }
+  public int getTokenPos() {
+    return tokenPos;
+  }
 
-    public void setTokenPos(int tokenPos) {
-        this.tokenPos = tokenPos;
-    }
+  public void setTokenPos(int tokenPos) {
+    this.tokenPos = tokenPos;
+  }
 
-    public String getSurface() {
-        return tokens.stream().map(Token::getSurface).collect(Collectors.joining());
-    }
+  public String getSurface() {
+    return tokens.stream().map(Token::getSurface).collect(Collectors.joining());
+  }
 }

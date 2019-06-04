@@ -18,37 +18,36 @@ package com.worksap.nlp.kintoki.cabocha;
 
 public class Constant {
 
-    private Constant() {
-    }
+  private Constant() {}
 
-    public static final int CABOCHA_FORMAT_TREE = 0;
-    public static final int CABOCHA_FORMAT_LATTICE = 1;
-    public static final int CABOCHA_FORMAT_TREE_LATTICE = 2;
-    public static final int CABOCHA_FORMAT_XML = 3;
-    public static final int CABOCHA_FORMAT_CONLL = 4;
-    public static final int CABOCHA_FORMAT_NONE = 5;
+  public static final int CABOCHA_FORMAT_TREE = 0;
+  public static final int CABOCHA_FORMAT_LATTICE = 1;
+  public static final int CABOCHA_FORMAT_TREE_LATTICE = 2;
+  public static final int CABOCHA_FORMAT_XML = 3;
+  public static final int CABOCHA_FORMAT_CONLL = 4;
+  public static final int CABOCHA_FORMAT_NONE = 5;
 
-    public static final int CABOCHA_INPUT_RAW_SENTENCE = 0;
-    public static final int CABOCHA_INPUT_POS = 1;
-    public static final int CABOCHA_INPUT_CHUNK = 2;
-    public static final int CABOCHA_INPUT_SELECTION = 3;
-    public static final int CABOCHA_INPUT_DEP = 4;
+  public static final int CABOCHA_INPUT_RAW_SENTENCE = 0;
+  public static final int CABOCHA_INPUT_POS = 1;
+  public static final int CABOCHA_INPUT_CHUNK = 2;
+  public static final int CABOCHA_INPUT_SELECTION = 3;
+  public static final int CABOCHA_INPUT_DEP = 4;
 
-    public static final int CABOCHA_OUTPUT_RAW_SENTENCE = 0;
-    public static final int CABOCHA_OUTPUT_POS = 1;
-    public static final int CABOCHA_OUTPUT_CHUNK = 2;
-    public static final int CABOCHA_OUTPUT_SELECTION = 3;
-    public static final int CABOCHA_OUTPUT_DEP = 4;
+  public static final int CABOCHA_OUTPUT_RAW_SENTENCE = 0;
+  public static final int CABOCHA_OUTPUT_POS = 1;
+  public static final int CABOCHA_OUTPUT_CHUNK = 2;
+  public static final int CABOCHA_OUTPUT_SELECTION = 3;
+  public static final int CABOCHA_OUTPUT_DEP = 4;
 
-    public static final int CABOCHA_MAX_LINE_SIZE = 8192;
+  public static final int CABOCHA_MAX_LINE_SIZE = 8192;
 
-    public static final int MODEL_VERSION = 100;
+  public static final int MODEL_VERSION = 100;
 
-    public static final String CABOCHA_DEFAULT_POSSET = "UNIDIC";
-    public static final String CABOCHA_DEFAULT_CHARSET = "UTF-8";
+  public static final String CABOCHA_DEFAULT_POSSET = "UNIDIC";
+  public static final String CABOCHA_DEFAULT_CHARSET = "UTF-8";
 
-    public static final String COPYRIGHT = "Kintoki-CaboCha\nCopyright(C) Works Applications, All rights reserved.\n";
-    public static final String VERSION = "0.2.0";
-    public static final String PACKAGE = "Kintoki-CaboCha";
-
+  public static final String COPYRIGHT =
+      "Kintoki-CaboCha\nCopyright(C) Works Applications, All rights reserved.\n";
+  public static final String VERSION = "0.2.0";
+  public static final String PACKAGE = "Kintoki-CaboCha";
 }

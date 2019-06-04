@@ -25,34 +25,32 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class ByteUtil
-{
-    private static final ByteOrder ORDER = ByteOrder.LITTLE_ENDIAN;
+public class ByteUtil {
+  private static final ByteOrder ORDER = ByteOrder.LITTLE_ENDIAN;
 
-    private ByteUtil() {}
+  private ByteUtil() {}
 
-    public static ByteBuffer readAsByteBuffer(String path) throws IOException {
-        try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(path))) {
-            int size = (int)channel.size();
-            ByteBuffer bytes = ByteBuffer.allocate(size);
-            channel.read(bytes);
-            bytes.order(ORDER);
-            bytes.flip();
-            return bytes;
-        }
+  public static ByteBuffer readAsByteBuffer(String path) throws IOException {
+    try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(path))) {
+      int size = (int) channel.size();
+      ByteBuffer bytes = ByteBuffer.allocate(size);
+      channel.read(bytes);
+      bytes.order(ORDER);
+      bytes.flip();
+      return bytes;
     }
+  }
 
-    public static String getString(ByteBuffer bytes, int byteSize, Charset charset) {
-        byte[] array = new byte[byteSize];
-        bytes.get(array);
-        return new String(array, charset);
-    }
+  public static String getString(ByteBuffer bytes, int byteSize, Charset charset) {
+    byte[] array = new byte[byteSize];
+    bytes.get(array);
+    return new String(array, charset);
+  }
 
-    public static IntBuffer getIntBuffer(ByteBuffer bytes, int byteSize) {
-        ByteBuffer newBytes = bytes.slice();
-        newBytes.order(bytes.order());
-        bytes.position(bytes.position() + byteSize);
-        return newBytes.asIntBuffer();
-    }
-
+  public static IntBuffer getIntBuffer(ByteBuffer bytes, int byteSize) {
+    ByteBuffer newBytes = bytes.slice();
+    newBytes.order(bytes.order());
+    bytes.position(bytes.position() + byteSize);
+    return newBytes.asIntBuffer();
+  }
 }

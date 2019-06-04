@@ -22,35 +22,34 @@ import com.worksap.nlp.sudachi.DictionaryFactory;
 import com.worksap.nlp.sudachi.Morpheme;
 import com.worksap.nlp.sudachi.Tokenizer;
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 public class SudachiTokenizer {
 
-    private static Dictionary dictionary;
-    private Tokenizer tokenizer;
+  private static Dictionary dictionary;
+  private Tokenizer tokenizer;
 
-    private SudachiTokenizer() {
-        tokenizer = dictionary.create();
-    }
+  private SudachiTokenizer() {
+    tokenizer = dictionary.create();
+  }
 
-    private static synchronized void load(String dictPath) throws IOException {
-        if (dictionary == null) {
-            dictionary = new DictionaryFactory().create(dictPath, null);
-        }
+  private static synchronized void load(String dictPath) throws IOException {
+    if (dictionary == null) {
+      dictionary = new DictionaryFactory().create(dictPath, null);
     }
+  }
 
-    public static SudachiTokenizer getInstance(String dictPath) throws IOException {
-        load(dictPath);
-        return new SudachiTokenizer();
-    }
+  public static SudachiTokenizer getInstance(String dictPath) throws IOException {
+    load(dictPath);
+    return new SudachiTokenizer();
+  }
 
-    public List<Morpheme> parse(String text) {
-        if (!Utils.check((text))) {
-            return Collections.emptyList();
-        }
-        return tokenizer.tokenize(SplitMode.A, text);
+  public List<Morpheme> parse(String text) {
+    if (!Utils.check((text))) {
+      return Collections.emptyList();
     }
+    return tokenizer.tokenize(SplitMode.A, text);
+  }
 }

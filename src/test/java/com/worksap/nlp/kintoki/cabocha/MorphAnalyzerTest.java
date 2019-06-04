@@ -16,53 +16,54 @@
 
 package com.worksap.nlp.kintoki.cabocha;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import java.io.IOException;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class MorphAnalyzerTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private static Param param;
-    private static Analyzer morpher;
-    private static Tree tree;
+  private static Param param;
+  private static Analyzer morpher;
+  private static Tree tree;
 
-    @Before
-    public void setUp() throws IOException {
-        TestUtils.copyResources(temporaryFolder.getRoot().toPath());
-        String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
+  @Before
+  public void setUp() throws IOException {
+    TestUtils.copyResources(temporaryFolder.getRoot().toPath());
+    String configPath = TestUtils.buildConfig(temporaryFolder.getRoot().toPath());
 
-        param = new Param();
-        param.loadConfig(configPath);
+    param = new Param();
+    param.loadConfig(configPath);
 
-        morpher = new MorphAnalyzer();
-        morpher.open(param);
+    morpher = new MorphAnalyzer();
+    morpher.open(param);
 
-        tree = new Tree();
-    }
+    tree = new Tree();
+  }
 
-    @Test
-    public void parse() {
-        final String sent = "太郎は花子が読んでいる本を次郎に渡した。";
+  @Test
+  public void parse() {
+    final String sent = "太郎は花子が読んでいる本を次郎に渡した。";
 
-        tree.setSentence(sent);
-        morpher.parse(tree);
+    tree.setSentence(sent);
+    morpher.parse(tree);
 
-        assertArrayEquals(new String[] { "太郎", "は", "花子", "が", "読ん", "で", "いる", "本", "を", "次郎", "に", "渡し", "た", "。" },
-                tree.getTokens().stream().map(t -> t.getSurface()).toArray(String[]::new));
-    }
+    assertArrayEquals(
+        new String[] {"太郎", "は", "花子", "が", "読ん", "で", "いる", "本", "を", "次郎", "に", "渡し", "た", "。"},
+        tree.getTokens().stream().map(t -> t.getSurface()).toArray(String[]::new));
+  }
 
-    @Test
-    public void parseWithEmpty() {
-        tree.setSentence("");
-        morpher.parse(tree);
+  @Test
+  public void parseWithEmpty() {
+    tree.setSentence("");
+    morpher.parse(tree);
 
-        assertEquals(0, tree.getTokenSize());
-    }
+    assertEquals(0, tree.getTokenSize());
+  }
 }

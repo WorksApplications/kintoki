@@ -20,7 +20,7 @@ import java.util.List;
 
 public interface SVMModel {
 
-    int id(String key);
+  int id(String key);
 
-    double classify(List<Integer> x);
+  double classify(List<Integer> x);
 }

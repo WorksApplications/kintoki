@@ -18,10 +18,9 @@ package com.worksap.nlp.kintoki.cabocha.util;
 
 public class Utils {
 
-    private Utils() {
-    }
+  private Utils() {}
 
-    public static boolean check(String str) {
-        return str != null && !str.trim().isEmpty();
-    }
+  public static boolean check(String str) {
+    return str != null && !str.trim().isEmpty();
+  }
 }

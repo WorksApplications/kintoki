@@ -18,57 +18,58 @@ package com.worksap.nlp.kintoki.cabocha;
 
 public class Option {
 
-    private String name;
-    private char shortName;
-    private Object defaultValue;
-    private String argDescription;
-    private String description;
+  private String name;
+  private char shortName;
+  private Object defaultValue;
+  private String argDescription;
+  private String description;
 
-    public Option(String name, char shortName, Object defaultValue, String argDescription, String description) {
-        this.name = name;
-        this.shortName = shortName;
-        this.defaultValue = defaultValue;
-        this.argDescription = argDescription;
-        this.description = description;
-    }
+  public Option(
+      String name, char shortName, Object defaultValue, String argDescription, String description) {
+    this.name = name;
+    this.shortName = shortName;
+    this.defaultValue = defaultValue;
+    this.argDescription = argDescription;
+    this.description = description;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public char getShortName() {
-        return shortName;
-    }
+  public char getShortName() {
+    return shortName;
+  }
 
-    public void setShortName(char shortName) {
-        this.shortName = shortName;
-    }
+  public void setShortName(char shortName) {
+    this.shortName = shortName;
+  }
 
-    public Object getDefaultValue() {
-        return defaultValue;
-    }
+  public Object getDefaultValue() {
+    return defaultValue;
+  }
 
-    public void setDefaultValue(Object defaultValue) {
-        this.defaultValue = defaultValue;
-    }
+  public void setDefaultValue(Object defaultValue) {
+    this.defaultValue = defaultValue;
+  }
 
-    public String getArgDescription() {
-        return argDescription;
-    }
+  public String getArgDescription() {
+    return argDescription;
+  }
 
-    public void setArgDescription(String argDescription) {
-        this.argDescription = argDescription;
-    }
+  public void setArgDescription(String argDescription) {
+    this.argDescription = argDescription;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 }

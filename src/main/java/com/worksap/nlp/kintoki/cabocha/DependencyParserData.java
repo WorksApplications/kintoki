@@ -21,24 +21,23 @@ import java.util.List;
 
 public class DependencyParserData {
 
-    private List<ChunkInfo> chunkInfo = new ArrayList<>();
-    private List<Integer> fp = new ArrayList<>();
-    private Hypothesis hypothesis = new Hypothesis();
+  private List<ChunkInfo> chunkInfo = new ArrayList<>();
+  private List<Integer> fp = new ArrayList<>();
+  private Hypothesis hypothesis = new Hypothesis();
 
-    public List<ChunkInfo> getChunkInfo() {
-        return chunkInfo;
-    }
+  public List<ChunkInfo> getChunkInfo() {
+    return chunkInfo;
+  }
 
-    public List<Integer> getFp() {
-        return fp;
-    }
+  public List<Integer> getFp() {
+    return fp;
+  }
 
-    public ChunkInfo chunkInfo(int index) {
-        return this.chunkInfo.get(index);
-    }
+  public ChunkInfo chunkInfo(int index) {
+    return this.chunkInfo.get(index);
+  }
 
-    public Hypothesis getHypothesis() {
-        return hypothesis;
-    }
-
+  public Hypothesis getHypothesis() {
+    return hypothesis;
+  }
 }
