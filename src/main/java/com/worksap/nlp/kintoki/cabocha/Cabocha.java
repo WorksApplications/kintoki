@@ -20,6 +20,7 @@ import com.worksap.nlp.kintoki.cabocha.util.Utils;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -151,9 +152,6 @@ public class Cabocha {
      */
     public static void parse(String[] args) throws IOException {
         Param param = buildParam(args);
-        if (param == null) {
-            return;
-        }
         Parser parser = new Parser(param);
         parser.open();
 
@@ -208,11 +206,12 @@ public class Cabocha {
     }
 
     private static Param buildParam(String[] args) throws IOException {
-        Param param = new Param();
-        param.open(args, longOptions);
+        Param param = Param.open(args, longOptions);
 
-        if (param.helpVersion()) {
-            return null;
+        String help = helpVersion(param);
+        if (help != null) {
+            System.out.println(help);
+            System.exit(0);
         }
 
         Param newParam = new Param();
@@ -230,6 +229,17 @@ public class Cabocha {
         }
 
         return newParam;
+    }
+
+    static String helpVersion(Param param) {
+        if (Utils.check(param.getString("help"))) {
+            String systemName = System.getProperty("java.home") + "/bin/java -jar "
+                    + new File(Param.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+            return Option.buildHelpMessage(longOptions, systemName);
+        } else if (Utils.check(param.getString("version"))) {
+            return Constant.PACKAGE + " of " + Constant.VERSION;
+        }
+        return null;
     }
 
     public static void main(String[] args) throws IOException {

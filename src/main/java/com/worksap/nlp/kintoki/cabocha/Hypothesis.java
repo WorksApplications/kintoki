@@ -33,7 +33,7 @@ public class Hypothesis {
         hscore = 0.0;
         for (int i = 0; i < size; ++i) {
             head.add(-1);
-            score.add((double) 0);
+            score.add(0.0);
             children.add(new ArrayList<>());
         }
     }

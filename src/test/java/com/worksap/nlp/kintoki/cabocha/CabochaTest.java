@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CabochaTest {
 
@@ -493,5 +494,16 @@ public class CabochaTest {
     public void testMainWithInvalidInputFile() throws IOException {
         String[] args = { "foo", "-r", configPath, "-o", outputFile, "-I0", "-O4", "-f2" };
         Cabocha.main(args);
+    }
+
+    @Test
+    public void helpVersion() {
+        Param param = new Param();
+        param.set("help", "1");
+        assertTrue(Cabocha.helpVersion(param).contains(Constant.COPYRIGHT));
+
+        param = new Param();
+        param.set("version", "1");
+        assertTrue(Cabocha.helpVersion(param).contains(Constant.VERSION));
     }
 }

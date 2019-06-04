@@ -18,16 +18,13 @@ package com.worksap.nlp.kintoki.cabocha;
 
 import org.junit.Test;
 
-import java.io.File;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
 public class ParamTest {
 
-    final static String systemName = System.getProperty("java.home") + "/bin/java -jar "
-            + new File(Param.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
-    final static String version = Constant.PACKAGE + " of " + Constant.VERSION + "\n";
+    final static String systemName = "test";
     final static String help = "Kintoki-CaboCha\n"
             + "Copyright(C) Works Applications, All rights reserved.\n"
             + "\n"
@@ -54,23 +51,15 @@ public class ParamTest {
             + " -d, --sudachi-dict=DIR    use DIR as sudachi dictionary directory\n"
             + " -o, --output=FILE         use FILE as output file\n"
             + " -v, --version             show the version and exit\n"
-            + " -h, --help                show this help and exit\n\n";
+            + " -h, --help                show this help and exit\n";
 
     @Test
-    public void initParam() {
-        Param param = new Param();
-        param.setSystemName(systemName);
-        assertNull(param.getHelp());
-        assertNull(param.getVersion());
-
-        param.initParam(Cabocha.longOptions);
-
-        assertEquals(help, param.getHelp());
-        assertEquals(version, param.getVersion());
+    public void help() {
+        assertEquals(help, Option.buildHelpMessage(Cabocha.longOptions, systemName));
     }
 
+    @Test
     public void open() {
-        Param param = new Param();
         String dep = "dep.bccwj.model";
         String chunk = "chunk.bccwj.model";
         String rc = "cabocharc.properties";
@@ -83,7 +72,7 @@ public class ParamTest {
                 "--version", "--help" };
 
         args1 = Stream.of(args1, input).flatMap(Stream::of).toArray(String[]::new);
-        param.open(args1, Cabocha.longOptions);
+        Param param = Param.open(args1, Cabocha.longOptions);
 
         assertEquals(1, param.getInt(Param.INPUT_LAYER));
         assertEquals(3, param.getInt(Param.OUTPUT_LAYER));
@@ -94,12 +83,11 @@ public class ParamTest {
         assertEquals(rc, param.getString(Param.RC_FILE));
         assertEquals(output, param.getString(Param.OUTPUT));
         assertArrayEquals(input, param.getRest().toArray());
-        assertEquals("1", param.getString(Param.HELP));
-        assertEquals("1", param.getString(Param.VERSION));
+        assertEquals("1", param.getString("help"));
+        assertEquals("1", param.getString("version"));
 
-        param = new Param();
         args2 = Stream.of(args2, input).flatMap(Stream::of).toArray(String[]::new);
-        param.open(args2, Cabocha.longOptions);
+        param = Param.open(args2, Cabocha.longOptions);
 
         assertEquals(1, param.getInt(Param.INPUT_LAYER));
         assertEquals(3, param.getInt(Param.OUTPUT_LAYER));
@@ -110,13 +98,12 @@ public class ParamTest {
         assertEquals(rc, param.getString(Param.RC_FILE));
         assertEquals(output, param.getString(Param.OUTPUT));
         assertArrayEquals(input, param.getRest().toArray());
-        assertEquals("1", param.getString(Param.HELP));
-        assertEquals("1", param.getString(Param.VERSION));
+        assertEquals("1", param.getString("help"));
+        assertEquals("1", param.getString("version"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalArgumentTest() {
-        Param param = new Param();
         String dep = "dep.bccwj.model";
         String chunk = "chunk.bccwj.model";
         String rc = "cabocharc.properties";
@@ -124,7 +111,7 @@ public class ParamTest {
         String output = "output_file";
         String[] args = { "--I1", "-O3", "-f2", "-m", dep, "-M", chunk, "-d", dic, "-r", rc, "-o", output, "-v", "-h" };
 
-        param.open(args, Cabocha.longOptions);
+        Param.open(args, Cabocha.longOptions);
     }
 
     @Test
