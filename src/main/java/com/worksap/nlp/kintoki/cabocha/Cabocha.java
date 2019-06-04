@@ -151,6 +151,9 @@ public class Cabocha {
      */
     public static void parse(String[] args) throws IOException {
         Param param = buildParam(args);
+        if (param == null) {
+            return;
+        }
         Parser parser = new Parser(param);
         parser.open();
 
