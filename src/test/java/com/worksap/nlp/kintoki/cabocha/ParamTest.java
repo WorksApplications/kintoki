@@ -128,4 +128,20 @@ public class ParamTest {
 
                 param.open(args, Cabocha.longOptions);
         }
+
+        @Test
+        public void geString() {
+                Param param = new Param();
+                param.set(Param.OUTPUT, "foo");
+                assertEquals("foo", param.getString(Param.OUTPUT));
+                assertEquals(null, param.getString("Foo"));
+        }
+
+        @Test
+        public void getInt() {
+                Param param = new Param();
+                param.set(Param.INPUT_LAYER, 1);
+                assertEquals(1, param.getInt(Param.INPUT_LAYER));
+                assertEquals(0, param.getInt("Foo"));
+        }
 }

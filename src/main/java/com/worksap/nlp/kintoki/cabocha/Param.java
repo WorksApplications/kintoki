@@ -59,15 +59,21 @@ public class Param {
     }
 
     public String getString(String key) {
-        return (String) conf.get(key);
+        Object value = conf.get(key);
+        if (value != null && value instanceof String) {
+            return (String) value;
+        } else {
+            return null;
+        }
     }
 
     public int getInt(String key) {
-        return (Integer) conf.get(key);
-    }
-
-    public double getDouble(String key) {
-        return (Double) conf.get(key);
+        Object value = conf.get(key);
+        if (value != null && value instanceof Integer) {
+            return (Integer) value;
+        } else {
+            return 0;
+        }
     }
 
     public void set(String key, Object value) {
