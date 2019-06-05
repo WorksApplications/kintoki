@@ -139,6 +139,9 @@
         <version>1.23.0</version>
         <configuration>
           <java>
+            <eclipse>
+              <file>${basedir}/.formatter/eclipse-formatter.xml</file>
+            </eclipse>
             <removeUnusedImports/>
             <licenseHeader>
               <file>${basedir}/.formatter/license-header</file>
