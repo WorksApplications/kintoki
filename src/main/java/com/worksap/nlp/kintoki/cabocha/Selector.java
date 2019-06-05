@@ -25,9 +25,18 @@ import java.util.Map;
 
 public class Selector implements Analyzer {
 
-    private PatternMatcher patKutouten, patOpenBracket, patCloseBracket;
-    private PatternMatcher patDynA, patCase;
-    private PatternMatcher patUnidicFunc, patUnidicHead, patUnidicFunc2, patUnidicHead2, patUnidicHeadPre;
+    private PatternMatcher patKutouten;
+    private PatternMatcher patOpenBracket;
+    private PatternMatcher patCloseBracket;
+
+    private PatternMatcher patDynA;
+    private PatternMatcher patCase;
+
+    private PatternMatcher patUnidicFunc;
+    private PatternMatcher patUnidicHead;
+    private PatternMatcher patUnidicFunc2;
+    private PatternMatcher patUnidicHead2;
+    private PatternMatcher patUnidicHeadPre;
 
     public Selector() {
         super();
