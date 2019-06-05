@@ -141,7 +141,7 @@
           <java>
             <removeUnusedImports/>
             <licenseHeader>
-              <file>${basedir}/.license-header</file>
+              <file>${basedir}/.formatter/license-header</file>
             </licenseHeader>
           </java>
         </configuration>
