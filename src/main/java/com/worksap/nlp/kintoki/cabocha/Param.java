@@ -42,11 +42,11 @@ public class Param {
     public static final String RC_FILE = "rcfile";
     public static final String OUTPUT = "output";
 
-    static final Pattern LONG_OPTION_PATTERN = Pattern.compile("(--)(\\S+?)(?:=(\\S+))?");
-    static final Pattern SHORT_OPTION_PATTERN = Pattern.compile("(-)(\\S)(\\S+)?");
+    static final Pattern LONG_OPTION_PATTERN = Pattern.compile("--(\\S+?)(?:=(\\S+))?");
+    static final Pattern SHORT_OPTION_PATTERN = Pattern.compile("-([\\S&&[^-]])(\\S+)?");
 
-    private static List<String> keyList = Arrays.asList(
-            new String[] { INPUT_LAYER, OUTPUT_LAYER, PARSER_MODEL, CHUNKER_MODEL, SUDACHI_DICT, OUTPUT_FORMAT });
+    private static List<String> keyList = Arrays.asList(INPUT_LAYER, OUTPUT_LAYER, PARSER_MODEL, CHUNKER_MODEL,
+            SUDACHI_DICT, OUTPUT_FORMAT);
 
     private Map<String, Object> conf = new HashMap<>();
     private List<String> rest = new ArrayList<>();
@@ -114,45 +114,45 @@ public class Param {
     static Param open(String[] args, Option[] options) {
         Param param = new Param();
 
-        if (args.length == 0) {
-            return param; // this is not error
-        }
-
-        for (Option opt : options) {
-            if (opt.getDefaultValue() != null) {
-                param.set(opt.getName(), opt.getDefaultValue());
-            }
-        }
+        Stream.of(options).filter(o -> o.getDefaultValue() != null)
+                .forEach(o -> param.set(o.getName(), o.getDefaultValue()));
 
         Iterator<String> iterator = Stream.of(args).iterator();
         while (iterator.hasNext()) {
             String arg = iterator.next();
-            Matcher matcher;
-            if ((matcher = LONG_OPTION_PATTERN.matcher(arg)).matches()
-                    || (matcher = SHORT_OPTION_PATTERN.matcher(arg)).matches()) {
-                boolean isShort = matcher.group(1).equals("-");
-                String name = matcher.group(2);
-                String value = matcher.group(3);
-                Option option = getOption(options, name, isShort, arg);
-                if (option.getArgDescription() != null) {
-                    if (value == null) {
-                        if (!iterator.hasNext()) {
-                            throw new IllegalArgumentException("`" + arg + "` requires an argument");
-                        }
-                        value = iterator.next();
-                    }
-                    param.set(option.getName(), value);
-                } else {
-                    if (value != null) {
-                        throw new IllegalArgumentException("`" + arg + "` doesn't allow an argument");
-                    }
-                    param.set(option.getName(), "1");
-                }
-            } else {
+            if (!parseOption(arg, param, iterator, options, true)
+                    && !parseOption(arg, param, iterator, options, false)) {
                 param.rest.add(arg);
             }
         }
         return param;
+    }
+
+    private static boolean parseOption(String arg, Param param, Iterator<String> args, Option[] options,
+            boolean isShort) {
+        Pattern optionPattern = isShort ? SHORT_OPTION_PATTERN : LONG_OPTION_PATTERN;
+        Matcher matcher = optionPattern.matcher(arg);
+        if (!matcher.matches()) {
+            return false;
+        }
+        String name = matcher.group(1);
+        String value = matcher.group(2);
+        Option option = getOption(options, name, isShort, arg);
+        if (option.getArgDescription() != null) {
+            if (value == null) {
+                if (!args.hasNext()) {
+                    throw new IllegalArgumentException("`" + arg + "` requires an argument");
+                }
+                value = args.next();
+            }
+            param.set(option.getName(), value);
+        } else {
+            if (value != null) {
+                throw new IllegalArgumentException("`" + arg + "` doesn't allow an argument");
+            }
+            param.set(option.getName(), "1");
+        }
+        return true;
     }
 
     private static Option getOption(Option[] options, String name, boolean isShort, String arg) {
