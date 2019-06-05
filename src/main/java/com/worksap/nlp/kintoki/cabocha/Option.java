@@ -28,7 +28,7 @@ public class Option {
 
     public Option(String name, char shortName, Object defaultValue, String argDescription, String description) {
         this.name = name;
-        this.shortName = new String(new char[] { shortName});
+        this.shortName = new String(new char[] { shortName });
         this.defaultValue = defaultValue;
         this.argDescription = argDescription;
         this.description = description;
@@ -49,6 +49,7 @@ public class Option {
     public String getArgDescription() {
         return argDescription;
     }
+
     public String getDescription() {
         return description;
     }

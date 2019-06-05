@@ -31,8 +31,9 @@ public class Parser {
     /**
      * Create a new instance of Parser class.
      *
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
+     * @throws IOException
+     *             IOexception will be thrown when error occurs in reading files
+     *             (such as model file, resource file)
      */
     public Parser() throws IOException {
         this.param = new Param();
@@ -43,9 +44,11 @@ public class Parser {
     /**
      * Create a new instance of Parser class.
      *
-     * @param config the path of configuration file
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
+     * @param config
+     *            the path of configuration file
+     * @throws IOException
+     *             IOexception will be thrown when error occurs in reading files
+     *             (such as model file, resource file)
      */
     public Parser(String config) throws IOException {
         this.param = new Param();
@@ -56,7 +59,8 @@ public class Parser {
     /**
      * Create a new instance of Parser class.
      *
-     * @param param parameters required in parsing
+     * @param param
+     *            parameters required in parsing
      */
     public Parser(Param param) {
         this.param = param;
@@ -129,8 +133,9 @@ public class Parser {
     /**
      * Initialization for parser, which should be called before parsing.
      *
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
+     * @throws IOException
+     *             IOexception will be thrown when error occurs in reading files
+     *             (such as model file, resource file)
      */
     public void open() throws IOException {
         switch (this.inputLayer) {
@@ -232,7 +237,8 @@ public class Parser {
     /**
      * Parse a given sentence.
      *
-     * @param tree the sentence tree to be parsed
+     * @param tree
+     *            the sentence tree to be parsed
      * @return a tree object will be returned if the parsing is success, otherwise
      *         return null
      */
@@ -247,7 +253,8 @@ public class Parser {
     /**
      * Parse a given sentence.
      *
-     * @param text the sentence to be parsed
+     * @param text
+     *            the sentence to be parsed
      * @return a tree object will be returned
      */
     public Tree parse(String text) {
@@ -265,7 +272,8 @@ public class Parser {
     /**
      * Parse a given sentence.
      *
-     * @param sent the sentence to be parsed
+     * @param sent
+     *            the sentence to be parsed
      * @return a string will be returned if the parsing is success, otherwise return
      *         null
      */

@@ -23,7 +23,8 @@ import java.util.Properties;
 
 public class PropertyUtil {
 
-    private PropertyUtil() {}
+    private PropertyUtil() {
+    }
 
     public static boolean getPatterns(Map<String, String> patterns) throws IOException {
         Properties prop = new Properties();

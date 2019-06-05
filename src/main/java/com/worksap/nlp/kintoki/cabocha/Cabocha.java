@@ -87,7 +87,8 @@ public class Cabocha {
     /**
      * Create a new instance of Cabocha class.
      *
-     * @param config the path of configuration file
+     * @param config
+     *            the path of configuration file
      */
     public Cabocha(String config) throws IOException {
         parser = new Parser(config);
@@ -97,7 +98,8 @@ public class Cabocha {
     /**
      * Create a new instance of Cabocha class.
      *
-     * @param param configuration parameters
+     * @param param
+     *            configuration parameters
      */
     public Cabocha(Param param) throws IOException {
         parser = new Parser(param);
@@ -107,11 +109,13 @@ public class Cabocha {
     /**
      * Parse a given sentence.
      *
-     * @param sent the sentence to be parsed
+     * @param sent
+     *            the sentence to be parsed
      * @return a tree object will be returned if the parsing is success, otherwise
      *         return null
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
+     * @throws IOException
+     *             IOexception will be thrown when error occurs in reading files
+     *             (such as model file, resource file)
      */
     public Tree parse(String sent) throws IOException {
         return parser.parse(sent);
@@ -120,11 +124,13 @@ public class Cabocha {
     /**
      * Parse a given sentence tree.
      *
-     * @param sent the sentence tree to be parsed
+     * @param sent
+     *            the sentence tree to be parsed
      * @return a tree object will be returned if the parsing is success, otherwise
      *         return null
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
+     * @throws IOException
+     *             IOexception will be thrown when error occurs in reading files
+     *             (such as model file, resource file)
      */
     public Tree parse(Tree sent) throws IOException {
         return parser.parse(sent);
@@ -133,10 +139,12 @@ public class Cabocha {
     /**
      * Parse a given sentence.
      *
-     * @param sent the sentence to be parsed
+     * @param sent
+     *            the sentence to be parsed
      * @return the result of parsing in LATTICE format will be returned
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
+     * @throws IOException
+     *             IOexception will be thrown when error occurs in reading files
+     *             (such as model file, resource file)
      */
     public String parseToString(String sent) throws IOException {
         Tree tree = parser.parse(sent);
@@ -146,9 +154,11 @@ public class Cabocha {
     /**
      * Parse from command line.
      *
-     * @param args command line arguments
-     * @throws IOException IOexception will be thrown when error occurs in reading
-     *                     files (such as model file, resource file)
+     * @param args
+     *            command line arguments
+     * @throws IOException
+     *             IOexception will be thrown when error occurs in reading files
+     *             (such as model file, resource file)
      */
     public static void parse(String[] args) throws IOException {
         Param param = buildParam(args);
@@ -171,8 +181,11 @@ public class Cabocha {
         }
 
     }
-    private static void run(Parser parser, int inputLayer, InputStream input, FileStdoutStream output) throws IOException {
-        try (InputStreamReader inputReader = new InputStreamReader(input); BufferedReader reader = new BufferedReader(inputReader)) {
+
+    private static void run(Parser parser, int inputLayer, InputStream input, FileStdoutStream output)
+            throws IOException {
+        try (InputStreamReader inputReader = new InputStreamReader(input);
+                BufferedReader reader = new BufferedReader(inputReader)) {
             String sentence = null;
             while ((sentence = readSentence(reader, inputLayer)) != null) {
                 output.print(parser.parseToString(sentence));
@@ -194,7 +207,8 @@ public class Cabocha {
                 }
                 sb.append(line).append('\n');
                 if (++lineNum > Constant.CABOCHA_MAX_LINE_SIZE) {
-                    throw new IllegalArgumentException("too long line #line must be <= " + Constant.CABOCHA_MAX_LINE_SIZE);
+                    throw new IllegalArgumentException(
+                            "too long line #line must be <= " + Constant.CABOCHA_MAX_LINE_SIZE);
                 }
             }
             if (sb.length() != 0) {

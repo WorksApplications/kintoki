@@ -25,15 +25,15 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class ByteUtil
-{
+public class ByteUtil {
     private static final ByteOrder ORDER = ByteOrder.LITTLE_ENDIAN;
 
-    private ByteUtil() {}
+    private ByteUtil() {
+    }
 
     public static ByteBuffer readAsByteBuffer(String path) throws IOException {
         try (SeekableByteChannel channel = Files.newByteChannel(Paths.get(path))) {
-            int size = (int)channel.size();
+            int size = (int) channel.size();
             ByteBuffer bytes = ByteBuffer.allocate(size);
             channel.read(bytes);
             bytes.order(ORDER);
