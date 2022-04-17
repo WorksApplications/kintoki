@@ -1,6 +1,5 @@
 # Kintoki
 
-[![Build Status](https://travis-ci.com/WorksApplications/kintoki.svg?branch=develop)](https://travis-ci.com/WorksApplications/kintoki)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.worksap.nlp%3Akintoki&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.worksap.nlp%3Akintoki)
 
 Kintoki is a dependency parser library.
