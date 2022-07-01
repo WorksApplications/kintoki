@@ -1,0 +1,51 @@
+name: Build
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  checks: write # for SonarQube
+  contents: read # for SonarQube
+  statuses: read # for SonarQube
+  pull-requests: read # for SonarQube
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [11, 17]
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: temurin
+        cache: gradle
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+    - name: Build and check
+      run: ./gradlew --no-daemon --info --stacktrace build jacocoTestReport
+    - name: Analyze with sonarqube
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      if: matrix.java-version == 11 && env.SONAR_TOKEN != ''
+      run: ./gradlew --no-daemon --info --stacktrace sonarqube -Dsonar.verbose=true -Dsonar.login=$SONAR_TOKEN
+    - uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: reports (${{ matrix.java-version }})
+        path: build/reports
+    - name: Build javadoc
+      run: ./gradlew --no-daemon --info javadoc  
