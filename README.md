@@ -1,5 +1,6 @@
 # Kintoki
 
+[![Build](https://github.com/WorksApplications/kintoki/actions/workflows/build.yml/badge.svg)](https://github.com/WorksApplications/kintoki/actions/workflows/build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.worksap.nlp%3Akintoki&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.worksap.nlp%3Akintoki)
 
 Kintoki is a dependency parser library.
