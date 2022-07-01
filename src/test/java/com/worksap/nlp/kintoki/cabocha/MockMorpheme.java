@@ -83,6 +83,10 @@ class MockMorpheme implements Morpheme {
         return 0;
     }
 
+    public int[] getSynonymGroupIds() {
+        return new int[0];
+    }
+
     static List<Morpheme> getExampleList() {
         List<Morpheme> morphemes = new ArrayList<>();
 

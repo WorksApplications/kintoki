@@ -95,32 +95,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>
-        <executions>
-          <execution>
-            <id>build-sudachi-dict-for-test</id>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <phase>process-test-resources</phase>
-            <configuration>
-              <mainClass>com.worksap.nlp.sudachi.dictionary.DictionaryBuilder</mainClass>
-              <arguments>
-                <argument>-o</argument>
-                <argument>${project.build.testOutputDirectory}/system.dic</argument>
-                <argument>-m</argument>
-                <argument>${test.dict.source.directory}/sudachi_matrix.def</argument>
-                <argument>-d</argument>
-                <argument>Sudachi dictionary for the unit tests</argument>
-                <argument>${test.dict.source.directory}/sudachi_dict.csv</argument>
-              </arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.0.2</version>
@@ -165,7 +139,7 @@
     <dependency>
       <groupId>com.worksap.nlp</groupId>
       <artifactId>sudachi</artifactId>
-      <version>0.2.0</version>
+      <version>0.6.2</version>
     </dependency>
     <dependency>
       <groupId>com.worksap.nlp</groupId>
@@ -175,7 +149,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.2</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
