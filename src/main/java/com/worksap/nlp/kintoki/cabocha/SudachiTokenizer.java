@@ -17,13 +17,16 @@
 package com.worksap.nlp.kintoki.cabocha;
 
 import com.worksap.nlp.kintoki.cabocha.util.Utils;
+import com.worksap.nlp.sudachi.Config;
 import com.worksap.nlp.sudachi.Dictionary;
 import com.worksap.nlp.sudachi.DictionaryFactory;
 import com.worksap.nlp.sudachi.Morpheme;
+import com.worksap.nlp.sudachi.PathAnchor;
 import com.worksap.nlp.sudachi.Tokenizer;
 import com.worksap.nlp.sudachi.Tokenizer.SplitMode;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +41,9 @@ public class SudachiTokenizer {
 
     private static synchronized void load(String dictPath) throws IOException {
         if (dictionary == null) {
-            dictionary = new DictionaryFactory().create(dictPath, null);
+            PathAnchor anchor = PathAnchor.filesystem(Paths.get(dictPath)).andThen(PathAnchor.classpath());
+            Config config = Config.defaultConfig(anchor);
+            dictionary = new DictionaryFactory().create(config);
         }
     }
 

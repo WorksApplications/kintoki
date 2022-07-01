@@ -26,10 +26,13 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
+import com.worksap.nlp.sudachi.dictionary.build.DicBuilder;
 
 public class TestUtils {
-    static final String[] RESOURCES = { "/chunk.bccwj.model", "/dep.bccwj.model", "/system.dic", "/sudachi.json",
-            "/input", "/input2" };
+    static final String[] RESOURCES = { "/chunk.bccwj.model", "/dep.bccwj.model", "/sudachi.json", "/input",
+            "/input2" };
 
     static final String PROPERTY_FILE = "/cabocharc.properties";
     static final String REPLACE_DIR = "@@TEST_DIR@@";
@@ -47,6 +50,15 @@ public class TestUtils {
                 throw new IOException(e);
             }
         }
+        buildSudachiDict(folder);
+    }
+
+    static void buildSudachiDict(Path path) throws IOException {
+        InputStream matrixDef = TestUtils.class.getResourceAsStream("/sudachi_matrix.def");
+        InputStream lexicon = TestUtils.class.getResourceAsStream("/sudachi_dict.csv");
+        DicBuilder.System builder = DicBuilder.system().matrix(matrixDef).lexicon(lexicon);
+        builder.build(Files.newByteChannel(path.resolve("system.dic"), StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
     }
 
     static String buildConfig(Path folder) throws IOException {

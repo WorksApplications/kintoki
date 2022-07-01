@@ -15,13 +15,13 @@ This library includes followings:
 
 
 # Setting
-This library uses Sudachi as morphological analyzer, and provide models for Chunking and Parsing separately. 
+This library uses Sudachi as morphological analyzer, and provide models for Chunking and Parsing separately.
 The directories for dictionary of Sudachi, Chunking and Parsing models need to be configured before using the library.
-There are two ways to set these configurations: 
+There are two ways to set these configurations:
 
-- Configure in `cabocharc.properties`. 
+- Configure in `cabocharc.properties`.
 
-The following directories should be changed to real development environment. 
+The following directories should be changed to real development environment.
 
 ```
 # Parser model file name
@@ -34,7 +34,7 @@ chunker-model = chunk.bccwj.model
 sudachi-dict = ./
 ```
 
-About the configuration file, the `cabocharc.properties` file under the resources folder is used by default. 
+About the configuration file, the `cabocharc.properties` file under the resources folder is used by default.
 You can also specify the directory of configuration file when creating a new instance of `Cabocha` or `Parser` class.
 
 ```
@@ -45,8 +45,8 @@ Tree tree = cabocha.parse(sent);
 ```
 
 # Usage of APIs
-The `Cabocha` class provide APIs for CLI use and `Parser` class provide APIs for library use. 
-You can reference the interfaces as you need from external. 
+The `Cabocha` class provide APIs for CLI use and `Parser` class provide APIs for library use.
+You can reference the interfaces as you need from external.
 
 ## APIs provided by `Cabocha` class
 
@@ -169,7 +169,7 @@ public String parseToString(String sent) throws IOException {...}
 ```
 ## Example
 
-- An exmaple of calling `public Cabocha()` API of `Cabocha` class: 
+- An exmaple of calling `public Cabocha()` API of `Cabocha` class:
 
 ```
 public class example {
@@ -199,7 +199,7 @@ public class example {
 }
 ```
 
-- An exmaple of calling `public Parser(Param param)` API of `Parser` class: 
+- An exmaple of calling `public Parser(Param param)` API of `Parser` class:
 
 ```
 public class example {
@@ -242,7 +242,7 @@ public class example {
 
 
 # Command Line Tool
-Beside the APIs, we also provide a command line tool for terminal use. 
+Beside the APIs, we also provide a command line tool for terminal use.
 
 - Packaging
 
@@ -281,13 +281,13 @@ $ mvn package
 ```
 
 ## Usage
-As mentioned in `Setting` section, the configuration file should be set before using this tool. 
+As mentioned in `Setting` section, the configuration file should be set before using this tool.
 For command line tool, you can also use following options to set the parsing configuration:
 
 * use `-r` option to specify the path of configuration file, ex. `-r cabocharc.properties`.
 * use `-d` option to specify the path of dictionary for Sudachi, ex. `-d ./`.
-* use `-m` option to specify the path of parser model, ex. `-m dep.bccwj.model`. 
-* use `-M` option to specify the path of chunker model, ex. `-M chunk.bccwj.model`. 
+* use `-m` option to specify the path of parser model, ex. `-m dep.bccwj.model`.
+* use `-M` option to specify the path of chunker model, ex. `-M chunk.bccwj.model`.
 
 ### Parse from terminal input
 
@@ -323,7 +323,7 @@ EOS
 
 
 ```
-java -jar kintoki-0.1.1-SNAPSHOT-jar-with-dependencies.jar -I0 -O4 -f1 -r cabocharc.properties input_file 
+java -jar kintoki-0.1.1-SNAPSHOT-jar-with-dependencies.jar -I0 -O4 -f1 -r cabocharc.properties input_file
 ```
 - Input:
 
@@ -456,11 +456,11 @@ EOS
 ```
 
 # Models
-We provide two models, `chunk.bccwj.model` and `dep.bccwj.model` for Chunking and Parsing. We use BCCWJ-DepPara [1]  (without PA register) to generate training data for the model, you can also use you own dataset to train models for Kintoki. 
+We provide two models, `chunk.bccwj.model` and `dep.bccwj.model` for Chunking and Parsing. We use BCCWJ-DepPara [1]  (without PA register) to generate training data for the model, you can also use you own dataset to train models for Kintoki.
 
 - Training model
 
-We use C++ version of CaboCha (0.69) to train models for Kintoki. For the detail of training model, please refer to https://taku910.github.io/cabocha/ . Kintoki use `UNIDIC` as defalult pos set and `UTF8` as default character set, so it is necessary to keep the same settings when training a new model for kintoki. Models that are trained by the C++ version of CaboCha with the `UNIDIC / UTF8 ` setting can be used by Kintoki. 
+We use C++ version of CaboCha (0.69) to train models for Kintoki. For the detail of training model, please refer to https://taku910.github.io/cabocha/ . Kintoki use `UNIDIC` as defalult pos set and `UTF8` as default character set, so it is necessary to keep the same settings when training a new model for kintoki. Models that are trained by the C++ version of CaboCha with the `UNIDIC / UTF8 ` setting can be used by Kintoki.
 
 
 # Licenses
